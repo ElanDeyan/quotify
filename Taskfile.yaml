@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  clean-get:
+    cmds:
+      - flutter clean
+      - flutter pub get
