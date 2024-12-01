@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   go_router: ^14.6.1
+  pub_semver: ^2.1.4
 
 dev_dependencies:
   dependency_validator: ^4.1.1
