@@ -1,7 +1,7 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quotify/features/theme/logic/models/primary_colors.dart';
-import 'package:quotify/features/theme/logic/models/primary_colors_errors.dart';
+import 'package:quotify/features/primary_colors/logic/models/primary_colors.dart';
+import 'package:quotify/features/primary_colors/logic/models/primary_colors_errors.dart';
 import 'package:quotify/utils/result.dart';
 
 Iterable<String> _generateWrongPrimaryColorStringRepresentation() sync* {

@@ -4,12 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// A service for the [SharedPreferencesAsync].
 final class SharedPreferencesAsyncService {
   /// Constructor for the [SharedPreferencesAsyncService] class.
-  /// It takes a parameter [sharedPreferencesAsync] of type
-  /// [SharedPreferencesAsync].
-  const SharedPreferencesAsyncService(this.sharedPreferencesAsync);
+  /// It takes a parameter of type [SharedPreferencesAsync].
+  const SharedPreferencesAsyncService(this._sharedPreferencesAsync);
 
   /// This variable will hold an instance of the [SharedPreferencesAsync] class.
-  final SharedPreferencesAsync sharedPreferencesAsync;
+  final SharedPreferencesAsync _sharedPreferencesAsync;
 
   /// This variable is used for logging messages related to the
   /// [SharedPreferencesAsyncService] class.
@@ -24,7 +23,7 @@ final class SharedPreferencesAsyncService {
   ///   [key] ([String]): The [key] parameter is a string that represents the
   /// [key] to check for existence in the shared preferences.
   Future<bool> containsKey(String key) =>
-      sharedPreferencesAsync.containsKey(key);
+      _sharedPreferencesAsync.containsKey(key);
 
   /// Sets a string value in shared preferences asynchronously.
   ///
@@ -36,7 +35,7 @@ final class SharedPreferencesAsyncService {
   ///   [value] ([String]): The value parameter is a string that you want
   ///   to store in the shared preferences with the corresponding [key].
   Future<void> setString(String key, String value) =>
-      sharedPreferencesAsync.setString(key, value);
+      _sharedPreferencesAsync.setString(key, value);
 
   /// Retrieves a [String] value associated with a given [key] from shared
   /// preferences asynchronously.
@@ -45,5 +44,5 @@ final class SharedPreferencesAsyncService {
   ///   [key] ([String]): The [key] parameter is a unique identifier used
   /// to retrieve a specific value from the shared preferences.
   Future<String?> getString(String key) =>
-      sharedPreferencesAsync.getString(key);
+      _sharedPreferencesAsync.getString(key);
 }

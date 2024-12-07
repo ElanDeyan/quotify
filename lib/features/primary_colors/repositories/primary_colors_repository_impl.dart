@@ -68,20 +68,20 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   }
 
   @override
-  FutureResult<bool> savePrimaryColor(PrimaryColors primaryColor) async {
+  FutureResult<void> savePrimaryColor(PrimaryColors primaryColor) async {
     try {
       await sharedPreferencesAsyncService.setString(
         PrimaryColorsRepository.primaryColorKey,
         primaryColor.name,
       );
-      return const Result.ok(true);
+      return const Result.ok(null);
     } catch (error, stackTrace) {
       _log.warning(
         'Failed in save $primaryColor',
         error,
         stackTrace,
       );
-      return Result<bool>.failure(
+      return Result<void>.failure(
         PrimaryColorsRepositoryErrors.failAtSaving,
         stackTrace,
       );

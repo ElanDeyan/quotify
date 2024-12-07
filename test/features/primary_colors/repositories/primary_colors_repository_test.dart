@@ -4,15 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quotify/features/core/services/notifier.dart';
 import 'package:quotify/features/core/services/shared_preferences_async_service.dart';
-import 'package:quotify/features/theme/logic/models/primary_colors.dart';
-import 'package:quotify/features/theme/repositories/primary_colors_repository.dart';
-import 'package:quotify/features/theme/repositories/primary_colors_repository_errors.dart';
-import 'package:quotify/features/theme/repositories/primary_colors_repository_impl.dart';
+import 'package:quotify/features/primary_colors/logic/models/primary_colors.dart';
+import 'package:quotify/features/primary_colors/repositories/primary_colors_repository.dart';
+import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_errors.dart';
+import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_impl.dart';
 import 'package:quotify/utils/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final class MockSharedPreferencesAsync extends Mock
-    implements SharedPreferencesAsync {}
+import '../../../core/mock_shared_preferences_async.dart';
 
 void main() {
   const colorsValues = PrimaryColors.values;
@@ -227,8 +226,7 @@ void main() {
         final result =
             await colorsRepository.savePrimaryColor(randomColorSample);
 
-        expect(result, isA<Ok<bool>>());
-        expect(result.asOk.value, isTrue);
+        expect(result, isA<Ok<void>>());
 
         verify(
           () => sharedPreferencesAsync.setString(
@@ -253,7 +251,7 @@ void main() {
           () async {
             final result =
                 await colorsRepository.savePrimaryColor(randomColorSample);
-            expect(result, isA<Failure<bool>>());
+            expect(result, isA<Failure<void>>());
             expect(
               result.asFailure.failure,
               equals(PrimaryColorsRepositoryErrors.failAtSaving),

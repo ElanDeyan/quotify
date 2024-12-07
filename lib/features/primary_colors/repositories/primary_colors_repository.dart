@@ -14,5 +14,5 @@ abstract interface class PrimaryColorsRepository {
   FutureResult<PrimaryColors> fetchPrimaryColor();
 
   /// Defines a method for saving the [PrimaryColors] data.
-  FutureResult<bool> savePrimaryColor(PrimaryColors primaryColor);
+  FutureResult<void> savePrimaryColor(PrimaryColors primaryColor);
 }
