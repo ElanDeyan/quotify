@@ -30,18 +30,15 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   final Notifier notifier;
 
   /// Loads default values if they are missing asynchronously.
-  Future<void> initialize() => _loadDefaultIfMissing();
+  Future<void> initialize() => _setDefaultIfMissing();
 
-  Future<void> _loadDefaultIfMissing() async {
+  Future<void> _setDefaultIfMissing() async {
     if (await sharedPreferencesAsyncService
         .containsKey(PrimaryColorsRepository.primaryColorKey)) {
       return;
     }
 
-    await sharedPreferencesAsyncService.setString(
-      PrimaryColorsRepository.primaryColorKey,
-      PrimaryColors.defaultColor.name,
-    );
+    await savePrimaryColor(PrimaryColors.defaultColor);
   }
 
   @override
