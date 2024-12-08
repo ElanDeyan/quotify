@@ -1,112 +1,103 @@
-import 'dart:math';
-
+import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quotify/features/core/services/notifier.dart';
 import 'package:quotify/features/core/services/shared_preferences_async_service.dart';
 import 'package:quotify/features/primary_colors/logic/models/primary_colors.dart';
+import 'package:quotify/features/primary_colors/logic/models/primary_colors_errors.dart';
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository.dart';
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_errors.dart';
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_impl.dart';
 import 'package:quotify/utils/result.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/mock_shared_preferences_async.dart';
 
+//* Read this test to have a better test with InMemory.
+//* https://github.com/flutter/packages/blob/main/packages/shared_preferences/shared_preferences/test/shared_preferences_async_test.dart
+
 void main() {
-  const colorsValues = PrimaryColors.values;
-
-  final randomColorSample =
-      colorsValues.elementAt(Random().nextInt(colorsValues.length));
-
-  final nonDefaultColors = [...PrimaryColors.values]
-    ..removeWhere((color) => color == PrimaryColors.defaultColor);
-
-  final randomNonDefaultColorSample =
-      nonDefaultColors.elementAt(Random().nextInt(nonDefaultColors.length));
-
-  late PrimaryColorsRepository colorsRepository;
-  late SharedPreferencesAsync sharedPreferencesAsync;
-
+  TestWidgetsFlutterBinding.ensureInitialized();
+  late SharedPreferencesAsyncService sharedPreferencesAsyncService;
+  late PrimaryColorsRepository primaryColorsRepository;
   setUp(() {
-    sharedPreferencesAsync = MockSharedPreferencesAsync();
-    colorsRepository = PrimaryColorsRepositoryImpl(
-      SharedPreferencesAsyncService(sharedPreferencesAsync),
+    sharedPreferencesAsyncService =
+        SharedPreferencesAsyncService(MockSharedPreferencesAsync());
+    primaryColorsRepository = PrimaryColorsRepositoryImpl(
+      sharedPreferencesAsyncService,
       notifier: notifier,
     );
   });
 
   group('initialize', () {
-    group('when missing key', () {
-      setUp(() {
-        sharedPreferencesAsync = MockSharedPreferencesAsync();
-        colorsRepository = PrimaryColorsRepositoryImpl(
-          SharedPreferencesAsyncService(sharedPreferencesAsync),
-          notifier: notifier,
-        );
+    test('when does not have an existent value, sets defaultColor', () async {
+      when(
+        () => sharedPreferencesAsyncService
+            .containsKey(PrimaryColorsRepository.primaryColorKey),
+      ).thenAnswer((_) async => false);
+      when(
+        () => sharedPreferencesAsyncService.setString(
+          PrimaryColorsRepository.primaryColorKey,
+          PrimaryColors.defaultColor.name,
+        ),
+      ).thenAnswer((_) async {});
 
-        when(
-          () => sharedPreferencesAsync
-              .containsKey(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => false);
-        when(
-          () => sharedPreferencesAsync.setString(
-            PrimaryColorsRepository.primaryColorKey,
-            PrimaryColors.defaultColor.name,
-          ),
-        ).thenAnswer((_) async {});
-      });
+      await primaryColorsRepository.initialize();
 
-      test('set PrimaryColors.defaultColor', () async {
-        await (colorsRepository as PrimaryColorsRepositoryImpl).initialize();
+      verify(
+        () => sharedPreferencesAsyncService
+            .containsKey(PrimaryColorsRepository.primaryColorKey),
+      ).called(1);
 
-        verifyNever(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        );
-      });
+      verify(
+        () => sharedPreferencesAsyncService.setString(
+          PrimaryColorsRepository.primaryColorKey,
+          PrimaryColors.defaultColor.name,
+        ),
+      ).called(1);
     });
 
-    group('when already have a default value', () {
-      setUp(() {
-        sharedPreferencesAsync = MockSharedPreferencesAsync();
-        colorsRepository = PrimaryColorsRepositoryImpl(
-          SharedPreferencesAsyncService(sharedPreferencesAsync),
-          notifier: notifier,
-        );
+    test('when have an existent value, not changes', () async {
+      when(
+        () => sharedPreferencesAsyncService
+            .containsKey(PrimaryColorsRepository.primaryColorKey),
+      ).thenAnswer((_) async => true);
 
-        when(
-          () => sharedPreferencesAsync
-              .containsKey(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => true);
-      });
-      test('not set PrimaryColors.default', () async {
-        await (colorsRepository as PrimaryColorsRepositoryImpl).initialize();
+      await primaryColorsRepository.initialize();
 
-        verifyNever(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        );
-        verifyNever(
-          () => sharedPreferencesAsync.setString(
-            PrimaryColorsRepository.primaryColorKey,
-            PrimaryColors.defaultColor.name,
-          ),
-        );
-      });
+      verify(
+        () => sharedPreferencesAsyncService
+            .containsKey(PrimaryColorsRepository.primaryColorKey),
+      ).called(1);
+
+      verifyNever(
+        () => sharedPreferencesAsyncService.setString(
+          PrimaryColorsRepository.primaryColorKey,
+          PrimaryColors.defaultColor.name,
+        ),
+      );
     });
   });
 
   group('fetchPrimaryColor', () {
-    group('without call initialize', () {
-      test('should return PrimaryColorsRepositoryErrors.missing', () async {
-        verifyNever(() => sharedPreferencesAsync.setString(any(), any()));
+    tearDown(() {
+      verifyNever(
+        () => sharedPreferencesAsyncService.setString(
+          PrimaryColorsRepository.primaryColorKey,
+          any(),
+        ),
+      );
+    });
+    test(
+      'without an already existent value should return a '
+      'Failure with PrimaryColorRepositoryErrors.missing',
+      () async {
         when(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => null);
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).thenAnswer((_) async => false);
 
-        final result = await colorsRepository.fetchPrimaryColor();
+        final result = await primaryColorsRepository.fetchPrimaryColor();
 
         expect(result, isA<Failure<PrimaryColors>>());
         expect(
@@ -114,217 +105,168 @@ void main() {
           equals(PrimaryColorsRepositoryErrors.missing),
         );
 
-        verifyNever(() => sharedPreferencesAsync.setString(any(), any()));
-      });
-    });
-    group('after calling initialize', () {
-      setUp(() async {
-        sharedPreferencesAsync = MockSharedPreferencesAsync();
-        colorsRepository = PrimaryColorsRepositoryImpl(
-          SharedPreferencesAsyncService(sharedPreferencesAsync),
-          notifier: notifier,
+        verify(
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).called(1);
+
+        verifyNever(
+          () => sharedPreferencesAsyncService.getString(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        );
+      },
+    );
+
+    test(
+      'with an existent value, should return Ok with the PrimaryColor',
+      () async {
+        const sample = PrimaryColors.coolBlush;
+
+        when(
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).thenAnswer((_) async => true);
+        when(
+          () => sharedPreferencesAsyncService.getString(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).thenAnswer((_) async => sample.name);
+
+        final result = await primaryColorsRepository.fetchPrimaryColor();
+
+        expect(result, isA<Ok<PrimaryColors>>());
+        expect(result.asOk.value, equals(sample));
+
+        verify(
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).called(1);
+        verify(
+          () => sharedPreferencesAsyncService.getString(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).called(1);
+      },
+    );
+    test(
+      'with an invalid existent value, should return Failure '
+      'with the PrimaryColorsErrors.invalidStringRepresentation',
+      () async {
+        final sample = faker.lorem.word();
+
+        assert(
+          !PrimaryColors.values.map((color) => color.name).contains(sample),
+          'Should be an invalid name for this test',
         );
 
         when(
-          () => sharedPreferencesAsync
-              .containsKey(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => false);
-
-        when(
-          () => sharedPreferencesAsync.setString(
+          () => sharedPreferencesAsyncService.containsKey(
             PrimaryColorsRepository.primaryColorKey,
-            PrimaryColors.defaultColor.name,
           ),
-        ).thenAnswer((_) async {});
-
-        await (colorsRepository as PrimaryColorsRepositoryImpl).initialize();
-
-        verify(
-          () => sharedPreferencesAsync.setString(
+        ).thenAnswer((_) async => true);
+        when(
+          () => sharedPreferencesAsyncService.getString(
             PrimaryColorsRepository.primaryColorKey,
-            PrimaryColors.defaultColor.name,
           ),
-        ).called(1);
-      });
+        ).thenAnswer((_) async => sample);
 
-      test('should return PrimaryColors.default', () async {
-        when(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => PrimaryColors.defaultColor.name);
-
-        final result = await colorsRepository.fetchPrimaryColor();
-
-        expect(result, isA<Ok<PrimaryColors>>());
-        expect(result.asOk.value, equals(PrimaryColors.defaultColor));
-      });
-    });
-
-    group('after setting some value', () {
-      setUp(() {
-        when(
-          () => sharedPreferencesAsync.setString(
-            PrimaryColorsRepository.primaryColorKey,
-            randomColorSample.name,
-          ),
-        ).thenAnswer((_) async {});
-
-        when(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => randomColorSample.name);
-      });
-
-      test('should return the equivalent PrimaryColors', () async {
-        final result = await colorsRepository.fetchPrimaryColor();
-
-        expect(result, isA<Ok<PrimaryColors>>());
-        expect(result.asOk.value, equals(randomColorSample));
-      });
-    });
-    group('after some unexpected error', () {
-      setUp(() {
-        when(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        ).thenThrow(Exception('ooops...'));
-      });
-      test('should return PrimaryColorsRepositoryErrors.unknown', () async {
-        final result = await colorsRepository.fetchPrimaryColor();
+        final result = await primaryColorsRepository.fetchPrimaryColor();
 
         expect(result, isA<Failure<PrimaryColors>>());
         expect(
           result.asFailure.failure,
-          equals(PrimaryColorsRepositoryErrors.unknown),
+          equals(PrimaryColorsErrors.invalidStringRepresentation),
         );
-      });
-    });
+
+        verify(
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).called(1);
+        verify(
+          () => sharedPreferencesAsyncService.getString(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        ).called(1);
+      },
+    );
   });
 
-  group('savePrimaryColor', () {
-    group('without existing value', () {
-      setUp(() {
-        sharedPreferencesAsync = MockSharedPreferencesAsync();
-        colorsRepository = PrimaryColorsRepositoryImpl(
-          SharedPreferencesAsyncService(sharedPreferencesAsync),
-          notifier: notifier,
-        );
-
+  group('saveThemeBrightness', () {
+    group('whatever it has an already value or not', () {
+      test('should write the desired value', () async {
+        const sample = PrimaryColors.icyLilac;
         when(
-          () => sharedPreferencesAsync
-              .getString(PrimaryColorsRepository.primaryColorKey),
-        ).thenAnswer((_) async => null);
-
-        when(
-          () => sharedPreferencesAsync.setString(
+          () => sharedPreferencesAsyncService.setString(
             PrimaryColorsRepository.primaryColorKey,
-            randomColorSample.name,
+            sample.name,
           ),
         ).thenAnswer((_) async {});
-      });
-      test('should write desired value', () async {
-        final result =
-            await colorsRepository.savePrimaryColor(randomColorSample);
+
+        final result = await primaryColorsRepository.savePrimaryColor(sample);
 
         expect(result, isA<Ok<void>>());
 
         verify(
-          () => sharedPreferencesAsync.setString(
+          () => sharedPreferencesAsyncService.setString(
             PrimaryColorsRepository.primaryColorKey,
-            randomColorSample.name,
+            sample.name,
           ),
         ).called(1);
-      });
 
-      group('and occurs an error when writing', () {
-        setUp(() {
-          when(
-            () => sharedPreferencesAsync.setString(
-              PrimaryColorsRepository.primaryColorKey,
-              any(),
-            ),
-          ).thenThrow(Exception('ops!'));
-        });
-        test(
-          'should return a failure with '
-          'PrimaryColorsRepositoryErrors.failAtSave',
-          () async {
-            final result =
-                await colorsRepository.savePrimaryColor(randomColorSample);
-            expect(result, isA<Failure<void>>());
-            expect(
-              result.asFailure.failure,
-              equals(PrimaryColorsRepositoryErrors.failAtSaving),
-            );
-          },
+        verifyNever(
+          () => sharedPreferencesAsyncService.containsKey(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
+        );
+        verifyNever(
+          () => sharedPreferencesAsyncService.getString(
+            PrimaryColorsRepository.primaryColorKey,
+          ),
         );
       });
     });
-    // group('with existing value', () {
-    //   setUp(() async {
-    //     sharedPreferencesAsync = MockSharedPreferencesAsync();
-    //     colorsRepository = PrimaryColorsRepositoryImpl(
-    //       SharedPreferencesAsyncService(sharedPreferencesAsync),
-    //       notifier: notifier,
-    //     );
+    group('if something went wrong on saving', () {
+      test(
+        'should return a Failure with '
+        'PrimaryColorsRepositoryErrors.failAtSaving',
+        () async {
+          const sample = PrimaryColors.powderBlue;
 
-    //     when(
-    //       () => sharedPreferencesAsync
-    //           .containsKey(PrimaryColorsRepository.primaryColorKey),
-    //     ).thenAnswer((_) async => false);
+          when(
+            () => sharedPreferencesAsyncService.setString(
+              PrimaryColorsRepository.primaryColorKey,
+              any(),
+            ),
+          ).thenThrow(Exception('oops'));
 
-    //     when(
-    //       () => sharedPreferencesAsync.setString(
-    //         PrimaryColorsRepository.primaryColorKey,
-    //         any(),
-    //       ),
-    //     ).thenAnswer((_) async {});
+          final result = await primaryColorsRepository.savePrimaryColor(sample);
 
-    //     // sets a default value
-    //     await (colorsRepository as PrimaryColorsRepositoryImpl).initialize();
-    //     when(
-    //       () => sharedPreferencesAsync
-    //           .getString(PrimaryColorsRepository.primaryColorKey),
-    //     ).thenAnswer((_) async => randomColorSample.name);
-    //   });
-    //   test('should write desired value', () async {
-    //     final result =
-    //         await colorsRepository.savePrimaryColor(randomColorSample);
+          expect(result, isA<Failure<void>>());
 
-    //     expect(result, isA<Ok<bool>>());
-    //     expect(result.asOk.value, isTrue);
+          verify(
+            () => sharedPreferencesAsyncService.setString(
+              PrimaryColorsRepository.primaryColorKey,
+              sample.name,
+            ),
+          ).called(1);
 
-    //     verify(
-    //       () => sharedPreferencesAsync.setString(
-    //         PrimaryColorsRepository.primaryColorKey,
-    //         randomColorSample.name,
-    //       ),
-    //     ).called(1);
-    //   });
-
-    //   group('and occurs an error when writing', () {
-    //     setUp(() {
-    //       when(
-    //         () => sharedPreferencesAsync.setString(
-    //           PrimaryColorsRepository.primaryColorKey,
-    //           any(),
-    //         ),
-    //       ).thenThrow(Exception('ops!'));
-    //     });
-    //     test(
-    //       'should return a failure with '
-    //       'PrimaryColorsRepositoryErrors.failAtSave',
-    //       () async {
-    //         final result =
-    //             await colorsRepository.savePrimaryColor(randomColorSample);
-    //         expect(result, isA<Failure<bool>>());
-    //         expect(
-    //           result.asFailure.failure,
-    //           equals(PrimaryColorsRepositoryErrors.failAtSaving),
-    //         );
-    //       },
-    //     );
-    //   });
-    // });
+          verifyNever(
+            () => sharedPreferencesAsyncService.containsKey(
+              PrimaryColorsRepository.primaryColorKey,
+            ),
+          );
+          verifyNever(
+            () => sharedPreferencesAsyncService.getString(
+              PrimaryColorsRepository.primaryColorKey,
+            ),
+          );
+        },
+      );
+    });
   });
 }

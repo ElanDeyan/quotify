@@ -15,25 +15,26 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   /// You must call [initialize] to ensure that you will have a default value
   /// if missing.
   PrimaryColorsRepositoryImpl(
-    this.sharedPreferencesAsyncService, {
-    required this.notifier,
-  });
+    this._sharedPreferencesAsyncService, {
+    required Notifier notifier,
+  }) : _notifier = notifier;
 
   final _log = Logger('PrimaryColorsRepositoryImpl');
 
   /// Stores an instance of the [SharedPreferencesAsyncService] class,
   /// which is a service used to interact with shared preferences package.
-  final SharedPreferencesAsyncService sharedPreferencesAsyncService;
+  final SharedPreferencesAsyncService _sharedPreferencesAsyncService;
 
   /// Class used for notifying listeners or handling notifications within
   /// the application.
-  final Notifier notifier;
+  final Notifier _notifier;
 
-  /// Loads default values if they are missing asynchronously.
+  /// Set a default value if is missing asynchronously.
+  @override
   Future<void> initialize() => _setDefaultIfMissing();
 
   Future<void> _setDefaultIfMissing() async {
-    if (await sharedPreferencesAsyncService
+    if (await _sharedPreferencesAsyncService
         .containsKey(PrimaryColorsRepository.primaryColorKey)) {
       return;
     }
@@ -43,38 +44,36 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
 
   @override
   FutureResult<PrimaryColors> fetchPrimaryColor() async {
-    try {
-      final storedValue = await sharedPreferencesAsyncService
-          .getString(PrimaryColorsRepository.primaryColorKey);
-      if (storedValue != null) {
-        return PrimaryColors.fromString(storedValue);
-      } else {
-        _log.warning(
-          'Missing primary color key',
-          PrimaryColorsRepositoryErrors.missing,
-          StackTrace.current,
-        );
-        return Result.failure(
-          PrimaryColorsRepositoryErrors.missing,
-          StackTrace.current,
-        );
-      }
-    } catch (error, stackTrace) {
+    if (!(await _sharedPreferencesAsyncService
+        .containsKey(PrimaryColorsRepository.primaryColorKey))) {
+      _log.warning(
+        'Missing primary color key',
+        PrimaryColorsRepositoryErrors.missing,
+        StackTrace.current,
+      );
       return Result.failure(
-        PrimaryColorsRepositoryErrors.unknown,
-        stackTrace,
+        PrimaryColorsRepositoryErrors.missing,
+        StackTrace.current,
       );
     }
+    final storedValue = await _sharedPreferencesAsyncService
+        .getString(PrimaryColorsRepository.primaryColorKey);
+
+    return PrimaryColors.fromString(storedValue ?? '');
   }
 
   @override
   FutureResult<void> savePrimaryColor(PrimaryColors primaryColor) async {
     try {
-      await sharedPreferencesAsyncService.setString(
+      await _sharedPreferencesAsyncService.setString(
         PrimaryColorsRepository.primaryColorKey,
         primaryColor.name,
       );
-      return const Result.ok(null);
+      try {
+        return const Result.ok(null);
+      } finally {
+        _notifier.notifyListeners();
+      }
     } catch (error, stackTrace) {
       _log.warning(
         'Failed in save $primaryColor',
@@ -85,8 +84,6 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
         PrimaryColorsRepositoryErrors.failAtSaving,
         stackTrace,
       );
-    } finally {
-      notifier.notifyListeners();
     }
   }
 }

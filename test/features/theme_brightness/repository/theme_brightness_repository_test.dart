@@ -23,10 +23,65 @@ void main() {
     sharedPreferencesAsyncService =
         SharedPreferencesAsyncService(MockSharedPreferencesAsync());
     themeBrightnessRepository = ThemeBrightnessRepositoryImpl(
-      sharedPreferencesAsyncService: sharedPreferencesAsyncService,
+      sharedPreferencesAsyncService,
       notifier: notifier,
     );
   });
+
+  group('initialize', () {
+    test('when does not have an existent value, sets defaultTheme', () async {
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).thenAnswer((_) async => false);
+      when(
+        () => sharedPreferencesAsyncService.setString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+          ThemeBrightness.defaultTheme.name,
+        ),
+      ).thenAnswer((_) async {});
+
+      await themeBrightnessRepository.initialize();
+
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).called(1);
+
+      verify(
+        () => sharedPreferencesAsyncService.setString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+          ThemeBrightness.defaultTheme.name,
+        ),
+      ).called(1);
+    });
+
+    test('when have an existent value, not changes', () async {
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).thenAnswer((_) async => true);
+
+      await themeBrightnessRepository.initialize();
+
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).called(1);
+
+      verifyNever(
+        () => sharedPreferencesAsyncService.setString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+          ThemeBrightness.defaultTheme.name,
+        ),
+      );
+    });
+  });
+
   group('fetchThemeBrightness', () {
     tearDown(() {
       verifyNever(
@@ -178,6 +233,44 @@ void main() {
           ),
         );
       });
+    });
+    group('if something went wrong on saving', () {
+      test(
+        'should return a Failure with '
+        'ThemeBrightnessRepositoryErrors.failAtSaving',
+        () async {
+          const sample = ThemeBrightness.dark;
+          when(
+            () => sharedPreferencesAsyncService.setString(
+              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+              any(),
+            ),
+          ).thenThrow(Exception('oops'));
+
+          final result =
+              await themeBrightnessRepository.saveThemeBrightness(sample);
+
+          expect(result, isA<Failure<void>>());
+
+          verify(
+            () => sharedPreferencesAsyncService.setString(
+              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+              sample.name,
+            ),
+          ).called(1);
+
+          verifyNever(
+            () => sharedPreferencesAsyncService.containsKey(
+              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+            ),
+          );
+          verifyNever(
+            () => sharedPreferencesAsyncService.getString(
+              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+            ),
+          );
+        },
+      );
     });
   });
 }

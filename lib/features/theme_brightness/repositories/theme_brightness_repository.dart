@@ -10,6 +10,9 @@ abstract interface class ThemeBrightnessRepository {
   /// throughout the repository implementation and any other related code.
   static const themeBrightnessRepositoryKey = 'themeBrightness';
 
+  /// Defines a function for initializing the repository.
+  Future<void> initialize();
+
   /// Fetches the theme brightness settings asynchronously.
   ///
   /// It returns a [FutureResult] object that will eventually

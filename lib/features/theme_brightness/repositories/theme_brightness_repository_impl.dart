@@ -8,9 +8,14 @@ import '../logic/models/theme_brightness.dart';
 import 'theme_brightness_repository.dart';
 import 'theme_brightness_repository_errors.dart';
 
+/// Concrete implementation of [ThemeBrightnessRepository].
 final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
-  ThemeBrightnessRepositoryImpl({
-    required SharedPreferencesAsyncService sharedPreferencesAsyncService,
+  /// Uses a [SharedPreferencesAsyncService] to store this data.
+  ///
+  /// You must call [initialize] to ensure that you will have a default value
+  /// if missing.
+  ThemeBrightnessRepositoryImpl(
+    SharedPreferencesAsyncService sharedPreferencesAsyncService, {
     required Notifier notifier,
   })  : _sharedPreferencesAsyncService = sharedPreferencesAsyncService,
         _notifier = notifier;
@@ -19,6 +24,19 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   final Notifier _notifier;
 
   final _log = Logger('ThemeBrightnessRepositoryImpl');
+
+  /// Set a default value if is missing asynchronously.
+  @override
+  Future<void> initialize() => _setDefaultIfMissing();
+
+  Future<void> _setDefaultIfMissing() async {
+    if (await _sharedPreferencesAsyncService
+        .containsKey(ThemeBrightnessRepository.themeBrightnessRepositoryKey)) {
+      return;
+    }
+
+    await saveThemeBrightness(ThemeBrightness.defaultTheme);
+  }
 
   @override
   FutureResult<ThemeBrightness> fetchThemeBrightness() async {
@@ -40,11 +58,23 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   FutureResult<void> saveThemeBrightness(
     ThemeBrightness themeBrightness,
   ) async {
-    await _sharedPreferencesAsyncService.setString(
-      ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-      themeBrightness.name,
-    );
+    try {
+      await _sharedPreferencesAsyncService.setString(
+        ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        themeBrightness.name,
+      );
 
-    return const Result.ok(null);
+      try {
+        return const Result.ok(null);
+      } finally {
+        _notifier.notifyListeners();
+      }
+    } catch (error, stackTrace) {
+      _log.warning('Something went wrong!', error, stackTrace);
+      return Result.failure(
+        ThemeBrightnessRepositoryErrors.failAtSaving,
+        stackTrace,
+      );
+    }
   }
 }

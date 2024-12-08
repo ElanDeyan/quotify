@@ -10,6 +10,9 @@ abstract interface class PrimaryColorsRepository {
   /// retrieve the primary color data in the repository.
   static const String primaryColorKey = 'primaryColor';
 
+  /// Defines a function for initializing the repository.
+  Future<void> initialize();
+
   /// Function for fetching the [PrimaryColors].
   FutureResult<PrimaryColors> fetchPrimaryColor();
 
