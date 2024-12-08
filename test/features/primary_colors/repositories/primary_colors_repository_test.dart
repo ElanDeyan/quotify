@@ -12,9 +12,6 @@ import 'package:quotify/utils/result.dart';
 
 import '../../../core/mock_shared_preferences_async.dart';
 
-//* Read this test to have a better test with InMemory.
-//* https://github.com/flutter/packages/blob/main/packages/shared_preferences/shared_preferences/test/shared_preferences_async_test.dart
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late SharedPreferencesAsyncService sharedPreferencesAsyncService;
