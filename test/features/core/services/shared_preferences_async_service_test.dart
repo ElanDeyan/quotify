@@ -21,62 +21,64 @@ void main() {
     store.log.clear();
   });
 
-  test('containsKey', () async {
-    final sampleKey = faker.lorem.word();
-    final result = await service.containsKey(sampleKey);
+  group('sharedPreferencesAsyncService', () {
+    test('containsKey', () async {
+      final sampleKey = faker.lorem.word();
+      final result = await service.containsKey(sampleKey);
 
-    expect(
-      result,
-      await sharedPreferencesAsync.containsKey(sampleKey),
-    );
-  });
+      expect(
+        result,
+        await sharedPreferencesAsync.containsKey(sampleKey),
+      );
+    });
 
-  test('getString (with an already existent value)', () async {
-    final sampleKey = faker.lorem.word();
-    final sampleValue = faker.lorem.word();
+    test('getString (with an already existent value)', () async {
+      final sampleKey = faker.lorem.word();
+      final sampleValue = faker.lorem.word();
 
-    await sharedPreferencesAsync.setString(sampleKey, sampleValue);
+      await sharedPreferencesAsync.setString(sampleKey, sampleValue);
 
-    final result = await service.getString(sampleKey);
+      final result = await service.getString(sampleKey);
 
-    expect(
-      store.log,
-      containsOnce(isMethodCall('getString', arguments: [sampleKey])),
-    );
+      expect(
+        store.log,
+        containsOnce(isMethodCall('getString', arguments: [sampleKey])),
+      );
 
-    expect(result, equals(sampleValue));
-  });
+      expect(result, equals(sampleValue));
+    });
 
-  test('getString (without an existent value)', () async {
-    final sampleKey = faker.lorem.word();
+    test('getString (without an existent value)', () async {
+      final sampleKey = faker.lorem.word();
 
-    final inexistentValueFromService = await service.getString(sampleKey);
+      final inexistentValueFromService = await service.getString(sampleKey);
 
-    expect(
-      store.log,
-      containsOnce(isMethodCall('getString', arguments: [sampleKey])),
-    );
+      expect(
+        store.log,
+        containsOnce(isMethodCall('getString', arguments: [sampleKey])),
+      );
 
-    final inexistentValueFromSharedPreferences =
-        await sharedPreferencesAsync.getString(sampleKey);
+      final inexistentValueFromSharedPreferences =
+          await sharedPreferencesAsync.getString(sampleKey);
 
-    expect(inexistentValueFromService, inexistentValueFromSharedPreferences);
-    expect(inexistentValueFromService, isNull);
-    expect(inexistentValueFromSharedPreferences, isNull);
-  });
+      expect(inexistentValueFromService, inexistentValueFromSharedPreferences);
+      expect(inexistentValueFromService, isNull);
+      expect(inexistentValueFromSharedPreferences, isNull);
+    });
 
-  test('setString', () async {
-    final sampleKey = faker.lorem.word();
-    final sampleValue = faker.lorem.word();
+    test('setString', () async {
+      final sampleKey = faker.lorem.word();
+      final sampleValue = faker.lorem.word();
 
-    await service.setString(sampleKey, sampleValue);
+      await service.setString(sampleKey, sampleValue);
 
-    expect(store.log, <Matcher>[
-      isMethodCall('setString', arguments: [sampleKey, sampleValue]),
-    ]);
+      expect(store.log, <Matcher>[
+        isMethodCall('setString', arguments: [sampleKey, sampleValue]),
+      ]);
 
-    final containsKey = await service.containsKey(sampleKey);
+      final containsKey = await service.containsKey(sampleKey);
 
-    expect(containsKey, await sharedPreferencesAsync.containsKey(sampleKey));
+      expect(containsKey, await sharedPreferencesAsync.containsKey(sampleKey));
+    });
   });
 }
