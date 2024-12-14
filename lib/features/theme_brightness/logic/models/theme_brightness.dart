@@ -4,13 +4,13 @@ import 'theme_brightness_errors.dart';
 /// Represents different brightness themes in an application,
 /// allowing you to easily switch between these predefined options in your code.
 enum ThemeBrightness {
-  /// Indicates a light color scheme or theme that can be used in the
-  /// application.
-  light,
-
   /// Represents a dark color scheme or theme that can be used in the
   /// application.
   dark,
+
+  /// Indicates a light color scheme or theme that can be used in the
+  /// application.
+  light,
 
   /// Represents a color scheme or theme that follows the system-wide setting.
   /// This means that the application will automatically adapt its color scheme
