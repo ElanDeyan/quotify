@@ -1,5 +1,6 @@
 import 'package:languages_repository/models/languages.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
+import 'package:privacy_repository/logic/models/privacy_data.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
 
 import '../../../quotes/logic/models/quote.dart';
@@ -12,6 +13,7 @@ final class Backup {
     required this.themeBrightness,
     required this.primaryColor,
     required this.language,
+    required this.privacyData,
     required this.tags,
     required this.quotes,
   });
@@ -24,6 +26,10 @@ final class Backup {
 
   /// Preferred [Languages].
   final Languages language;
+
+  /// This property represents the privacy data associated with the user
+  /// preferences.
+  final PrivacyData privacyData;
 
   /// All added [Tag]s.
   final Set<Tag> tags;

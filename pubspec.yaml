@@ -13,6 +13,7 @@ workspace:
   - packages/theme_brightness_repository
   - packages/primary_colors_repository
   - packages/languages_repository
+  - packages/privacy_repository
 
 dependencies:
   flutter:
@@ -20,6 +21,7 @@ dependencies:
   languages_repository: ^0.0.1
   logging: ^1.3.0
   primary_colors_repository: ^0.0.1
+  privacy_repository: ^0.0.1
   pub_semver: ^2.1.5
   quotify_utils: ^1.0.0
   shared_preferences_service: ^1.0.0
