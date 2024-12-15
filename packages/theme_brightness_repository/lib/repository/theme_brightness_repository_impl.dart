@@ -2,7 +2,6 @@ import 'package:logging/logging.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
-import '../../core/services/notifier.dart';
 import '../logic/models/theme_brightness.dart';
 import 'theme_brightness_repository.dart';
 import 'theme_brightness_repository_errors.dart';
@@ -14,13 +13,10 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   /// You must call [initialize] to ensure that you will have a default value
   /// if missing.
   ThemeBrightnessRepositoryImpl(
-    SharedPreferencesAsyncService sharedPreferencesAsyncService, {
-    required Notifier notifier,
-  })  : _sharedPreferencesAsyncService = sharedPreferencesAsyncService,
-        _notifier = notifier;
+    SharedPreferencesAsyncService sharedPreferencesAsyncService,
+  ) : _sharedPreferencesAsyncService = sharedPreferencesAsyncService;
 
   final SharedPreferencesAsyncService _sharedPreferencesAsyncService;
-  final Notifier _notifier;
 
   final _log = Logger('ThemeBrightnessRepositoryImpl');
 
@@ -63,11 +59,7 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
         themeBrightness.name,
       );
 
-      try {
-        return const Result.ok(null);
-      } finally {
-        _notifier.notifyListeners();
-      }
+      return const Result.ok(null);
     } catch (error, stackTrace) {
       _log.warning('Something went wrong!', error, stackTrace);
       return Result.failure(

@@ -1,8 +1,9 @@
+import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
+
 import '../../../languages/logic/models/languages.dart';
 import '../../../primary_colors/logic/models/primary_colors.dart';
 import '../../../quotes/logic/models/quote.dart';
 import '../../../tags/logic/models/tag.dart';
-import '../../../theme_brightness/logic/models/theme_brightness.dart';
 
 /// Represents User preferences and data.
 final class Backup {

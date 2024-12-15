@@ -10,6 +10,7 @@ workspace:
   - packages/quotify_utils
   - packages/services/shared_preferences_service
   - packages/services/shared_preferences_service_test
+  - packages/theme_brightness_repository
 
 dependencies:
   flutter:
@@ -18,6 +19,7 @@ dependencies:
   pub_semver: ^2.1.5
   quotify_utils: ^1.0.0
   shared_preferences_service: ^1.0.0
+  theme_brightness_repository: ^0.0.1
 
 dev_dependencies:
   dependency_validator: ^4.1.2

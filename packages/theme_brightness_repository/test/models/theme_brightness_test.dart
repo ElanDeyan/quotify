@@ -1,8 +1,8 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quotify/features/theme_brightness/logic/models/theme_brightness.dart';
-import 'package:quotify/features/theme_brightness/logic/models/theme_brightness_errors.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
+import 'package:theme_brightness_repository/logic/models/theme_brightness_errors.dart';
 
 void main() {
   group('ThemeBrightness.fromString', () {

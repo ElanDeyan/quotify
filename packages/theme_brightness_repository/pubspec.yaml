@@ -1,0 +1,24 @@
+name: theme_brightness_repository
+description: The logic and data layer for theme brightness.
+version: 0.0.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  logging: ^1.3.0
+  quotify_utils: ^1.0.0
+  shared_preferences_service: ^1.0.0
+
+dev_dependencies:
+  faker: ^2.2.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  shared_preferences_service_test: ^0.0.1
+  very_good_analysis: ^6.0.0
