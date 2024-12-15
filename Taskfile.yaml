@@ -5,3 +5,10 @@ tasks:
     cmds:
       - flutter clean
       - flutter pub get
+  pub-deep-upgrade:
+    cmds:
+      - cmd: pwsh -Command Remove-Item pubspec.lock
+        platforms:
+          - windows
+      - flutter clean
+      - flutter pub upgrade --major-versions
