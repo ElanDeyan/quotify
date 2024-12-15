@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 
-import '../logic/models/primary_colors.dart';
+import '../models/primary_colors.dart';
 
-/// Defines methods for fetching and saving [PrimaryColors], extending
-/// [ChangeNotifier].
+/// Defines methods for fetching and saving [PrimaryColors].
 abstract interface class PrimaryColorsRepository {
   /// This variable is used to store the key that will be used to save and
   /// retrieve the primary color data in the repository.

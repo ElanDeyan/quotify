@@ -1,4 +1,4 @@
-import '../logic/models/primary_colors.dart';
+import '../models/primary_colors.dart';
 import 'primary_colors_repository.dart';
 
 /// This enum can be used to represent different types of errors that may occur

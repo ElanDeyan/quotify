@@ -2,8 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
-import '../../core/services/notifier.dart';
-import '../logic/models/primary_colors.dart';
+import '../models/primary_colors.dart';
 import 'primary_colors_repository.dart';
 import 'primary_colors_repository_errors.dart';
 
@@ -14,19 +13,14 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   /// You must call [initialize] to ensure that you will have a default value
   /// if missing.
   PrimaryColorsRepositoryImpl(
-    this._sharedPreferencesAsyncService, {
-    required Notifier notifier,
-  }) : _notifier = notifier;
+    this._sharedPreferencesAsyncService,
+  );
 
   final _log = Logger('PrimaryColorsRepositoryImpl');
 
   /// Stores an instance of the [SharedPreferencesAsyncService] class,
   /// which is a service used to interact with shared preferences package.
   final SharedPreferencesAsyncService _sharedPreferencesAsyncService;
-
-  /// Class used for notifying listeners or handling notifications within
-  /// the application.
-  final Notifier _notifier;
 
   /// Set a default value if is missing asynchronously.
   @override
@@ -68,17 +62,15 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
         PrimaryColorsRepository.primaryColorKey,
         primaryColor.name,
       );
-      try {
-        return const Result.ok(null);
-      } finally {
-        _notifier.notifyListeners();
-      }
+
+      return const Result.ok(null);
     } catch (error, stackTrace) {
       _log.warning(
         'Failed in save $primaryColor',
         error,
         stackTrace,
       );
+
       return Result<void>.failure(
         PrimaryColorsRepositoryErrors.failAtSaving,
         stackTrace,

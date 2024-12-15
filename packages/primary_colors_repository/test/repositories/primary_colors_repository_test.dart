@@ -1,12 +1,11 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:quotify/features/core/services/notifier.dart';
-import 'package:quotify/features/primary_colors/logic/models/primary_colors.dart';
-import 'package:quotify/features/primary_colors/logic/models/primary_colors_errors.dart';
-import 'package:quotify/features/primary_colors/repositories/primary_colors_repository.dart';
-import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_errors.dart';
-import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_impl.dart';
+import 'package:primary_colors_repository/models/primary_colors.dart';
+import 'package:primary_colors_repository/models/primary_colors_errors.dart';
+import 'package:primary_colors_repository/repositories/primary_colors_repository.dart';
+import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
+import 'package:primary_colors_repository/repositories/primary_colors_repository_impl.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
@@ -20,7 +19,6 @@ void main() {
         SharedPreferencesAsyncService(MockSharedPreferencesAsync());
     primaryColorsRepository = PrimaryColorsRepositoryImpl(
       sharedPreferencesAsyncService,
-      notifier: notifier,
     );
   });
 

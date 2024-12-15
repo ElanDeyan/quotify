@@ -1,7 +1,7 @@
+import 'package:primary_colors_repository/models/primary_colors.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
 
 import '../../../languages/logic/models/languages.dart';
-import '../../../primary_colors/logic/models/primary_colors.dart';
 import '../../../quotes/logic/models/quote.dart';
 import '../../../tags/logic/models/tag.dart';
 
