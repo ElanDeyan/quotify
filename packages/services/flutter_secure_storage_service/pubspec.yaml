@@ -1,0 +1,20 @@
+name: flutter_secure_storage_service
+description: "A new Flutter package project."
+version: 0.0.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^9.2.2
+
+dev_dependencies:
+  faker: ^2.2.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0

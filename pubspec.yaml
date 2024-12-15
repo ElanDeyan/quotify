@@ -9,6 +9,7 @@ environment:
 workspace:
   - packages/quotify_utils
   - packages/services/shared_preferences_service
+  - packages/services/flutter_secure_storage_service
   - packages/services/shared_preferences_service_test
   - packages/theme_brightness_repository
   - packages/primary_colors_repository
