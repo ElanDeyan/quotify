@@ -1,7 +1,6 @@
 import 'package:logging/logging.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 
-import '../../../utils/future_result.dart';
-import '../../../utils/result.dart';
 import '../../core/services/notifier.dart';
 import '../../core/services/shared_preferences_async_service.dart';
 import '../logic/models/languages.dart';

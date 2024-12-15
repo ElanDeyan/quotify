@@ -8,7 +8,7 @@ import 'package:quotify/features/languages/logic/models/languages.dart';
 import 'package:quotify/features/languages/repositories/languages_repository.dart';
 import 'package:quotify/features/languages/repositories/languages_repository_errors.dart';
 import 'package:quotify/features/languages/repositories/languages_repository_impl.dart';
-import 'package:quotify/utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 
 import '../../../core/mock_shared_preferences_async.dart';
 

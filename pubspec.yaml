@@ -6,6 +6,9 @@ version: 0.1.0
 environment:
   sdk: ^3.6.0
 
+workspace:
+  - packages/quotify_utils
+
 dependencies:
   flutter:
     sdk: flutter
@@ -14,6 +17,7 @@ dependencies:
   logging: ^1.3.0
   meta: ^1.15.0
   pub_semver: ^2.1.5
+  quotify_utils: ^1.0.0
   shared_preferences: ^2.3.3
 
 dev_dependencies:

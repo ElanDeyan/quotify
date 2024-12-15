@@ -1,4 +1,5 @@
-import '../../../../utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import 'theme_brightness_errors.dart';
 
 /// Represents different brightness themes in an application,

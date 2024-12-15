@@ -1,5 +1,5 @@
-import '../../../utils/future_result.dart';
-import '../../../utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import '../logic/models/theme_brightness.dart';
 import 'theme_brightness_repository_errors.dart';
 

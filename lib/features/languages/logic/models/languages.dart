@@ -1,4 +1,5 @@
-import '../../../../utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import 'language_errors.dart';
 
 /// Each enum value has a corresponding [languageCode] property assigned to it.

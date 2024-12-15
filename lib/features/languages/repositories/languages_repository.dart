@@ -1,4 +1,5 @@
-import '../../../utils/future_result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import '../logic/models/languages.dart';
 
 /// A repository that provides methods to get the current language.

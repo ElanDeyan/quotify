@@ -9,6 +9,8 @@ library;
 
 import 'package:meta/meta.dart';
 
+import '../quotify_utils.dart';
+
 // Copyright 2024 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -33,8 +35,28 @@ sealed class Result<T> {
   const factory Result.ok(T value) = Ok;
 
   /// Create an instance of Result containing an error
-  const factory Result.failure(Exception failure, StackTrace stackTrace) =
-      Failure;
+  const factory Result.failure(Object failure, StackTrace stackTrace) = Failure;
+
+  /// Returns a [Result] from a synchronous function call.
+  factory Result.fromComputationSync(T Function() computation) {
+    try {
+      return Result.ok(computation());
+    } catch (error, stackTrace) {
+      return Result.failure(error, stackTrace);
+    }
+  }
+
+  /// Returns a [Result] from a synchronous function call.
+  static FutureResult<T> fromComputationAsync<T>(
+    Future<T> Function() computation,
+  ) async {
+    try {
+      final result = await computation();
+      return Result.ok(result);
+    } catch (error, stackTrace) {
+      return Result.failure(error, stackTrace);
+    }
+  }
 
   /// Convenience method to cast to [Ok]
   @visibleForTesting
@@ -47,6 +69,7 @@ sealed class Result<T> {
 
 /// Subclass of Result for values
 final class Ok<T> extends Result<T> {
+  /// Subclass of Result for values
   const Ok(this.value);
 
   /// Returned value in result
@@ -58,11 +81,13 @@ final class Ok<T> extends Result<T> {
 
 /// Subclass of Result for errors
 final class Failure<T> extends Result<T> {
+  /// Subclass of Result for errors
   const Failure(this.failure, this.stackTrace);
 
   /// Returned error in result
-  final Exception failure;
+  final Object failure;
 
+  /// Stack trace related to this [Failure].
   final StackTrace stackTrace;
 
   @override

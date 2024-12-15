@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
-import '../../../../utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import 'primary_colors_errors.dart';
 
 /// Represents various colors.

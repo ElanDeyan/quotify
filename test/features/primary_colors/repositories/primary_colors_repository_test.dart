@@ -8,7 +8,7 @@ import 'package:quotify/features/primary_colors/logic/models/primary_colors_erro
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository.dart';
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_errors.dart';
 import 'package:quotify/features/primary_colors/repositories/primary_colors_repository_impl.dart';
-import 'package:quotify/utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 
 import '../../../core/mock_shared_preferences_async.dart';
 

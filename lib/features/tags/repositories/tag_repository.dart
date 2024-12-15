@@ -1,4 +1,5 @@
-import '../../../utils/future_result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+
 import '../../core/id.dart';
 import '../logic/models/tag.dart';
 import 'tag_entry.dart';

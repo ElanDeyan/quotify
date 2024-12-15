@@ -8,7 +8,7 @@ import 'package:quotify/features/theme_brightness/logic/models/theme_brightness_
 import 'package:quotify/features/theme_brightness/repositories/theme_brightness_repository.dart';
 import 'package:quotify/features/theme_brightness/repositories/theme_brightness_repository_errors.dart';
 import 'package:quotify/features/theme_brightness/repositories/theme_brightness_repository_impl.dart';
-import 'package:quotify/utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 
 import '../../../core/mock_shared_preferences_async.dart';
 

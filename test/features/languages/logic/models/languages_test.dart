@@ -2,7 +2,7 @@ import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotify/features/languages/logic/models/language_errors.dart';
 import 'package:quotify/features/languages/logic/models/languages.dart';
-import 'package:quotify/utils/result.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 
 void main() {
   group('With valid language', () {
