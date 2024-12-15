@@ -2,21 +2,16 @@ import 'package:logging/logging.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
-import '../../core/services/notifier.dart';
-import '../logic/models/languages.dart';
+import '../models/languages.dart';
 import 'languages_repository.dart';
 import 'languages_repository_errors.dart';
 
 /// A repository that provides methods to get the current language.
 final class LanguagesRepositoryImpl implements LanguagesRepository {
   /// Initializes a new instance of the [LanguagesRepositoryImpl] class.
-  LanguagesRepositoryImpl(
-    this._sharedPreferencesAsyncService, {
-    required Notifier notifier,
-  }) : _notifier = notifier;
+  LanguagesRepositoryImpl(this._sharedPreferencesAsyncService);
 
   final SharedPreferencesAsyncService _sharedPreferencesAsyncService;
-  final Notifier _notifier;
 
   final _log = Logger('LanguagesRepositoryImpl');
 
@@ -60,11 +55,8 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
         LanguagesRepository.languageKey,
         language.languageCode,
       );
-      try {
-        return const Result.ok(null);
-      } finally {
-        _notifier.notifyListeners();
-      }
+
+      return const Result.ok(null);
     } catch (error, stackTrace) {
       _log.warning('Fail at saving $language', error, stackTrace);
       return Result.failure(LanguagesRepositoryErrors.failAtSaving, stackTrace);
