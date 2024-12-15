@@ -1,0 +1,22 @@
+name: shared_preferences_service_test
+description: "A new Flutter package project."
+version: 0.0.1
+
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  mocktail: ^1.0.4
+  shared_preferences: ^2.3.3
+  shared_preferences_platform_interface: ^2.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0

@@ -6,15 +6,24 @@ version: 0.1.0
 environment:
   sdk: ^3.6.0
 
+workspace:
+  - packages/quotify_utils
+  - packages/services/shared_preferences_service
+  - packages/services/shared_preferences_service_test
+  - packages/theme_brightness_repository
+  - packages/primary_colors_repository
+  - packages/languages_repository
+
 dependencies:
   flutter:
     sdk: flutter
-  get_it: ^8.0.3
-  go_router: ^14.6.2
+  languages_repository: ^0.0.1
   logging: ^1.3.0
-  meta: ^1.15.0
+  primary_colors_repository: ^0.0.1
   pub_semver: ^2.1.5
-  shared_preferences: ^2.3.3
+  quotify_utils: ^1.0.0
+  shared_preferences_service: ^1.0.0
+  theme_brightness_repository: ^0.0.1
 
 dev_dependencies:
   dependency_validator: ^4.1.2
@@ -24,7 +33,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   mocktail: ^1.0.4
-  shared_preferences_platform_interface: ^2.4.1
+  shared_preferences_service_test: ^0.0.1
   very_good_analysis: ^6.0.0
 
 flutter:
