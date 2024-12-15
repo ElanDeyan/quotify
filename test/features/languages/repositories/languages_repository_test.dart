@@ -2,15 +2,14 @@ import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quotify/features/core/services/notifier.dart';
-import 'package:quotify/features/core/services/shared_preferences_async_service.dart';
 import 'package:quotify/features/languages/logic/models/language_errors.dart';
 import 'package:quotify/features/languages/logic/models/languages.dart';
 import 'package:quotify/features/languages/repositories/languages_repository.dart';
 import 'package:quotify/features/languages/repositories/languages_repository_errors.dart';
 import 'package:quotify/features/languages/repositories/languages_repository_impl.dart';
 import 'package:quotify_utils/quotify_utils.dart';
-
-import '../../../core/mock_shared_preferences_async.dart';
+import 'package:shared_preferences_service/shared_preferences_async_service.dart';
+import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

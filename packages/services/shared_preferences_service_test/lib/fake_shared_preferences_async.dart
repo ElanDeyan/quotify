@@ -10,8 +10,15 @@ import 'package:shared_preferences_platform_interface/types.dart';
 ///* [FakeSharedPreferencesAsync] implementation from the original github repo.
 ///* https://github.com/flutter/packages/blob/45bcc3210fcc24011bc7f88de1ca61528d9e5cbc/packages/shared_preferences/shared_preferences/test/shared_preferences_async_test.dart#L828
 base class FakeSharedPreferencesAsync extends SharedPreferencesAsyncPlatform {
+  /// [InMemorySharedPreferencesAsync] implementation.
   final InMemorySharedPreferencesAsync backend =
       InMemorySharedPreferencesAsync.empty();
+
+  /// Will store instances of the [MethodCall] class. This list will be used to
+  /// keep track of method calls made on the [FakeSharedPreferencesAsync] class
+  /// for testing or debugging purposes. Each time a method is called on an
+  /// instance of [FakeSharedPreferencesAsync], a corresponding [MethodCall]
+  /// object will be added to this list to log the method call details.
   final List<MethodCall> log = <MethodCall>[];
 
   @override

@@ -15,8 +15,8 @@ final class SharedPreferencesAsyncService {
   static final sharedPreferencesAsyncServiceLogger =
       Logger('SharedPreferencesAsyncService');
 
-  /// The function `containsKey` checks if a key exists in the shared
-  /// preferences asynchronously and returns a Future<bool>
+  /// The function [containsKey] checks if a [key] exists in the shared
+  /// preferences asynchronously and returns a [Future] of [bool]
   /// indicating the result.
   ///
   /// Args:

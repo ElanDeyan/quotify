@@ -3,6 +3,13 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 
 import 'fake_shared_preferences_async.dart';
 
+
+/// Initializes and returns a pair of [SharedPreferencesAsync] and
+/// [FakeSharedPreferencesAsync] objects.
+///
+/// Returns:
+///   A record containing the preferences object and the store
+/// object is being returned.
 (SharedPreferencesAsync preferences, FakeSharedPreferencesAsync store)
     getPreferences() {
   final store = FakeSharedPreferencesAsync();

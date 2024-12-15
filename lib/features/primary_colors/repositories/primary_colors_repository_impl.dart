@@ -1,8 +1,8 @@
 import 'package:logging/logging.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
 import '../../core/services/notifier.dart';
-import '../../core/services/shared_preferences_async_service.dart';
 import '../logic/models/primary_colors.dart';
 import 'primary_colors_repository.dart';
 import 'primary_colors_repository_errors.dart';

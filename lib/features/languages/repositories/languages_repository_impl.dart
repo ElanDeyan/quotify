@@ -1,8 +1,8 @@
 import 'package:logging/logging.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
 import '../../core/services/notifier.dart';
-import '../../core/services/shared_preferences_async_service.dart';
 import '../logic/models/languages.dart';
 import 'languages_repository.dart';
 import 'languages_repository_errors.dart';

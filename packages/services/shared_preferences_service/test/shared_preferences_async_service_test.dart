@@ -1,10 +1,9 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quotify/features/core/services/shared_preferences_async_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../core/fake_shared_preferences_async.dart';
-import '../../../core/get_preferences.dart';
+import 'package:shared_preferences_service/shared_preferences_async_service.dart';
+import 'package:shared_preferences_service_test/fake_shared_preferences_async.dart';
+import 'package:shared_preferences_service_test/get_preferences.dart';
 
 void main() {
   late SharedPreferencesAsync sharedPreferencesAsync;
