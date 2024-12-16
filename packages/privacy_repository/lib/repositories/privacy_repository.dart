@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 
 import '../logic/models/privacy_data.dart';
@@ -42,6 +43,11 @@ abstract interface class PrivacyRepository {
   /// will set the passed [value].
   FutureResult<void> toggleAcceptedAppDataUsage({bool? value});
 
-  /// Generates a random and secure password with the provided [length].
-  String generateRandomSecurePassword(int length);
+  /// Generates a random and secure password with 16-32 chars.
+  @visibleForTesting
+  String generateRandomSecurePassword();
+
+  FutureResult<void> setEncryptionPassword();
+
+  FutureResult<String> fetchEncryptionPassword();
 }

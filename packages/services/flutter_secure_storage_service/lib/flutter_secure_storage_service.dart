@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// A service that forwards commands to [FlutterSecureStorage].
-final class FlutterSecureStorageService {
+interface class FlutterSecureStorageService {
   /// A service that forwards commands to [FlutterSecureStorage].
   const FlutterSecureStorageService({
     required FlutterSecureStorage flutterSecureStorage,
