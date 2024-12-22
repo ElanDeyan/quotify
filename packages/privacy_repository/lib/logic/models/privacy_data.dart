@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 
+import '../../repositories/privacy_data_entry.dart';
 import '../../repositories/privacy_repository.dart';
 import 'privacy_data_errors.dart';
 
@@ -14,6 +15,13 @@ final class PrivacyData {
     this.allowErrorReporting = false,
     this.acceptedDataUsage = false,
   });
+
+  /// Creates an instance from [PrivacyDataEntry].
+  factory PrivacyData.fromPrivacyDataEntry(PrivacyDataEntry entry) =>
+      PrivacyData(
+        acceptedDataUsage: entry.acceptedDataUsage ?? false,
+        allowErrorReporting: entry.allowErrorReporting ?? false,
+      );
 
   /// Flag to indicate wether the user allowed error reporting or not.
   /// Initialized with `false` by default.
@@ -77,4 +85,10 @@ final class PrivacyData {
       StackTrace.current,
     );
   }
+
+  /// Helper to convert to [PrivacyDataEntry].
+  PrivacyDataEntry toPrivacyDataEntry() => PrivacyDataEntry(
+        allowErrorReporting: allowErrorReporting,
+        acceptedDataUsage: acceptedDataUsage,
+      );
 }

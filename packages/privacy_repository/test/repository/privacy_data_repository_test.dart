@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:password_strength/password_strength.dart';
 import 'package:privacy_repository/logic/models/privacy_data.dart';
+import 'package:privacy_repository/repositories/privacy_data_entry.dart';
 import 'package:privacy_repository/repositories/privacy_data_repository_errors.dart';
 import 'package:privacy_repository/repositories/privacy_repository.dart';
 import 'package:privacy_repository/repositories/privacy_repository_impl.dart';
@@ -232,6 +233,96 @@ void main() {
               .read(PrivacyRepository.allowErrorReportingKey),
         ).called(1);
       });
+    });
+  });
+
+  group('savePrivacyData', () {
+    group(
+        'without any (or both) data present and entry has both null parameters',
+        () {
+      setUp(() {
+        when(
+          () => secureStorageService.containsKey(any()),
+        ).thenAnswer((_) async => false);
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).called(1);
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).called(1);
+
+        verifyNever(() => secureStorageService.read(any()));
+        verifyNever(() => secureStorageService.write(any(), any()));
+      });
+      test(
+        'should return Failure with PrivacyRepositoryErrors.missing',
+        () async {
+          await privacyRepository.savePrivacyData(const PrivacyDataEntry());
+        },
+      );
+    });
+    group('with data present', () {
+      setUp(() {
+        when(() => secureStorageService.containsKey(any()))
+            .thenAnswer((_) async => true);
+        when(() => secureStorageService.write(any(), any()))
+            .thenAnswer((_) async {});
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).called(1);
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).called(1);
+        verify(() => secureStorageService.write(any(), any()))
+            .called(inInclusiveRange(1, 2));
+      });
+
+      test(
+        'and one parameter is null should only '
+        'write the non-null (allowErrorReporting)',
+        () async {
+          const sample = PrivacyDataEntry(allowErrorReporting: true);
+
+          final result = await privacyRepository.savePrivacyData(sample);
+
+          expect(result, isA<Ok<void>>());
+        },
+      );
+
+      test(
+        'and one parameter is null should only '
+        'write the non-null (acceptedDataUsage)',
+        () async {
+          const sample = PrivacyDataEntry(acceptedDataUsage: true);
+
+          final result = await privacyRepository.savePrivacyData(sample);
+
+          expect(result, isA<Ok<void>>());
+        },
+      );
+      test(
+        'and both parameters are not null should write both',
+        () async {
+          const sample = PrivacyDataEntry(
+            acceptedDataUsage: true,
+            allowErrorReporting: false,
+          );
+
+          final result = await privacyRepository.savePrivacyData(sample);
+
+          expect(result, isA<Ok<void>>());
+        },
+      );
     });
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage_service/flutter_secure_storage_service.da
 import 'package:quotify_utils/quotify_utils.dart';
 
 import '../logic/models/privacy_data.dart';
+import 'privacy_data_entry.dart';
 import 'privacy_data_repository_errors.dart';
 import 'privacy_repository.dart';
 
@@ -89,21 +90,42 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<void> savePrivacyData(PrivacyData privacyData) {
-    // TODO: implement savePrivacyData
-    throw UnimplementedError();
-  }
+  FutureResult<void> savePrivacyData(PrivacyDataEntry privacyDataEntry) async {
+    final hasAllowErrorReportingKey = await _secureStorageService
+        .containsKey(PrivacyRepository.allowErrorReportingKey);
+    final hasAcceptedDataUsageKey = await _secureStorageService
+        .containsKey(PrivacyRepository.acceptedDataUsageKey);
 
-  @override
-  FutureResult<void> toggleAcceptedAppDataUsage({bool? value}) {
-    // TODO: implement toggleAcceptedAppDataUsage
-    throw UnimplementedError();
-  }
+    final notHasAllowErrorReportingKeyAndNullValuePassed =
+        !hasAllowErrorReportingKey &&
+            privacyDataEntry.allowErrorReporting == null;
 
-  @override
-  FutureResult<void> toggleAllowErrorReporting({bool? value}) {
-    // TODO: implement toggleAllowErrorReporting
-    throw UnimplementedError();
+    final notHasAcceptedDataUsageKeyAndNullValuePassed =
+        !hasAcceptedDataUsageKey && privacyDataEntry.acceptedDataUsage == null;
+
+    if (notHasAllowErrorReportingKeyAndNullValuePassed ||
+        notHasAcceptedDataUsageKeyAndNullValuePassed) {
+      return Result.failure(
+        PrivacyRepositoryErrors.missingSomeKey,
+        StackTrace.current,
+      );
+    }
+
+    if (privacyDataEntry.allowErrorReporting != null) {
+      await _secureStorageService.write(
+        PrivacyRepository.allowErrorReportingKey,
+        privacyDataEntry.allowErrorReporting.toString(),
+      );
+    }
+
+    if (privacyDataEntry.acceptedDataUsage != null) {
+      await _secureStorageService.write(
+        PrivacyRepository.acceptedDataUsageKey,
+        privacyDataEntry.acceptedDataUsage.toString(),
+      );
+    }
+
+    return const Result.ok(null);
   }
 
   @override

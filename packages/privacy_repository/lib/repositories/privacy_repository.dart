@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 
 import '../logic/models/privacy_data.dart';
+import 'privacy_data_entry.dart';
 
 /// Defines methods and constants related to privacy data management and
 /// password generation.
@@ -28,20 +29,8 @@ abstract interface class PrivacyRepository {
   /// Fetches public [PrivacyData] related to user preferences.
   FutureResult<PrivacyData> fetchPrivacyData();
 
-  /// Saves [privacyData] to the data storage.
-  FutureResult<void> savePrivacyData(PrivacyData privacyData);
-
-  /// Toggles allow error reporting data in data storage.
-  ///
-  /// if [Null], the result will just negate the available value. If [bool],
-  /// will set the passed [value].
-  FutureResult<void> toggleAllowErrorReporting({bool? value});
-
-  /// Toggles accepted data usage in data storage.
-  ///
-  /// if [Null], the result will just negate the available value. If [bool],
-  /// will set the passed [value].
-  FutureResult<void> toggleAcceptedAppDataUsage({bool? value});
+  /// Saves [privacyDataEntry] to the data storage.
+  FutureResult<void> savePrivacyData(PrivacyDataEntry privacyDataEntry);
 
   /// Generates a random and secure password with 16-32 chars.
   @visibleForTesting
