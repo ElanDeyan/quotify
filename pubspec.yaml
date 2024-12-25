@@ -9,10 +9,12 @@ environment:
 workspace:
   - packages/quotify_utils
   - packages/services/shared_preferences_service
+  - packages/services/flutter_secure_storage_service
   - packages/services/shared_preferences_service_test
   - packages/theme_brightness_repository
   - packages/primary_colors_repository
   - packages/languages_repository
+  - packages/privacy_repository
 
 dependencies:
   flutter:
@@ -20,6 +22,7 @@ dependencies:
   languages_repository: ^0.0.1
   logging: ^1.3.0
   primary_colors_repository: ^0.0.1
+  privacy_repository: ^1.0.0
   pub_semver: ^2.1.5
   quotify_utils: ^1.0.0
   shared_preferences_service: ^1.0.0
@@ -34,7 +37,7 @@ dev_dependencies:
     sdk: flutter
   mocktail: ^1.0.4
   shared_preferences_service_test: ^0.0.1
-  very_good_analysis: ^6.0.0
+  very_good_analysis: ^7.0.0
 
 flutter:
   uses-material-design: true

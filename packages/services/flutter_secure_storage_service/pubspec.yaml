@@ -1,22 +1,20 @@
-name: shared_preferences_service_test
+name: flutter_secure_storage_service
 description: "A new Flutter package project."
 version: 0.0.1
 
+resolution: workspace
 
 environment:
   sdk: ^3.6.0
   flutter: ">=1.17.0"
 
-resolution: workspace
-
 dependencies:
   flutter:
     sdk: flutter
-  mocktail: ^1.0.4
-  shared_preferences: ^2.3.3
-  shared_preferences_platform_interface: ^2.4.1
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
+  faker: ^2.2.0
   flutter_test:
     sdk: flutter
   very_good_analysis: ^7.0.0
