@@ -1,7 +1,6 @@
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:tags_repository/models/tag.dart';
 
-import '../../core/id.dart';
-import '../../tags/logic/models/tag.dart';
 import '../logic/models/quote.dart';
 import 'quote_entry.dart';
 

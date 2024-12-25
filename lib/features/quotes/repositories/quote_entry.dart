@@ -1,9 +1,12 @@
-import '../../../utils/non_blank_string.dart';
-import '../../tags/logic/models/tag.dart';
+
+import 'package:quotify_utils/quotify_utils.dart';
+import 'package:tags_repository/models/tag.dart';
+
 import '../logic/models/quote.dart';
 
+/// An entry for [Quote] class.
 final class QuoteEntry {
-  /// A Quote class.
+  /// An entry for [Quote] class.
   const QuoteEntry({
     required this.content,
     required this.author,

@@ -1,6 +1,5 @@
-import '../../../../utils/non_blank_string.dart';
-import '../../../core/id.dart';
-import '../../../tags/logic/models/tag.dart';
+import 'package:quotify_utils/quotify_utils.dart';
+import 'package:tags_repository/models/tag.dart';
 
 /// A Quote class.
 final class Quote {
