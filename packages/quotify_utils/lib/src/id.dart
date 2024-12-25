@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import 'natural.dart';
 
 /// An extension type that wraps a `Natural` value and provides additional functionality.
@@ -16,7 +18,8 @@ import 'natural.dart';
 ///
 /// Methods:
 /// - `toInt()`: Converts the wrapped `Natural` value to an `int`.
-extension type Id(Natural _self) {
+@immutable
+extension type const Id(Natural _self) {
   /// Converts to [int].
   int toInt() => _self;
 }
