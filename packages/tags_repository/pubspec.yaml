@@ -11,9 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  quotify_utils: ^1.3.0
+  meta: ^1.15.0
+  quotify_utils: ^2.0.0
 
 dev_dependencies:
+  faker: ^2.2.0
   flutter_test:
     sdk: flutter
   very_good_analysis: ^7.0.0

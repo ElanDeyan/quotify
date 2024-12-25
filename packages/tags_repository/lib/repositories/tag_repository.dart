@@ -1,6 +1,6 @@
 import 'package:quotify_utils/quotify_utils.dart';
 
-import '../models/tag.dart';
+import '../logic/models/tag.dart';
 import 'tag_entry.dart';
 
 /// An abstract interface class that defines the contract for a repository
