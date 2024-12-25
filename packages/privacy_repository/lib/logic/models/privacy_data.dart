@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/serialization/interfaces/encodable.dart';
 
 import '../../repositories/privacy_data_entry.dart';
 import '../../repositories/privacy_repository.dart';
@@ -9,7 +10,7 @@ import 'privacy_data_errors.dart';
 
 /// Represents public data related to user privacy
 @immutable
-final class PrivacyData {
+final class PrivacyData implements Encodable {
   /// Represents public data related to user privacy
   const PrivacyData({
     this.allowErrorReporting = false,
@@ -45,6 +46,7 @@ final class PrivacyData {
 
   /// Method to transform [PrivacyData] to a [Map] of [String] and [Object]?
   /// pair.
+  @override
   Map<String, Object?> toMap() => {
         PrivacyRepository.allowErrorReportingKey: allowErrorReporting,
         PrivacyRepository.acceptedDataUsageKey: acceptedDataUsage,
@@ -74,6 +76,7 @@ final class PrivacyData {
   }
 
   /// Encodes the [PrivacyData] with [jsonEncode].
+  @override
   String toJsonString() => jsonEncode(toMap());
 
   /// Returns a [Result] with either [Ok], with a [PrivacyData] object, or a
