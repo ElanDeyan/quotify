@@ -2,6 +2,7 @@
 /// quotify app.
 library;
 
+export 'src/diagnosticable.dart';
 export 'src/future_result.dart';
 export 'src/id.dart';
 export 'src/maybe.dart';
