@@ -1,3 +1,3 @@
-import '../../utils/natural.dart';
+import 'natural.dart';
 
 extension type Id(Natural self) {}
