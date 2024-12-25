@@ -12,17 +12,13 @@ import 'package:quotify_utils/quotify_utils.dart';
 final class MockFlutterSecureStorageService extends Mock
     implements FlutterSecureStorageService {}
 
-final class MockPrivacyRepository extends Mock implements PrivacyRepository {}
-
 void main() {
   late PrivacyRepository privacyRepository;
-  late PrivacyRepository mockPrivacyRepository;
   late FlutterSecureStorageService secureStorageService;
 
   setUp(() {
     secureStorageService = MockFlutterSecureStorageService();
     privacyRepository = PrivacyRepositoryImpl(secureStorageService);
-    mockPrivacyRepository = MockPrivacyRepository();
   });
 
   group('generateRandomSecurePassword', () {
@@ -570,7 +566,118 @@ void main() {
     });
   });
 
-  group('initialize', () {
-    group('without any privacy data and encryption key', () {});
+  group('setPrivacyDataIfMissing', () {
+    group('without one of keys present', () {
+      setUp(() {
+        when(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).thenAnswer((_) async => false);
+        when(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).thenAnswer((_) async => true);
+        when(() => secureStorageService.write(any(), any()))
+            .thenAnswer((_) async {});
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).called(2);
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).called(2);
+        verify(
+          () => secureStorageService.write(
+            PrivacyRepository.acceptedDataUsageKey,
+            const PrivacyData.initial().acceptedDataUsage.toString(),
+          ),
+        ).called(1);
+      });
+
+      test('should write only in the missing key', () async {
+        final result = await privacyRepository.setPrivacyDataIfMissing();
+        expect(result, isA<Ok<void>>());
+      });
+    });
+
+    group('without any keys present', () {
+      setUp(() {
+        when(
+          () => secureStorageService.containsKey(any()),
+        ).thenAnswer((_) async => false);
+        when(() => secureStorageService.write(any(), any()))
+            .thenAnswer((_) async {});
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).called(2);
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).called(2);
+        verify(
+          () => secureStorageService.write(
+            PrivacyRepository.acceptedDataUsageKey,
+            const PrivacyData.initial().acceptedDataUsage.toString(),
+          ),
+        ).called(1);
+        verify(
+          () => secureStorageService.write(
+            PrivacyRepository.allowErrorReportingKey,
+            const PrivacyData.initial().allowErrorReporting.toString(),
+          ),
+        ).called(1);
+      });
+
+      test('should write both keys', () async {
+        final result = await privacyRepository.setPrivacyDataIfMissing();
+        expect(result, isA<Ok<void>>());
+      });
+    });
+
+    group('with both keys present', () {
+      setUp(() {
+        when(
+          () => secureStorageService.containsKey(any()),
+        ).thenAnswer((_) async => true);
+        when(() => secureStorageService.write(any(), any()))
+            .thenAnswer((_) async {});
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+        ).called(2);
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.allowErrorReportingKey),
+        ).called(2);
+        verifyNever(
+          () => secureStorageService.write(
+            PrivacyRepository.acceptedDataUsageKey,
+            const PrivacyData.initial().acceptedDataUsage.toString(),
+          ),
+        );
+        verifyNever(
+          () => secureStorageService.write(
+            PrivacyRepository.allowErrorReportingKey,
+            const PrivacyData.initial().allowErrorReporting.toString(),
+          ),
+        );
+      });
+
+      test('should not write', () async {
+        final result = await privacyRepository.setPrivacyDataIfMissing();
+        expect(result, isA<Ok<void>>());
+      });
+    });
   });
 }

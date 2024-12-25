@@ -29,6 +29,10 @@ abstract interface class PrivacyRepository {
   @visibleForTesting
   FutureResult<void> setEncryptionPasswordIfMissing();
 
+  /// Sets default values (if are missing) for privacy data.
+  @visibleForTesting
+  FutureResult<void> setPrivacyDataIfMissing();
+
   /// Fetches public [PrivacyData] related to user preferences.
   FutureResult<PrivacyData> fetchPrivacyData();
 
