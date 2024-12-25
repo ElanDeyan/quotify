@@ -6,3 +6,11 @@ extension type Natural._(int _self) implements int {
     return Natural._(integer);
   }
 }
+
+/// Extension on [int] to convert an integer to a [Natural] number.
+extension IntNatural on int {
+  /// Converts an integer to a [Natural] number.
+  ///
+  /// Returns a [Natural] instance representing the current integer.
+  Natural toNatural() => Natural(this);
+}
