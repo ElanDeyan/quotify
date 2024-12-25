@@ -23,6 +23,9 @@ final class PrivacyData {
         allowErrorReporting: entry.allowErrorReporting ?? false,
       );
 
+  /// Creates an instance with default values.
+  const factory PrivacyData.initial() = PrivacyData;
+
   /// Flag to indicate wether the user allowed error reporting or not.
   /// Initialized with `false` by default.
   final bool allowErrorReporting;

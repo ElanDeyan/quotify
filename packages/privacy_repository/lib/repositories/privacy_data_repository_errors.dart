@@ -6,5 +6,11 @@ enum PrivacyRepositoryErrors implements Exception {
   missingSomeKey,
 
   /// Used when the stored value cannot be converted to [bool].
-  invalidBooleanString;
+  invalidBooleanString,
+
+  /// Used when the stored value cannot be converted to [String].
+  invalidEncryptionPassword,
+
+  /// Used when the stored value cannot be stored.
+  failAtWriting,
 }

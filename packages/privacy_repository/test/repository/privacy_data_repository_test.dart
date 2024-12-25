@@ -12,13 +12,17 @@ import 'package:quotify_utils/quotify_utils.dart';
 final class MockFlutterSecureStorageService extends Mock
     implements FlutterSecureStorageService {}
 
+final class MockPrivacyRepository extends Mock implements PrivacyRepository {}
+
 void main() {
   late PrivacyRepository privacyRepository;
+  late PrivacyRepository mockPrivacyRepository;
   late FlutterSecureStorageService secureStorageService;
 
   setUp(() {
     secureStorageService = MockFlutterSecureStorageService();
     privacyRepository = PrivacyRepositoryImpl(secureStorageService);
+    mockPrivacyRepository = MockPrivacyRepository();
   });
 
   group('generateRandomSecurePassword', () {
@@ -324,5 +328,249 @@ void main() {
         },
       );
     });
+  });
+
+  group('isEncryptionPasswordValid', () {
+    group('with invalid passwords', () {
+      final sampleLowerCasePassword = 'a' * 16;
+      final sampleUpperCasePassword = 'P' * 16;
+      final sampleDigitPassword = '0' * 16;
+      final sampleSymbolPassword = '!' * 16;
+      final sampleShortPassword = 'Lk0[' * 2;
+      final sampleLongPassword = 'Rf0!' * 9;
+      final sampleLowerUpperCasePassword = 'nB' * 8;
+      final sampleLowerDigitPassword = 's0' * 8;
+      final sampleLowerSymbolPassword = 'h[' * 8;
+      final sampleUpperDigitPassword = 'D0' * 8;
+      final sampleUpperSymbolPassword = 'U%' * 8;
+      final sampleDigitSymbolPassword = '0=' * 8;
+      final sampleLowerUpperDigitPassword = 'wZ0' * 6;
+      final sampleLowerUpperSymbolPassword = 'qX-' * 6;
+      final sampleLowerDigitSymbolPassword = 'y0]' * 6;
+      final sampleUpperDigitSymbolPassword = 'E0+' * 6;
+
+      final allInvalidPasswords = [
+        sampleLowerCasePassword,
+        sampleUpperCasePassword,
+        sampleDigitPassword,
+        sampleSymbolPassword,
+        sampleShortPassword,
+        sampleLongPassword,
+        sampleLowerUpperCasePassword,
+        sampleLowerDigitPassword,
+        sampleLowerSymbolPassword,
+        sampleUpperDigitPassword,
+        sampleUpperSymbolPassword,
+        sampleDigitSymbolPassword,
+        sampleLowerUpperDigitPassword,
+        sampleLowerUpperSymbolPassword,
+        sampleLowerDigitSymbolPassword,
+        sampleUpperDigitSymbolPassword,
+      ];
+
+      test('should return false', () {
+        for (final password in allInvalidPasswords) {
+          expect(
+            privacyRepository.isEncryptionPasswordValid(password),
+            isFalse,
+          );
+        }
+      });
+    });
+
+    group('with valid passwords', () {
+      final sampleValidPasswords = [
+        r'A2e$' * 4,
+        'B3r@' * 4,
+        'C4t#' * 4,
+        'D5y%' * 4,
+        'E6u[' * 4,
+        'F7i&' * 4,
+        'G8o*' * 4,
+        'H9p(' * 4,
+        'I0q)' * 4,
+        'J1w-' * 4,
+      ];
+
+      test('should return true', () {
+        for (final password in sampleValidPasswords) {
+          expect(
+            privacyRepository.isEncryptionPasswordValid(password),
+            isTrue,
+          );
+        }
+      });
+    });
+  });
+
+  group('fetchEncryptionPassword', () {
+    group('with no key present', () {
+      setUp(() {
+        when(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).thenAnswer((_) async => false);
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).called(1);
+        verifyNever(() => secureStorageService.read(any()));
+      });
+
+      test('should return Failure with PrivacyRepository.missingKey', () async {
+        final result = await privacyRepository.fetchEncryptionPassword();
+
+        expect(result, isA<Failure<String>>());
+        expect(
+          result.asFailure.failure,
+          equals(PrivacyRepositoryErrors.missingSomeKey),
+        );
+      });
+    });
+
+    group('with key present, but invalid,', () {
+      setUp(() {
+        when(() => secureStorageService.containsKey(any()))
+            .thenAnswer((_) async => true);
+        when(
+          () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
+        ).thenAnswer((_) async => 'password');
+      });
+      test(' should return Failure with invalidEncryptionPassword', () async {
+        final result = await privacyRepository.fetchEncryptionPassword();
+
+        expect(result, isA<Failure<String>>());
+        expect(
+          result.asFailure.failure,
+          equals(PrivacyRepositoryErrors.invalidEncryptionPassword),
+        );
+      });
+    });
+
+    group('with key present, but valid', () {
+      const samplePassword = 'Password123!@Ee6';
+      setUp(() {
+        when(() => secureStorageService.containsKey(any()))
+            .thenAnswer((_) async => true);
+        when(
+          () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
+        ).thenAnswer((_) async => samplePassword);
+      });
+
+      test('should return Ok with the password', () async {
+        final result = await privacyRepository.fetchEncryptionPassword();
+
+        expect(result, isA<Ok<String>>());
+        expect(
+          result.asOk.value,
+          equals(samplePassword),
+        );
+      });
+    });
+  });
+
+  group('setEncryptionPassword', () {
+    group('with no errors on write', () {
+      setUp(() {
+        when(() => secureStorageService.write(any(), any()))
+            .thenAnswer((_) async {});
+      });
+
+      tearDown(() {
+        verify(() => secureStorageService.write(any(), any())).called(1);
+        verifyNever(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        );
+        verifyNever(
+          () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
+        );
+      });
+
+      test('should return ok', () async {
+        final result = await privacyRepository.setEncryptionPassword();
+
+        expect(result, isA<Ok<void>>());
+      });
+    });
+
+    group('with errors on write', () {
+      setUp(() {
+        when(() => secureStorageService.write(any(), any()))
+            .thenThrow(Exception());
+      });
+
+      tearDown(() {
+        verify(() => secureStorageService.write(any(), any())).called(1);
+        verifyNever(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        );
+        verifyNever(
+          () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
+        );
+      });
+
+      test('should return failure', () async {
+        final result = await privacyRepository.setEncryptionPassword();
+
+        expect(result, isA<Failure<void>>());
+      });
+    });
+  });
+
+  group('setEncryptionPasswordIfMissing', () {
+    group('with no key present', () {
+      setUp(() {
+        when(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).thenAnswer((_) async => false);
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).called(1);
+        verify(() => secureStorageService.write(any(), any())).called(1);
+        verifyNever(() => secureStorageService.read(any()));
+      });
+
+      test('should call secureStorageService.write once', () async {
+        final result = await privacyRepository.setEncryptionPasswordIfMissing();
+        expect(result, isA<Ok<void>>());
+      });
+    });
+
+    group('with key present', () {
+      setUp(() {
+        when(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).thenAnswer((_) async => true);
+      });
+
+      tearDown(() {
+        verify(
+          () => secureStorageService
+              .containsKey(PrivacyRepository.dataEncryptionKey),
+        ).called(1);
+        verifyNever(() => secureStorageService.read(any()));
+        verifyNever(() => secureStorageService.write(any(), any()));
+      });
+
+      test('should not call secureStorageService.write', () async {
+        final result = await privacyRepository.setEncryptionPasswordIfMissing();
+        expect(result, isA<Ok<void>>());
+      });
+    });
+  });
+
+  group('initialize', () {
+    group('without any privacy data and encryption key', () {});
   });
 }

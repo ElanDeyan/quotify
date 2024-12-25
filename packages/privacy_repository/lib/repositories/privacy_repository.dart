@@ -20,11 +20,14 @@ abstract interface class PrivacyRepository {
   static const acceptedDataUsageKey = 'acceptedDataUsage';
 
   /// Sets default values (if are missing) for:
-  /// - encryption key
+  /// - encryption password
   /// - allow error reporting
   /// - accepted data usage
-  /// - random password
-  Future<void> initialize();
+  FutureResult<void> initialize();
+
+  /// Sets default value (if are missing) for encryption password
+  @visibleForTesting
+  FutureResult<void> setEncryptionPasswordIfMissing();
 
   /// Fetches public [PrivacyData] related to user preferences.
   FutureResult<PrivacyData> fetchPrivacyData();
@@ -36,7 +39,13 @@ abstract interface class PrivacyRepository {
   @visibleForTesting
   String generateRandomSecurePassword();
 
+  /// Sets the encryption password to the data storage by
+  /// calling [generateRandomSecurePassword].
   FutureResult<void> setEncryptionPassword();
 
+  /// Fetches the encryption password from the data storage.
   FutureResult<String> fetchEncryptionPassword();
+
+  @visibleForTesting
+  bool isEncryptionPasswordValid(String password);
 }

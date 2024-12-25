@@ -80,13 +80,36 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
       password.length >= 16 && password.length <= 32,
       'Should be within 16 and 32',
     );
+    assert(
+      password.contains(RegExp('[a-z]')) &&
+          password.contains(RegExp('[A-Z]')) &&
+          password.contains(RegExp('[0-9]')) &&
+          password.contains(RegExp(r'[!@#$%&*(){}[\]\|?/+=_-]')),
+      'Should contain at least one of each: lowercase, uppercase, number, '
+      'special char',
+    );
+
     return password;
   }
 
   @override
-  Future<void> initialize() {
-    // TODO: implement initialize
-    throw UnimplementedError();
+  FutureResult<void> initialize() async =>
+      Result.fromComputationAsync(() async {
+        await savePrivacyData(
+          PrivacyDataEntry.fromPrivacyData(const PrivacyData.initial()),
+        );
+        await setEncryptionPasswordIfMissing();
+      });
+
+  /// Sets default value (if are missing) for encryption password
+  @override
+  FutureResult<void> setEncryptionPasswordIfMissing() async {
+    if (!(await _secureStorageService
+        .containsKey(PrivacyRepository.dataEncryptionKey))) {
+      return Result.fromComputationAsync(setEncryptionPassword);
+    }
+
+    return const Result.ok(null);
   }
 
   @override
@@ -129,14 +152,62 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<String> fetchEncryptionPassword() {
-    // TODO: implement fetchEncryptionPassword
-    throw UnimplementedError();
+  FutureResult<String> fetchEncryptionPassword() async {
+    if (!(await _secureStorageService
+        .containsKey(PrivacyRepository.dataEncryptionKey))) {
+      return Result.failure(
+        PrivacyRepositoryErrors.missingSomeKey,
+        StackTrace.current,
+      );
+    }
+
+    final encryptionKey =
+        await _secureStorageService.read(PrivacyRepository.dataEncryptionKey);
+
+    if (encryptionKey == null) {
+      return Result.failure(
+        PrivacyRepositoryErrors.missingSomeKey,
+        StackTrace.current,
+      );
+    }
+
+    if (!isEncryptionPasswordValid(encryptionKey)) {
+      return Result.failure(
+        PrivacyRepositoryErrors.invalidEncryptionPassword,
+        StackTrace.current,
+      );
+    }
+
+    return Result.ok(
+      (await _secureStorageService.read(PrivacyRepository.dataEncryptionKey))!,
+    );
   }
 
   @override
-  FutureResult<void> setEncryptionPassword() {
-    // TODO: implement setEncryptionPassword
-    throw UnimplementedError();
+  bool isEncryptionPasswordValid(String password) {
+    if (password.length < 16 || password.length > 32) {
+      return false;
+    }
+
+    if (password.contains(RegExp('[a-z]')) &&
+        password.contains(RegExp('[A-Z]')) &&
+        password.contains(RegExp('[0-9]')) &&
+        password.contains(RegExp(r'[!@#$%&*(){}[\]\|?/+=_-]'))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  FutureResult<void> setEncryptionPassword() async {
+    final password = generateRandomSecurePassword();
+
+    return Result.fromComputationAsync(
+      () => _secureStorageService.write(
+        PrivacyRepository.dataEncryptionKey,
+        password,
+      ),
+    );
   }
 }
