@@ -82,7 +82,18 @@ final class PrivacyData implements Encodable {
   /// Returns a [Result] with either [Ok], with a [PrivacyData] object, or a
   /// [Failure] with some of [PrivacyDataErrors] enum members.
   static Result<PrivacyData> fromJsonString(String jsonString) {
-    if (jsonDecode(jsonString) case final Map<String, Object?> map) {
+    late final Object? decodedJsonString;
+
+    try {
+      decodedJsonString = jsonDecode(jsonString);
+    } on FormatException catch (error, stackTrace) {
+      return Result.failure(
+        PrivacyDataErrors.invalidJsonStringFormat,
+        stackTrace,
+      );
+    }
+
+    if (decodedJsonString case final Map<String, Object?> map) {
       return fromMap(map);
     }
 

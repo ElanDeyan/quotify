@@ -88,11 +88,14 @@ void main() {
       final sampleList = <Map<String, Object?>>[
         for (var i = 0; i < 5; i++) {'$i': i},
       ];
+      const invalidJson = '';
 
       test(
-        'should return a Failure with PrivacyDataErrors.invalidJsonStringFormat',
+        'should return a Failure with '
+        'PrivacyDataErrors.invalidJsonStringFormat',
         () {
-          for (final sample in [sampleMap, sampleList].map(jsonEncode)) {
+          for (final sample
+              in [sampleMap, sampleList, invalidJson].map(jsonEncode)) {
             final result = PrivacyData.fromJsonString(sample);
             expect(
               result,
