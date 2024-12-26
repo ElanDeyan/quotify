@@ -42,7 +42,7 @@ final class Tag implements Encodable, Diagnosticable {
       id == other.id && label == other.label;
 
   @override
-  int get hashCode => id.toInt().hashCode ^ label.hashCode;
+  int get hashCode => id.hashCode ^ label.hashCode;
 
   /// Creates a `Tag` object from a given map representation.
   ///
