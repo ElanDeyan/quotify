@@ -89,10 +89,37 @@ final class AppDatabase extends _$AppDatabase {
     return Result.ok(operation);
   }
 
-  FutureResult<TagTable> deleteTag(Id id) {
-    // TODO: implement deleteTag
-    throw UnimplementedError();
-  }
+  /// Deletes a tag from the database based on the provided [id].
+  ///
+  /// This method performs a transaction to delete a tag from the `tags` table
+  /// where the tag's ID matches the provided [id]. It returns a [FutureResult]
+  /// containing the deleted tag if the operation is successful.
+  ///
+  /// Throws:
+  /// - [DatabaseErrors.notFoundId] if no tag with the specified ID is found.
+  /// - [DatabaseErrors.tooMuchRowsAffected] if more than one row is affected
+  /// by the delete operation.
+  ///
+  /// Returns:
+  /// - A [FutureResult] containing the deleted [TagTable] if the operation is
+  /// successful.
+  FutureResult<TagTable> deleteTag(Id id) async => Result.fromComputationAsync(
+        () => transaction(
+          () async {
+            final affectedRows = await (delete(tags)
+                  ..where(
+                    (tbl) => tbl.id.equals(id.toInt()),
+                  ))
+                .goAndReturn();
+
+            return switch (affectedRows) {
+              [final deletedTag] => deletedTag,
+              [] => throw DatabaseErrors.notFoundId,
+              [...] => throw DatabaseErrors.tooMuchRowsAffected,
+            };
+          },
+        ),
+      );
 
   /// Retrieves a tag from the database by its ID.
   ///
@@ -124,17 +151,20 @@ final class AppDatabase extends _$AppDatabase {
 
   /// Updates a tag in the database with the given [id] and [updatedTagEntry].
   ///
-  /// This method performs a database transaction to update the tag's label and
-  /// updatedAt fields. If the update affects exactly one row, it retrieves the
-  /// updated tag from the database and returns it. If no rows are affected or
-  /// the updated tag cannot be found, it throws a [DatabaseErrors] exception.
+  /// This method performs a transaction to update the tag's label and
+  /// updatedAt fields. It returns a [FutureResult] containing the updated
+  /// [TagTable] entry.
   ///
-  /// Returns a [FutureResult] containing the updated [TagTable].
+  /// If the update is successful and exactly one row is affected, the updated
+  /// row is returned. If no rows are affected, a [DatabaseErrors.notFoundId]
+  /// error is thrown. If more than one row is affected, a
+  /// [DatabaseErrors.tooMuchRowsAffected] error is thrown.
   ///
-  /// Throws:
-  /// - [DatabaseErrors.cannotUpdateEntry] if the update does not affect
-  /// exactly one row.
-  /// - [DatabaseErrors.notFoundId] if the updated tag cannot be found.
+  /// - Parameters:
+  ///   - id: The ID of the tag to be updated.
+  ///   - updatedTagEntry: The new values for the tag entry.
+  ///
+  /// - Returns: A [FutureResult] containing the updated [TagTable] entry.
   FutureResult<TagTable> updateTag(Id id, TagEntry updatedTagEntry) async =>
       Result.fromComputationAsync(
         () => transaction(
@@ -143,21 +173,18 @@ final class AppDatabase extends _$AppDatabase {
                   ..where(
                     (tbl) => tbl.id.equals(id.toInt()),
                   ))
-                .write(
+                .writeReturning(
               TagsCompanion(
                 label: Value(updatedTagEntry.label),
                 updatedAt: Value(DateTime.now()),
               ),
             );
 
-            if (affectedRows != 1) throw DatabaseErrors.cannotUpdateEntry;
-
-            final updatedTag = await getTagById(id);
-            if (updatedTag == null) {
-              throw DatabaseErrors.notFoundId;
-            }
-
-            return updatedTag;
+            return switch (affectedRows) {
+              [final updatedRow] => updatedRow,
+              [] => throw DatabaseErrors.notFoundId,
+              [...] => throw DatabaseErrors.tooMuchRowsAffected,
+            };
           },
         ),
       );

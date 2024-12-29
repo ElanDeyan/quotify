@@ -191,9 +191,58 @@ void main() {
         expect(result, isA<Failure<TagTable>>());
         expect(
           result.asFailure.failure,
-          equals(DatabaseErrors.cannotUpdateEntry),
+          equals(DatabaseErrors.notFoundId),
         );
       });
     });
+  });
+
+  group('deleteTag', () {
+    late TagEntry firstEntry;
+    late TagTable initialAdded;
+
+    setUp(() async {
+      firstEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+      initialAdded = (await database.createTag(firstEntry)).asOk.value;
+    });
+
+    test('delete existent id should remove it and return it as a Ok', () async {
+      final initialTagsQuantity = (await database.allTags).length;
+
+      final result = await database.deleteTag(Id(initialAdded.id.toNatural()));
+
+      expect(result, isA<Ok<TagTable>>());
+      expect(result.asOk.value, equals(initialAdded));
+
+      final actualTagsQuantity = (await database.allTags).length;
+      expect(actualTagsQuantity, equals(initialTagsQuantity - 1));
+    });
+
+    test(
+      'delete non-existent Id should return Failure with notFoundId',
+      () async {
+        final initialTagsQuantity = (await database.allTags).length;
+
+        final nonExistentId = Id(Natural(initialAdded.id + 1));
+
+        expect(
+          database.allTags,
+          completion(
+            predicate(
+              (List<TagTable> tags) =>
+                  !tags.map((tag) => tag.id).contains(nonExistentId.toInt()),
+            ),
+          ),
+        );
+
+        final result = await database.deleteTag(nonExistentId);
+
+        expect(result, isA<Failure<TagTable>>());
+        expect(result.asFailure.failure, equals(DatabaseErrors.notFoundId));
+
+        final actualTagsQuantity = (await database.allTags).length;
+        expect(actualTagsQuantity, equals(initialTagsQuantity));
+      },
+    );
   });
 }

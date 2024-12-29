@@ -14,5 +14,7 @@ enum DatabaseErrors implements Exception {
 
   notFoundId,
 
-  
+  cannotDeleteEntry,
+
+  tooMuchRowsAffected,
 }
