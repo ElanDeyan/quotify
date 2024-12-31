@@ -41,7 +41,7 @@ sealed class Result<T> {
   factory Result.fromComputationSync(T Function() computation) {
     try {
       return Result.ok(computation());
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       return Result.failure(error, stackTrace);
     }
   }
@@ -53,7 +53,7 @@ sealed class Result<T> {
     try {
       final result = await computation();
       return Result.ok(result);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       return Result.failure(error, stackTrace);
     }
   }
