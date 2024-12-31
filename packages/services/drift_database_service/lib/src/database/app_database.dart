@@ -52,10 +52,32 @@ final class AppDatabase extends _$AppDatabase {
   /// table changes.
   Stream<List<TagTable>> get allTagsStream => select(tags).watch();
 
-  Future<void> clearAllTags() {
-    // TODO: implement clearAllTags
-    throw UnimplementedError();
-  }
+  /// Clears all tags from the database.
+  ///
+  /// This method performs a transaction to delete all rows from the `tags`
+  /// table.
+  ///
+  /// It first retrieves the number of tags before deletion and then
+  /// deletes all tags.
+  ///
+  /// If the number of rows affected by the deletion does not match the number
+  /// of tags before deletion, it throws a `DatabaseErrors.notDeletedAllTags`
+  /// error.
+  ///
+  /// Returns a [FutureResult] containing [Unit] upon successful completion.
+  FutureResult<void> clearAllTags() => Result.fromComputationAsync(
+        () => transaction(
+          () async {
+            final howManyTagsBeforeDelete = (await allTags).length;
+
+            final amountOfRowsAffected = await delete(tags).go();
+
+            if (amountOfRowsAffected != howManyTagsBeforeDelete) {
+              throw DatabaseErrors.notDeletedAllTags;
+            }
+          },
+        ),
+      );
 
   /// Creates a new tag in the database.
   ///
@@ -133,7 +155,7 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns a [Future] that completes with a [Maybe] of [TagTable] if
   /// a tag with the specified ID is found, or `null` if no such tag
   /// exists.
-  Future<Maybe<TagTable>?> getTagById(Id id) async => (select(tags)
+  Future<TagTable?> getTagById(Id id) async => (select(tags)
         ..where(
           (tbl) => tbl.id.equals(id.toInt()),
         ))

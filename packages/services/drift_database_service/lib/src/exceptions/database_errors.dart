@@ -1,20 +1,20 @@
-/// An enumeration representing possible database errors.
-///
-/// This enum implements the [Exception] interface, allowing instances of
-/// [DatabaseErrors] to be thrown and caught as exceptions.
-///
-/// Possible values:
-/// - [DatabaseErrors.cannotCreateEntry]: Indicates that the entry could not
-/// be created. Like a Tag
+/// Enum representing various database errors that can occur in the application.
 enum DatabaseErrors implements Exception {
-  /// Indicates that the entry, like a Tag, cannot be created.
+  /// Error indicating that an entry could not be created.
   cannotCreateEntry,
 
+  /// Error indicating that an entry could not be updated.
   cannotUpdateEntry,
 
+  /// Error indicating that an entry with the specified ID was not found.
   notFoundId,
 
+  /// Error indicating that an entry could not be deleted.
   cannotDeleteEntry,
 
+  /// Error indicating that too many rows were affected by an operation.
   tooMuchRowsAffected,
+
+  /// Error indicating that not all tags were deleted as expected.
+  notDeletedAllTags,
 }

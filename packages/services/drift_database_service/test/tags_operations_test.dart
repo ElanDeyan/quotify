@@ -245,4 +245,18 @@ void main() {
       },
     );
   });
+
+  group('clearAllTags', () {
+    test('should return Ok and have 0 tags in the table', () async {
+      for (var i = 0; i < 10; i++) {
+        await database
+            .createTag(TagEntry(label: NonBlankString(faker.lorem.word())));
+      }
+
+      final result = await database.clearAllTags();
+
+      expect(result, isA<Ok<void>>());
+      expect(database.allTags, completion(hasLength(isZero)));
+    });
+  });
 }
