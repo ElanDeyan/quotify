@@ -2,9 +2,11 @@ import 'package:meta/meta.dart';
 
 import 'natural.dart';
 
-/// An extension type that wraps a `Natural` value and provides additional functionality.
+/// An extension type that wraps a `Natural` value and provides additional
+/// functionality.
 ///
-/// The `Id` extension type allows you to convert the wrapped `Natural` value to an `int`.
+/// The `Id` extension type allows you to convert the wrapped `Natural` value
+/// to an `int`.
 ///
 /// Example usage:
 /// ```dart
