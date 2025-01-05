@@ -4,11 +4,11 @@ import 'package:event/event.dart';
 
 /// An abstract base class that represents a reactive entity which can publish
 /// events of type [T].
-/// 
+///
 /// [T] is a type that extends [EventArgs].
 abstract base class Reactive<T extends EventArgs> {
-    /// The event publisher responsible for publishing events of type [T].
-    final EventPublisher<T> eventPublisher = EventPublisher<T>(Event());
+  /// The event publisher responsible for publishing events of type [T].
+  final EventPublisher<T> eventPublisher = EventPublisher<T>(Event());
 }
 
 /// An extension type that provides additional functionality for an [Event].
@@ -34,7 +34,6 @@ abstract base class Reactive<T extends EventArgs> {
 /// - `T`: The type of event arguments, which must extend [EventArgs].
 extension type EventPublisher<T extends EventArgs>(Event<T> _event)
     implements Event<T> {
-  
   /// Notifies all subscribers with the given event.
   ///
   /// Returns `true` if the notification was successful, `false` otherwise.
