@@ -42,7 +42,7 @@ final class Tag implements Encodable, Diagnosticable {
       id == other.id && label == other.label;
 
   @override
-  int get hashCode => id.hashCode ^ label.hashCode;
+  int get hashCode => Object.hashAll([id, label]);
 
   /// Creates a `Tag` object from a given map representation.
   ///
@@ -86,7 +86,7 @@ final class Tag implements Encodable, Diagnosticable {
 
   /// Converts a JSON string into a `Tag` object.
   ///
-  /// This method attempts to decode the provided JSON string and convert it 
+  /// This method attempts to decode the provided JSON string and convert it
   /// into a `Tag` object. If the JSON string is invalid or does not represent
   /// a valid map, it returns a failure result with the appropriate error.
   ///
