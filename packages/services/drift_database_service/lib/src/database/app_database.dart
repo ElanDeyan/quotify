@@ -207,13 +207,13 @@ final class AppDatabase extends _$AppDatabase {
   ///   - updatedTagEntry: The new values for the tag entry.
   ///
   /// - Returns: A [FutureResult] containing the updated [TagTable] entry.
-  FutureResult<TagTable> updateTag(Id id, TagEntry updatedTagEntry) async =>
+  FutureResult<TagTable> updateTag(FullTagEntry updatedTagEntry) async =>
       Result.fromComputationAsync(
         () => transaction(
           () async {
             final affectedRows = await (update(tags)
                   ..where(
-                    (tbl) => tbl.id.equals(id.toInt()),
+                    (tbl) => tbl.id.equals(updatedTagEntry.id.toInt()),
                   ))
                 .writeReturning(
               TagsCompanion(

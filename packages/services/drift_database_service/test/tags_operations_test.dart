@@ -147,13 +147,12 @@ void main() {
 
   group('updateTag', () {
     group('with existent tag', () {
-      late TagEntry firstEntry;
-      late TagEntry secondEntry;
+      late HalfTagEntry firstEntry;
+      late FullTagEntry secondEntry;
       late TagTable initialAdded;
 
       setUp(() async {
         firstEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
-        secondEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
         initialAdded = (await database.createTag(firstEntry)).asOk.value;
         await Future.delayed(
@@ -162,15 +161,17 @@ void main() {
             // Needed to give time before the next updated operation
           },
         );
+
+        secondEntry = FullTagEntry(
+          id: Id(initialAdded.id.toNatural()),
+          label: NonBlankString(faker.lorem.word()),
+        );
       });
 
       test(
         'should update the label and updatedAt, but keep the Id and createdAt',
         () async {
-          final result = await database.updateTag(
-            Id(initialAdded.id.toNatural()),
-            secondEntry,
-          );
+          final result = await database.updateTag(secondEntry);
 
           expect(result, isA<Ok<TagTable>>());
 
@@ -206,10 +207,8 @@ void main() {
           ),
         );
 
-        final result = await database.updateTag(
-          nonExistentId,
-          secondEntry,
-        );
+        secondEntry = FullTagEntry(label: secondEntry.label, id: nonExistentId);
+        final result = await database.updateTag(secondEntry);
 
         expect(result, isA<Failure<TagTable>>());
         expect(
