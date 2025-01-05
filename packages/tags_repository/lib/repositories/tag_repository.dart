@@ -12,7 +12,8 @@ import 'tag_entry.dart';
 abstract interface class TagRepository {
   /// Retrieves all tags.
   ///
-  /// Returns a [Future] that completes with a list of all [Tag] objects.
+  /// Returns a [Future] that completes with an unmodifiable list of all
+  /// [Tag] objects.
   Future<List<Tag>> get allTags;
 
   /// Retrieves a tag by its ID.
@@ -21,14 +22,14 @@ abstract interface class TagRepository {
   ///
   /// Returns a [Future] that completes with the [Tag] object if found,
   /// or `null` if no tag with the given ID exists.
-  Future<Maybe<Tag>> getTagById(Id id);
+  Future<Tag?> getTagById(Id id);
 
   /// Retrieves multiple tags by their IDs.
   ///
   /// [ids] - An iterable of IDs of the tags to retrieve.
   ///
-  /// Returns a [Future] that completes with a list of [Tag] objects
-  /// corresponding to the given IDs.
+  /// Returns a [Future] that completes with an unmodifiable list of
+  /// [Tag] objects corresponding to the given IDs.
   Future<List<Tag>> getTagsByIds(Iterable<Id> ids);
 
   /// Creates a new tag.
@@ -43,7 +44,7 @@ abstract interface class TagRepository {
   /// [tag] - The [TagEntry] object containing the updated details of the tag.
   ///
   /// Returns a [FutureResult] that completes with the updated [Tag] object.
-  FutureResult<Tag> updateTag(TagEntry tag);
+  FutureResult<Tag> updateTag(FullTagEntry tag);
 
   /// Deletes a tag by its ID.
   ///
@@ -52,15 +53,8 @@ abstract interface class TagRepository {
   /// Returns a [FutureResult] that completes with the deleted [Tag] object.
   FutureResult<Tag> deleteTag(Id id);
 
-  /// Restores a list of tags.
-  ///
-  /// [tags] - The list of [Tag] objects to restore.
-  ///
-  /// Returns a [Future] that completes when the tags have been restored.
-  Future<void> restoreTags(List<Tag> tags);
-
   /// Clears all tags.
   ///
   /// Returns a [Future] that completes when all tags have been cleared.
-  Future<void> clearAllTags();
+  FutureResult<void> clearAllTags();
 }
