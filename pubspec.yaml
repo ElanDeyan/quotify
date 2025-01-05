@@ -16,6 +16,7 @@ workspace:
   - packages/primary_colors_repository
   - packages/languages_repository
   - packages/privacy_repository
+  - packages/quotes_repository
   - packages/tags_repository
 
 dependencies:

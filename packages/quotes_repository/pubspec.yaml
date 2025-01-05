@@ -1,0 +1,23 @@
+name: quotes_repository
+description: "A new Flutter package project."
+version: 0.0.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  collection: ^1.19.0
+  flutter:
+    sdk: flutter
+  meta: ^1.15.0
+  quotify_utils: ^2.5.0
+  tags_repository: ^1.0.0
+
+dev_dependencies:
+  faker: ^2.2.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
