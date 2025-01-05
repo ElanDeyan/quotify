@@ -191,7 +191,7 @@ final class AppDatabase extends _$AppDatabase {
     return foundTags;
   }
 
-  /// Updates a tag in the database with the given [id] and [updatedTagEntry].
+  /// Updates a tag in the database with the given [updatedTagEntry].
   ///
   /// This method performs a transaction to update the tag's label and
   /// updatedAt fields. It returns a [FutureResult] containing the updated
