@@ -37,7 +37,7 @@ void main() {
   });
 
   group('createTag', () {
-    final sampleEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+    final sampleEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
     test('without data, should add and return Ok with the data', () async {
       expect(database.allTags, completion(isEmpty));
@@ -56,7 +56,8 @@ void main() {
       'having a tag with same label, will create a new one, '
       'but with different Id',
       () async {
-        final sampleEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+        final sampleEntry =
+            HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
         final firstAdded = await database.createTag(sampleEntry);
         final secondAdded = await database.createTag(sampleEntry);
@@ -70,6 +71,28 @@ void main() {
         );
 
         expect(firstAdded.asOk.value.id, isNot(secondAdded.asOk.value.id));
+      },
+    );
+
+    test(
+      'with a full entry, and existing id, should not replace it',
+      () async {
+        final sampleEntry = HalfTagEntry(
+          label: NonBlankString(faker.lorem.word()),
+        );
+
+        final addedTag = (await database.createTag(sampleEntry)).asOk.value;
+
+        final fullEntryWithSameId = FullTagEntry(
+          label: NonBlankString(faker.lorem.word()),
+          id: Id(Natural((await database.allTags).single.id)),
+        );
+
+        final result = await database.createTag(fullEntryWithSameId);
+
+        expect(result, isA<Failure<TagTable>>());
+        expect(database.allTags, completion(hasLength(1)));
+        expect(database.allTags, completion([addedTag]));
       },
     );
   });
@@ -91,7 +114,7 @@ void main() {
       late TagTable addedTagTable;
       late TagEntry sampleEntry;
       setUp(() async {
-        sampleEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+        sampleEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
         addedTagTable = (await database.createTag(sampleEntry)).asOk.value;
       });
@@ -129,8 +152,8 @@ void main() {
       late TagTable initialAdded;
 
       setUp(() async {
-        firstEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
-        secondEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+        firstEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
+        secondEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
         initialAdded = (await database.createTag(firstEntry)).asOk.value;
         await Future.delayed(
@@ -202,7 +225,7 @@ void main() {
     late TagTable initialAdded;
 
     setUp(() async {
-      firstEntry = TagEntry(label: NonBlankString(faker.lorem.word()));
+      firstEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
       initialAdded = (await database.createTag(firstEntry)).asOk.value;
     });
 
@@ -250,7 +273,7 @@ void main() {
     test('should return Ok and have 0 tags in the table', () async {
       for (var i = 0; i < 10; i++) {
         await database
-            .createTag(TagEntry(label: NonBlankString(faker.lorem.word())));
+            .createTag(HalfTagEntry(label: NonBlankString(faker.lorem.word())));
       }
 
       final result = await database.clearAllTags();
@@ -258,5 +281,48 @@ void main() {
       expect(result, isA<Ok<void>>());
       expect(database.allTags, completion(hasLength(isZero)));
     });
+  });
+
+  group('getTagsByIds', () {
+    test('with empty Id list, should return an empty list', () async {
+      expect(database.getTagsWithIds([]), completion(isEmpty));
+    });
+
+    test('with all ids existing, should return exactly N items', () async {
+      for (var i = 0; i < 10; i++) {
+        await database
+            .createTag(HalfTagEntry(label: NonBlankString(faker.lorem.word())));
+      }
+
+      final tags = await database.allTags;
+      final allIds = tags.map((tag) => Id(tag.id.toNatural()));
+
+      final tagsWithIds = await database.getTagsWithIds(allIds);
+
+      expect(tagsWithIds, equals({...tags}));
+    });
+
+    test(
+      'with a non-existent id, should just ignore it and return founded ones',
+      () async {
+        final missingId = Id(50.toNatural());
+        for (var i = 0; i < 10; i++) {
+          await database.createTag(
+            HalfTagEntry(label: NonBlankString(faker.lorem.word())),
+          );
+        }
+
+        final tags = await database.allTags;
+        final idsInDatabase = tags.map((tag) => Id(tag.id.toNatural()));
+
+        expect(idsInDatabase.contains(missingId), isFalse);
+
+        final foundTags =
+            await database.getTagsWithIds([...idsInDatabase, missingId]);
+
+        expect(foundTags.map((e) => e.id).contains(missingId.toInt()), isFalse);
+        expect(foundTags, equals({...tags}));
+      },
+    );
   });
 }

@@ -1,17 +1,19 @@
 import 'package:drift/drift.dart';
 import 'package:drift_database_service/src/database/connection/native_connection.dart';
 import 'package:drift_database_service/src/exceptions/database_errors.dart';
+import 'package:drift_database_service/src/extensions/tag_entry_extension.dart';
 import 'package:quotify_utils/quotify_utils.dart';
-import 'package:tags_repository/logic/models/tag.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
 
 import '../tables/tags.dart';
 
 part 'app_database.g.dart';
 
+/// Database for the tags and quotes.
 @DriftDatabase(tables: [Tags])
 final class AppDatabase extends _$AppDatabase {
-  /// Constructs an instance of [AppDatabase] with the given encryption passphrase.
+  /// Constructs an instance of [AppDatabase] with the given encryption
+  /// passphrase.
   ///
   /// The [encryptionPassPhrase] is used to encrypt the database connection.
   ///
@@ -95,20 +97,23 @@ final class AppDatabase extends _$AppDatabase {
   ///
   /// - Returns: A [FutureResult] containing the created [TagTable] entry or an
   /// error.
-  FutureResult<TagTable> createTag(TagEntry tag) async {
-    final operation = await into(tags).insertReturningOrNull(
-      TagsCompanion(label: Value(tag.label)),
-      mode: InsertMode.insertOrReplace,
+  FutureResult<TagTable> createTag(TagEntry entry) async {
+    final operationResult = await Result.fromComputationAsync(
+      () => transaction(
+        () => into(tags).insertReturningOrNull(
+          entry.toTagsCompanion(),
+          mode: InsertMode.insertOrAbort,
+        ),
+      ),
     );
 
-    if (operation == null) {
-      return Result.failure(
-        DatabaseErrors.cannotCreateEntry,
-        StackTrace.current,
-      );
-    }
-
-    return Result.ok(operation);
+    return switch (operationResult) {
+      Ok(:final value?) => Result.ok(value),
+      Ok(value: null) =>
+        Result.failure(DatabaseErrors.cannotCreateEntry, StackTrace.current),
+      Failure(:final failure, :final stackTrace) =>
+        Result.failure(failure, stackTrace),
+    };
   }
 
   /// Deletes a tag from the database based on the provided [id].
@@ -161,14 +166,29 @@ final class AppDatabase extends _$AppDatabase {
         ))
       .getSingleOrNull();
 
-  Future<List<TagTable>> getTagsByIds(Iterable<Id> ids) {
-    // TODO: implement getTagsByIds
-    throw UnimplementedError();
-  }
+  /// Retrieves a set of `TagTable` entries corresponding to the provided IDs.
+  ///
+  /// This method takes an iterable of IDs and returns a set of `TagTable`
+  /// objects that match those IDs. If the provided iterable is empty, an
+  /// empty set is returned.
+  ///
+  /// The method iterates over each ID, fetches the corresponding `TagTable`
+  /// entry using `getTagById`, and adds it to the set if it exists.
+  ///
+  /// - Parameter ids: An iterable collection of IDs to fetch `TagTable`
+  /// entries for.
+  /// - Returns: A `Future` that completes with a set of `TagTable` entries.
+  Future<Set<TagTable>> getTagsWithIds(Iterable<Id> ids) async {
+    if (ids.isEmpty) return const {};
 
-  Future<void> restoreTags(List<Tag> tags) {
-    // TODO: implement restoreTags
-    throw UnimplementedError();
+    final foundTags = <TagTable>{};
+
+    for (final id in ids) {
+      final maybeTag = await getTagById(id);
+      if (maybeTag != null) foundTags.add(maybeTag);
+    }
+
+    return foundTags;
   }
 
   /// Updates a tag in the database with the given [id] and [updatedTagEntry].

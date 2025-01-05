@@ -17,7 +17,7 @@ dependencies:
   quotify_utils: ^2.1.2
   sqlcipher_flutter_libs: ^0.6.4
   sqlite3: ^2.5.0
-  tags_repository: ^0.0.1
+  tags_repository: ^1.0.0
 
 dev_dependencies:
   build_runner: ^2.4.14
