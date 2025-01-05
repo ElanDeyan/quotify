@@ -28,7 +28,7 @@ dependencies:
   pub_semver: ^2.1.5
   quotify_utils: ^2.0.0
   shared_preferences_service: ^1.0.0
-  tags_repository: ^0.0.1
+  tags_repository: ^1.0.0
   theme_brightness_repository: ^0.0.1
 
 dev_dependencies:
