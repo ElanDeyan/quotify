@@ -93,19 +93,19 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<void> initialize() async =>
-      Result.fromComputationAsync(() async {
+  FutureResult<void> initialize() async => Result.guardAsync(() async {
         await Future.wait([
           setPrivacyDataIfMissing(),
           setEncryptionPasswordIfMissing(),
         ]);
+        return null;
       });
 
   @override
   FutureResult<void> setEncryptionPasswordIfMissing() async {
     if (!(await _secureStorageService
         .containsKey(PrivacyRepository.dataEncryptionKey))) {
-      return Result.fromComputationAsync(setEncryptionPassword);
+      return Result.guardAsync(setEncryptionPassword);
     }
 
     return const Result.ok(null);
@@ -128,7 +128,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
         ? null
         : defaultAcceptedDataUsage;
 
-    return Result.fromComputationAsync(
+    return Result.guardAsync(
       () => savePrivacyData(
         PrivacyDataEntry(
           allowErrorReporting: allowErrorReportingEntry,
@@ -229,7 +229,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   FutureResult<void> setEncryptionPassword() async {
     final password = generateRandomSecurePassword();
 
-    return Result.fromComputationAsync(
+    return Result.guardAsync(
       () => _secureStorageService.write(
         PrivacyRepository.dataEncryptionKey,
         password,

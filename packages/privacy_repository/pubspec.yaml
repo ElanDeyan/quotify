@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   flutter_secure_storage_service: ^0.0.1
   meta: ^1.15.0
-  quotify_utils: ^2.0.0
+  quotify_utils: ^3.0.0
 
 dev_dependencies:
   flutter_secure_storage: ^9.2.2

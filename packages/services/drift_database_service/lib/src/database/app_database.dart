@@ -66,8 +66,8 @@ final class AppDatabase extends _$AppDatabase {
   /// of tags before deletion, it throws a `DatabaseErrors.notDeletedAllTags`
   /// error.
   ///
-  /// Returns a [FutureResult] containing [Unit] upon successful completion.
-  FutureResult<void> clearAllTags() => Result.fromComputationAsync(
+  /// Returns a [FutureResult] containing [Null] upon successful completion.
+  FutureResult<void> clearAllTags() => Result.guardAsync(
         () => transaction(
           () async {
             final howManyTagsBeforeDelete = (await allTags).length;
@@ -77,6 +77,7 @@ final class AppDatabase extends _$AppDatabase {
             if (amountOfRowsAffected != howManyTagsBeforeDelete) {
               throw DatabaseErrors.notDeletedAllTags;
             }
+            return null;
           },
         ),
       );
@@ -98,7 +99,7 @@ final class AppDatabase extends _$AppDatabase {
   /// - Returns: A [FutureResult] containing the created [TagTable] entry or an
   /// error.
   FutureResult<TagTable> createTag(TagEntry entry) async {
-    final operationResult = await Result.fromComputationAsync(
+    final operationResult = await Result.guardAsync(
       () => transaction(
         () => into(tags).insertReturningOrNull(
           entry.toTagsCompanion(),
@@ -130,7 +131,7 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns:
   /// - A [FutureResult] containing the deleted [TagTable] if the operation is
   /// successful.
-  FutureResult<TagTable> deleteTag(Id id) async => Result.fromComputationAsync(
+  FutureResult<TagTable> deleteTag(Id id) async => Result.guardAsync(
         () => transaction(
           () async {
             final affectedRows = await (delete(tags)
@@ -208,7 +209,7 @@ final class AppDatabase extends _$AppDatabase {
   ///
   /// - Returns: A [FutureResult] containing the updated [TagTable] entry.
   FutureResult<TagTable> updateTag(FullTagEntry updatedTagEntry) async =>
-      Result.fromComputationAsync(
+      Result.guardAsync(
         () => transaction(
           () async {
             final affectedRows = await (update(tags)
