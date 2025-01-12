@@ -113,13 +113,38 @@ final class Quote implements Encodable {
         'source': source,
         'sourceUri': sourceUri,
         'isFavorite': isFavorite,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
         'tags': <Map<String, Object?>>[
           for (final tag in tags) tag.toMap(),
         ],
       };
 
+  /// Creates a `Quote` object from a map representation.
+  ///
+  /// The map must contain the following keys with corresponding value types:
+  /// - 'id': `int` (non-negative)
+  /// - 'content': `String` (non-empty)
+  /// - 'author': `String` (non-empty)
+  /// - 'source': `String?` (optional)
+  /// - 'sourceUri': `String?` (optional, must be a valid URI if present)
+  /// - 'isFavorite': `bool`
+  /// - 'createdAt': `String` (must be a valid date-time string)
+  /// - 'updatedAt': `String` (must be a valid date-time string)
+  /// - 'tags': `List<Object?>` (each element must be a map)
+  ///
+  /// Returns a `Result<Quote>` which is either:
+  /// - `Result.ok(Quote)` if the map is valid and the `Quote` object is
+  /// created successfully.
+  /// - `Result.failure` with appropriate error if the map is invalid or any
+  /// validation fails.
+  ///
+  /// Possible errors:
+  /// - `QuoteErrors.invalidMapRepresentation`: If the map does not meet the
+  /// required structure or contains invalid data.
+  /// - `QuoteErrors.updatedAtDateBeforeCreatedAt`: If the `updatedAt` date
+  /// is before the `createdAt` date.
+  /// - `TagErrors.invalidMapRepresentation`: If any tag map is invalid.
   static Result<Quote> fromMap(Map<String, Object?> map) {
     if (map
         case {
@@ -186,12 +211,21 @@ final class Quote implements Encodable {
     );
   }
 
+  /// Converts a JSON string into a `Quote` object.
+  ///
+  /// This method attempts to decode the provided JSON string and convert it
+  /// into a `Quote` object. If the decoding or conversion fails, it returns a
+  /// `Result.failure` with the appropriate error and stack trace.
+  ///
+  /// - Parameter jsonString: The JSON string to be converted.
+  /// - Returns: A `Result` containing either a `Quote` object or a failure with
+  ///   an error and stack trace.
   static Result<Quote> fromJsonString(String jsonString) {
     late final Object? decodedJson;
 
     try {
       decodedJson = jsonDecode(jsonString);
-    } on FormatException catch (e, stackTrace) {
+    } on FormatException catch (_, stackTrace) {
       return Result.failure(QuoteErrors.invalidJsonString, stackTrace);
     }
 
