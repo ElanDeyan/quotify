@@ -6,7 +6,7 @@ import 'quotes_repository.dart';
 
 /// Sealed class related with [Quote]s, for being added in [QuotesRepository].
 sealed class QuoteEntry {
-  QuoteEntry({
+  const QuoteEntry({
     required this.content,
     required this.author,
     required this.source,
@@ -41,7 +41,7 @@ final class PartialQuoteEntry extends QuoteEntry {
   /// A partial entry for [Quote] class.
   ///
   /// With partial, that means without an Id.
-  PartialQuoteEntry({
+  const PartialQuoteEntry({
     required super.content,
     required super.author,
     required super.source,
@@ -68,7 +68,7 @@ final class FullQuoteEntry extends QuoteEntry {
   /// - [isFavorite]: A boolean indicating if the quote is marked as favorite.
   /// - [tags]: A list of tags associated with the quote.
   /// - [id]: The unique identifier for this quote entry.
-  FullQuoteEntry({
+  const FullQuoteEntry({
     required super.content,
     required super.author,
     required super.source,

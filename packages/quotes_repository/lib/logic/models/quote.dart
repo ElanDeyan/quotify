@@ -13,7 +13,7 @@ import 'quote_errors.dart';
 @immutable
 final class Quote implements Encodable {
   /// A Quote class.
-  const Quote({
+  Quote({
     required this.id,
     required this.content,
     required this.author,
@@ -23,7 +23,10 @@ final class Quote implements Encodable {
     this.sourceUri,
     this.isFavorite = false,
     this.tags = const {},
-  });
+  }) : assert(
+          !updatedAt.isBefore(createdAt),
+          'Updated at should be equal or after createdAt',
+        );
 
   /// An [Id].
   final Id id;
