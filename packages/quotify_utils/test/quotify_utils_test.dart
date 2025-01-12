@@ -8,21 +8,21 @@ void main() {
     group('sync', () {
       test('Result from computation: Ok', () {
         expect(
-          Result.fromComputationSync(iWillReturnAnIntSynchronously),
+          Result.guardSync(iWillReturnAnIntSynchronously),
           isA<Ok<int>>(),
         );
         expect(
-          Result.fromComputationSync(iWillReturnAnIntSynchronously).asOk.value,
+          Result.guardSync(iWillReturnAnIntSynchronously).asOk.value,
           equals(1),
         );
       });
       test('Result from computation: Failure', () {
         expect(
-          Result.fromComputationSync(iWillThrowSynchronously),
+          Result.guardSync(iWillThrowSynchronously),
           isA<Failure<int>>(),
         );
         expect(
-          Result.fromComputationSync(iWillThrowSynchronously).asFailure.failure,
+          Result.guardSync(iWillThrowSynchronously).asFailure.failure,
           isException,
         );
       });
@@ -31,25 +31,21 @@ void main() {
     group('async', () {
       test('Result from computation: Ok', () async {
         expect(
-          Result.fromComputationAsync(iWillReturnAnIntAsynchronously),
+          Result.guardAsync(iWillReturnAnIntAsynchronously),
           completion(isA<Ok<int>>()),
         );
         expect(
-          (await Result.fromComputationAsync(iWillReturnAnIntAsynchronously))
-              .asOk
-              .value,
+          (await Result.guardAsync(iWillReturnAnIntAsynchronously)).asOk.value,
           equals(1),
         );
       });
       test('Result from computation: Failure', () async {
         expect(
-          Result.fromComputationAsync(iWillThrowAsynchronously),
+          Result.guardAsync(iWillThrowAsynchronously),
           completion(isA<Failure<int>>()),
         );
         expect(
-          (await Result.fromComputationAsync(iWillThrowAsynchronously))
-              .asFailure
-              .failure,
+          (await Result.guardAsync(iWillThrowAsynchronously)).asFailure.failure,
           isException,
         );
       });

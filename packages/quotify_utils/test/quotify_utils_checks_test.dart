@@ -8,19 +8,17 @@ void main() {
   group('with package:checks', () {
     group('sync', () {
       test('Result from computation: Ok', () {
-        check(Result.fromComputationSync(iWillReturnAnIntSynchronously))
-            .isA<Ok<int>>();
+        check(Result.guardSync(iWillReturnAnIntSynchronously)).isA<Ok<int>>();
 
         check(
-          Result.fromComputationSync(iWillReturnAnIntSynchronously).asOk.value,
+          Result.guardSync(iWillReturnAnIntSynchronously).asOk.value,
         ).equals(1);
       });
       test('Result from computation: Failure', () {
-        check(Result.fromComputationSync(iWillThrowSynchronously))
-            .isA<Failure<int>>();
+        check(Result.guardSync(iWillThrowSynchronously)).isA<Failure<int>>();
 
         check(
-          Result.fromComputationSync(iWillThrowSynchronously).asFailure.failure,
+          Result.guardSync(iWillThrowSynchronously).asFailure.failure,
         ).isA<Exception>();
       });
     });
@@ -28,28 +26,24 @@ void main() {
     group('async', () {
       test('Result from computation: Ok', () async {
         await check(
-          Result.fromComputationAsync(iWillReturnAnIntAsynchronously),
+          Result.guardAsync(iWillReturnAnIntAsynchronously),
         ).completes(
           (result) => result.isA<Ok<int>>(),
         );
 
         check(
-          (await Result.fromComputationAsync(iWillReturnAnIntAsynchronously))
-              .asOk
-              .value,
+          (await Result.guardAsync(iWillReturnAnIntAsynchronously)).asOk.value,
         ).equals(1);
       });
       test('Result from computation: Failure', () async {
         await check(
-          Result.fromComputationAsync(iWillThrowAsynchronously),
+          Result.guardAsync(iWillThrowAsynchronously),
         ).completes(
           (result) => result.isA<Failure<int>>(),
         );
 
         check(
-          (await Result.fromComputationAsync(iWillThrowAsynchronously))
-              .asFailure
-              .failure,
+          (await Result.guardAsync(iWillThrowAsynchronously)).asFailure.failure,
         ).isA<Exception>();
       });
     });
