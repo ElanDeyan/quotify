@@ -115,9 +115,139 @@ sealed class Result<T extends Object?> {
     Future<U> Function(T value) callback,
   ) async =>
       switch (this) {
-        Ok(:final value) => Result.guardAsync(() => callback(value)),
+        Ok(:final value) => await Result.guardAsync(() => callback(value)),
         Failure(:final failure, :final stackTrace) =>
           Result.failure(failure, stackTrace),
+      };
+
+  /// Applies one of two functions to the result, depending on whether it is an
+  /// `Ok` or a `Failure`.
+  ///
+  /// If the result is an `Ok`, the [onOk] function is called with the value.
+  /// If the result is a `Failure`, the [onFailure] function is called with the
+  /// exception and stack trace.
+  ///
+  /// The return value of the called function is returned.
+  ///
+  /// - Parameters:
+  ///   - onOk: A function that is called with the value if the result is an
+  ///   `Ok`.
+  ///   - onFailure: A function that is called with the exception and stack
+  ///   trace if the result is a `Failure`.
+  /// - Returns: The return value of the called function.
+  R fold<R extends Object?>({
+    required R Function(T value) onOk,
+    required R Function(Exception exception, StackTrace stackTrace) onFailure,
+  }) =>
+      switch (this) {
+        Ok(:final value) => onOk(value),
+        Failure(:final failure, :final stackTrace) =>
+          onFailure(failure, stackTrace),
+      };
+
+  /// Returns the value if the result is `Ok`, otherwise returns the provided
+  /// fallback value if the result is `Failure`.
+  ///
+  /// - Parameter fallback: The value to return if the result is `Failure`.
+  /// - Returns: The value if the result is `Ok`, otherwise the fallback value.
+  T orElse(T fallback) => switch (this) {
+        Ok(:final value) => value,
+        Failure(failure: _, stackTrace: _) => fallback,
+      };
+
+  /// Recovers from a failure by executing the provided synchronous recovery
+  /// function.
+  ///
+  /// If the current `Result` is an `Ok` instance, it returns the current
+  /// instance.
+  /// If the current `Result` is a `Failure` instance, it executes the
+  /// `onFailure` function with the exception and stack trace, and returns a
+  /// new `Result` based on the outcome of the `onFailure` function.
+  ///
+  /// The `onFailure` function is a synchronous function that takes an
+  /// `Exception` and a `StackTrace` as parameters and returns a value of type
+  /// `T`.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// Result<int> result = someFunctionThatReturnsResult();
+  /// Result<int> recoveredResult = result.recoverSync((exception, stackTrace) {
+  ///   // Handle the exception and return a recovery value
+  ///   return 42;
+  /// });
+  /// ```
+  ///
+  /// - Parameter onFailure: A synchronous function that takes an `Exception`
+  ///   and a `StackTrace` and returns a value of type `T`.
+  /// - Returns: A `Result` instance which is either the original `Ok` instance
+  ///   or a new `Result` based on the outcome of the `onFailure` function.
+  FutureResult<T> recoverAsync(
+    Future<T> Function(Exception exception, StackTrace stackTrace) onFailure,
+  ) async =>
+      switch (this) {
+        Ok(value: _) => this,
+        Failure(:final failure, :final stackTrace) =>
+          await Result.guardAsync(() => onFailure(failure, stackTrace)),
+      };
+
+  /// Filters the `Result` based on a predicate function applied to the
+  /// `Ok` value.
+  ///
+  /// If the `Result` is `Ok` and the predicate function returns `false`,
+  /// it returns a `Result.failure` with the provided exception and current
+  /// stack trace. Otherwise, it returns the original `Result`.
+  ///
+  /// - Parameters:
+  ///   - predicateOnOk: A function that takes the `Ok` value and returns a
+  ///   `bool`.
+  ///   - exceptionOnFalse: The exception to return if the predicate function
+  ///   returns `false`.
+  ///
+  /// - Returns: A `Result` that is either the original `Result` or a
+  ///   `Result.failure` if the predicate function returns `false`.
+  Result<T> where(
+    bool Function(T value) predicateOnOk,
+    Exception exceptionOnFalse,
+  ) =>
+      switch (this) {
+        Ok(:final value) when !predicateOnOk(value) =>
+          Result.failure(exceptionOnFalse, StackTrace.current),
+        _ => this,
+      };
+
+  /// Executes the provided callbacks based on the result type.
+  ///
+  /// Ideal for side effects.
+  ///
+  /// If the result is `Ok`, the `onOk` callback is called with the value.
+  /// If the result is `Failure`, the `onFailure` callback is called with the
+  /// exception and stack trace.
+  ///
+  /// Both callbacks are optional.
+  ///
+  /// - Parameters:
+  ///   - onOk: A callback to be executed if the result is `Ok`.
+  ///   - onFailure: A callback to be executed if the result is `Failure`.
+  void tap({
+    void Function(T value)? onOk,
+    void Function(Exception failure, StackTrace stackTrace)? onFailure,
+  }) =>
+      switch (this) {
+        Ok(:final value) => onOk?.call(value),
+        Failure(:final failure, :final stackTrace) =>
+          onFailure?.call(failure, stackTrace)
+      };
+
+  /// Converts the current result to a nullable value.
+  ///
+  /// If the result is `Ok`, it returns the contained value.
+  /// If the result is `Failure`, it returns `null`.
+  ///
+  /// Returns:
+  /// - `T?`: The contained value if the result is `Ok`, otherwise `null`.
+  T? toNullable() => switch (this) {
+        Ok(:final value) => value,
+        Failure(failure: _, stackTrace: _) => null,
       };
 
   /// Convenience method to cast to [Ok]
