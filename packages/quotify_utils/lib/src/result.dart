@@ -30,7 +30,7 @@ import 'result_extension.dart';
 /// }
 /// ```
 @immutable
-sealed class Result<T extends Object, E extends Exception> {
+sealed class Result<T extends Object, E extends Object> {
   const Result();
 
   /// Creates an instance of Result containing a value
@@ -50,7 +50,9 @@ sealed class Result<T extends Object, E extends Exception> {
   ///
   /// - Returns: A `Result` object containing either the computed value or the
   ///   error and stack trace.
-  factory Result.guardSync(T Function() computation) {
+  static Result<T, E> guardSync<T extends Object, E extends Object>(
+    T Function() computation,
+  ) {
     try {
       return Result.ok(computation());
     } on E catch (error, stackTrace) {
@@ -76,7 +78,7 @@ sealed class Result<T extends Object, E extends Exception> {
   /// computation or an exception of type `E`.
   ///
   /// - Throws: Any exceptions that are not of type `E`.
-  static FutureResult<T, E> guardAsync<T extends Object, E extends Exception>(
+  static FutureResult<T, E> guardAsync<T extends Object, E extends Object>(
     Future<T> Function() computation,
   ) async {
     try {
@@ -100,7 +102,7 @@ sealed class Result<T extends Object, E extends Exception> {
   ///
   /// - Returns: A `Result` containing an iterable of the values from the
   ///   successful results, or the first failure if any result is a failure.
-  static Result<Iterable<T>, E> combine<T extends Object, E extends Exception>(
+  static Result<Iterable<T>, E> combine<T extends Object, E extends Object>(
     List<Result<T, E>> results,
   ) {
     if (results.anyFailure()) {
@@ -155,7 +157,7 @@ sealed class Result<T extends Object, E extends Exception> {
   ///     `E` and the stack trace, and returns a new exception of type `F`.
   ///
   /// - Returns: A new `Result` of type `Result<R, F>`.
-  Result<R, F> mapSync<R extends Object, F extends Exception>(
+  Result<R, F> mapSync<R extends Object, F extends Object>(
     R Function(T value) callback, {
     F Function(E exception, StackTrace stackTrace)? failureMapper,
   }) =>
@@ -370,7 +372,7 @@ sealed class Result<T extends Object, E extends Exception> {
 
 /// Subclass of Result for values
 @immutable
-final class Ok<T extends Object, E extends Exception> extends Result<T, E> {
+final class Ok<T extends Object, E extends Object> extends Result<T, E> {
   /// Subclass of Result for values
   const Ok(this.value);
 
@@ -389,8 +391,7 @@ final class Ok<T extends Object, E extends Exception> extends Result<T, E> {
 
 /// Subclass of Result for errors
 @immutable
-final class Failure<T extends Object, E extends Exception>
-    extends Result<T, E> {
+final class Failure<T extends Object, E extends Object> extends Result<T, E> {
   /// Subclass of Result for errors
   const Failure(this.failure, this.stackTrace);
 

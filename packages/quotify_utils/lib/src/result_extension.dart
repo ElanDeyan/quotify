@@ -1,6 +1,6 @@
 import '../quotify_utils.dart';
 
-extension ListOfResultsExtension<T extends Object, E extends Exception>
+extension ListOfResultsExtension<T extends Object, E extends Object>
     on List<Result<T, E>> {
   bool everyOk() => every(
         (element) => element.isOk,
