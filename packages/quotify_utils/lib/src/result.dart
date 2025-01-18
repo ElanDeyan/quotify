@@ -243,8 +243,8 @@ sealed class Result<T extends Object, E extends Object> {
   /// callback's return value.
   ///
   /// The [onFailure] callback takes two parameters:
-  /// - [exception]: The exception that caused the failure.
-  /// - [stackTrace]: The stack trace associated with the failure.
+  /// - exception: The exception that caused the failure.
+  /// - stackTrace: The stack trace associated with the failure.
   ///
   /// Returns a new `Result` based on the outcome of the [onFailure] callback.
   Result<T, E> recoverSync(
