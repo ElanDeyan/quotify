@@ -7,10 +7,11 @@
 /// - Also some comments.
 library;
 
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 
-import '../quotify_utils.dart';
-import 'result_extension.dart';
+import '../../result.dart';
 
 // Copyright 2024 The Flutter team. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
@@ -91,28 +92,90 @@ sealed class Result<T extends Object, E extends Object> {
     }
   }
 
-  /// Combines a list of `Result` objects into a single `Result` containing an
-  /// iterable of the values from the successful results.
+  /// Executes an asynchronous computation with a specified timeout and returns
+  /// a `FutureResult` containing either the result of the computation or a
+  /// failure.
   ///
-  /// If any of the results in the list is a failure, the first failure is
-  /// returned.
+  /// If the computation completes successfully within the timeout duration, the
+  /// result is wrapped in a `Result.ok`. If the computation times out, a
+  /// `TimeoutException` is thrown and a `Result.failure` is returned with the
+  /// provided `failureOnTimeout` value. If the computation throws an exception
+  /// of type `E`, a `Result.failure` is returned with the exception. Any other
+  /// exceptions are rethrown.
   ///
   /// - Parameters:
-  ///   - results: A list of `Result` objects to be combined.
+  ///   - computation: A `Future` function representing the asynchronous
+  ///     computation to be executed.
+  ///   - timeout: The duration within which the computation must complete.
+  ///   - failureOnTimeout: The value to be returned in a `Result.failure` if
+  ///     the computation times out.
   ///
-  /// - Returns: A `Result` containing an iterable of the values from the
-  ///   successful results, or the first failure if any result is a failure.
-  static Result<Iterable<T>, E> combine<T extends Object, E extends Object>(
-    List<Result<T, E>> results,
-  ) {
-    if (results.anyFailure()) {
-      return Result.failure(
-        results.allFailures.first.failure,
-        results.allFailures.first.stackTrace,
+  /// - Returns: A `FutureResult` containing either the result of the
+  ///   computation or a failure.
+  static FutureResult<T, E>
+      guardAsyncWithTimeout<T extends Object, E extends Object>(
+    Future<T> Function() computation, {
+    required Duration timeout,
+    required E failureOnTimeout,
+  }) async {
+    try {
+      final operationResult = await computation().timeout(
+        timeout,
+        onTimeout: () => throw TimeoutException('Operation timed out', timeout),
       );
+
+      return Result.ok(operationResult);
+    } on TimeoutException catch (_, stackTrace) {
+      return Result.failure(failureOnTimeout, stackTrace);
+    } on E catch (exception, stackTrace) {
+      return Result.failure(exception, stackTrace);
+    } on Object {
+      rethrow;
+    }
+  }
+
+  static Stream<Result<T, E>> guardStream<T extends Object, E extends Object>(
+    Stream<T> stream,
+  ) =>
+      stream
+          .map(
+            Result<T, E>.ok,
+          )
+          .handleError(
+            (Object error, StackTrace stackTrace) =>
+                Result<T, E>.failure(error as E, stackTrace),
+            test: (error) => error is E,
+          )
+          .asBroadcastStream();
+
+  static FutureResult<T, E> retryAsync<T extends Object, E extends Object>(
+    Future<T> Function() computation, {
+    int maxAttempts = 1,
+    Duration delay = const Duration(milliseconds: 500),
+    bool Function(E failure, StackTrace stackTrace)? retryIf,
+  }) async {
+    assert(maxAttempts > 0, 'maxAttempts should be higher than 0');
+    assert(!delay.isNegative, 'delay should be positive');
+    late Result<T, E> lastResult;
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      lastResult = await Result.guardAsync<T, E>(computation);
+
+      switch (lastResult) {
+        case Ok():
+          return lastResult;
+        case Failure(:final failure, :final stackTrace):
+          if (retryIf?.call(failure, stackTrace) ?? true) {
+            if (attempt < maxAttempts) {
+              await Future<void>.delayed(delay * attempt);
+              continue;
+            }
+          }
+          return lastResult;
+      }
     }
 
-    return Result.ok(results.allOks.map((e) => e.value));
+    return lastResult;
   }
 
   @override
@@ -188,7 +251,7 @@ sealed class Result<T extends Object, E extends Object> {
   /// A `FutureResult` containing the result of the callback function if the
   /// original result is `Ok`, or the original failure and stack trace if the
   /// result is `Failure`.
-  FutureResult<R, F> mapAsync<R extends Object, F extends Exception>(
+  FutureResult<R, F> mapAsync<R extends Object, F extends Object>(
     Future<R> Function(T value) callback, {
     F Function(E exception, StackTrace stackTrace)? failureMapper,
   }) async =>
@@ -314,6 +377,33 @@ sealed class Result<T extends Object, E extends Object> {
         Ok(:final value) when !predicateOnOk(value) =>
           Result.failure(exceptionOnFalse, StackTrace.current),
         _ => this,
+      };
+
+  /// Applies a list of predicates with corresponding error functions to the
+  /// current `Result` object. If the current object is an `Ok` variant, it
+  /// sequentially applies each predicate to the value. If a predicate returns
+  /// `false`, the corresponding error function is used to transform the value
+  /// into an error, and the `Result` becomes a `Failure`. If the current object
+  /// is already a `Failure`, it remains unchanged.
+  ///
+  /// - Parameters:
+  ///   - predicatesWithErrors: A list of tuples where each tuple contains a
+  ///     predicate function and an error function. The predicate function takes
+  ///     a value of type `T` and returns a `bool`. The error function takes a
+  ///     value of type `T` and returns an error of type `E`.
+  ///
+  /// - Returns: A `Result` object that is either an `Ok` or a `Failure`
+  ///   depending on the evaluation of the predicates.
+  Result<T, E> whereAll(
+    List<(bool Function(T value), E Function(T value))> predicatesWithErrors,
+  ) =>
+      switch (this) {
+        Ok(:final value) => predicatesWithErrors.fold(
+            this,
+            (acc, predicatePair) =>
+                acc.where(predicatePair.$1, predicatePair.$2(value)),
+          ),
+        Failure(failure: _, stackTrace: _) => this,
       };
 
   /// Executes the provided callbacks based on the result type.
