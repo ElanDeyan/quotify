@@ -5,6 +5,7 @@ import 'package:drift_database_service/src/exceptions/database_errors.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
 
 void main() {
@@ -44,7 +45,7 @@ void main() {
 
       final result = await database.createTag(sampleEntry);
 
-      expect(result, isA<Ok<TagTable>>());
+      expect(result, isA<Ok<TagTable, DatabaseErrors>>());
       final TagTable(:label) = result.asOk.value;
 
       expect(label, equals(sampleEntry.label));
@@ -62,8 +63,8 @@ void main() {
         final firstAdded = await database.createTag(sampleEntry);
         final secondAdded = await database.createTag(sampleEntry);
 
-        expect(firstAdded, isA<Ok<TagTable>>());
-        expect(secondAdded, isA<Ok<TagTable>>());
+        expect(firstAdded, isA<Ok<TagTable, DatabaseErrors>>());
+        expect(secondAdded, isA<Ok<TagTable, DatabaseErrors>>());
 
         expect(
           firstAdded.asOk.value.label,
@@ -90,7 +91,7 @@ void main() {
 
         final result = await database.createTag(fullEntryWithSameId);
 
-        expect(result, isA<Failure<TagTable>>());
+        expect(result, isA<Failure<TagTable, DatabaseErrors>>());
         expect(database.allTags, completion(hasLength(1)));
         expect(database.allTags, completion([addedTag]));
       },
@@ -173,7 +174,7 @@ void main() {
         () async {
           final result = await database.updateTag(secondEntry);
 
-          expect(result, isA<Ok<TagTable>>());
+          expect(result, isA<Ok<TagTable, DatabaseErrors>>());
 
           final TagTable(:id, :label, :createdAt, :updatedAt) =
               result.asOk.value;
@@ -210,7 +211,7 @@ void main() {
         secondEntry = FullTagEntry(label: secondEntry.label, id: nonExistentId);
         final result = await database.updateTag(secondEntry);
 
-        expect(result, isA<Failure<TagTable>>());
+        expect(result, isA<Failure<TagTable, DatabaseErrors>>());
         expect(
           result.asFailure.failure,
           equals(DatabaseErrors.notFoundId),
@@ -233,7 +234,7 @@ void main() {
 
       final result = await database.deleteTag(Id(initialAdded.id.toNatural()));
 
-      expect(result, isA<Ok<TagTable>>());
+      expect(result, isA<Ok<TagTable, DatabaseErrors>>());
       expect(result.asOk.value, equals(initialAdded));
 
       final actualTagsQuantity = (await database.allTags).length;
@@ -259,7 +260,7 @@ void main() {
 
         final result = await database.deleteTag(nonExistentId);
 
-        expect(result, isA<Failure<TagTable>>());
+        expect(result, isA<Failure<TagTable, DatabaseErrors>>());
         expect(result.asFailure.failure, equals(DatabaseErrors.notFoundId));
 
         final actualTagsQuantity = (await database.allTags).length;
@@ -277,7 +278,7 @@ void main() {
 
       final result = await database.clearAllTags();
 
-      expect(result, isA<Ok<void>>());
+      expect(result, isA<Ok<(), DatabaseErrors>>());
       expect(database.allTags, completion(hasLength(isZero)));
     });
   });

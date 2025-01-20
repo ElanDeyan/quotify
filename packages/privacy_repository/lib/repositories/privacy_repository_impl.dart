@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_secure_storage_service/flutter_secure_storage_service.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../logic/models/privacy_data.dart';
 import 'privacy_data_entry.dart';
@@ -16,7 +16,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   final FlutterSecureStorageService _secureStorageService;
 
   @override
-  FutureResult<PrivacyData> fetchPrivacyData() async {
+  FutureResult<PrivacyData, PrivacyRepositoryErrors> fetchPrivacyData() async {
     final acceptedDataUsageString = await _secureStorageService
         .read(PrivacyRepository.acceptedDataUsageKey);
     final allowErrorReportingString = await _secureStorageService
@@ -93,26 +93,36 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<void> initialize() async => Result.guardAsync(() async {
-        await Future.wait([
+  FutureResult<(), Iterable<PrivacyRepositoryErrors>> initialize() async =>
+      Result.guardAsync(() async {
+        final results = await Future.wait([
           setPrivacyDataIfMissing(),
           setEncryptionPasswordIfMissing(),
         ]);
-        return null;
+        if (results.anyFailure()) {
+          throw PrivacyRepositoryErrors.failAtWriting;
+        }
+
+        return ();
       });
 
   @override
-  FutureResult<void> setEncryptionPasswordIfMissing() async {
+  FutureResult<(), PrivacyRepositoryErrors>
+      setEncryptionPasswordIfMissing() async {
     if (!(await _secureStorageService
         .containsKey(PrivacyRepository.dataEncryptionKey))) {
-      return Result.guardAsync(setEncryptionPassword);
+      return (await Result.guardAsync(setEncryptionPassword)).mapAsync(
+        (value) async => (),
+        failureMapper: (exception, stackTrace) =>
+            PrivacyRepositoryErrors.failAtWriting,
+      );
     }
 
-    return const Result.ok(null);
+    return const Result.ok(());
   }
 
   @override
-  FutureResult<void> setPrivacyDataIfMissing() async {
+  FutureResult<(), PrivacyRepositoryErrors> setPrivacyDataIfMissing() async {
     final PrivacyData(
       acceptedDataUsage: defaultAcceptedDataUsage,
       allowErrorReporting: defaultAllowErrorReporting
@@ -129,17 +139,23 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
         : defaultAcceptedDataUsage;
 
     return Result.guardAsync(
-      () => savePrivacyData(
-        PrivacyDataEntry(
-          allowErrorReporting: allowErrorReportingEntry,
-          acceptedDataUsage: acceptedDataUsageEntry,
-        ),
-      ),
+      () async {
+        await savePrivacyData(
+          PrivacyDataEntry(
+            allowErrorReporting: allowErrorReportingEntry,
+            acceptedDataUsage: acceptedDataUsageEntry,
+          ),
+        );
+
+        return ();
+      },
     );
   }
 
   @override
-  FutureResult<void> savePrivacyData(PrivacyDataEntry privacyDataEntry) async {
+  FutureResult<(), PrivacyRepositoryErrors> savePrivacyData(
+    PrivacyDataEntry privacyDataEntry,
+  ) async {
     final hasAllowErrorReportingKey = await _secureStorageService
         .containsKey(PrivacyRepository.allowErrorReportingKey);
     final hasAcceptedDataUsageKey = await _secureStorageService
@@ -174,11 +190,12 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
       );
     }
 
-    return const Result.ok(null);
+    return const Result.ok(());
   }
 
   @override
-  FutureResult<String> fetchEncryptionPassword() async {
+  FutureResult<String, PrivacyRepositoryErrors>
+      fetchEncryptionPassword() async {
     if (!(await _secureStorageService
         .containsKey(PrivacyRepository.dataEncryptionKey))) {
       return Result.failure(
@@ -226,14 +243,17 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<void> setEncryptionPassword() async {
+  FutureResult<(), Object> setEncryptionPassword() async {
     final password = generateRandomSecurePassword();
 
     return Result.guardAsync(
-      () => _secureStorageService.write(
-        PrivacyRepository.dataEncryptionKey,
-        password,
-      ),
+      () async {
+        await _secureStorageService.write(
+          PrivacyRepository.dataEncryptionKey,
+          password,
+        );
+        return ();
+      },
     );
   }
 }

@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:tags_repository/logic/models/tag.dart';
-import 'package:tags_repository/logic/models/tag_errors.dart';
+import 'package:tags_repository/logic/models/tag_model_errors.dart';
 
 void main() {
   group('fromMap', () {
@@ -17,7 +18,7 @@ void main() {
         final sampleTagJson = sampleTag.toMap();
         test('should return a Tag', () {
           final result = Tag.fromMap(sampleTagJson);
-          expect(result, isA<Ok<Tag>>());
+          expect(result, isA<Ok<Tag, TagModelErrors>>());
           expect(result.asOk.value, equals(sampleTag));
         });
       });
@@ -45,10 +46,10 @@ void main() {
             tagJsonBothInvalid,
           ]) {
             final result = Tag.fromMap(sample);
-            expect(result, isA<Failure<Tag>>());
+            expect(result, isA<Failure<Tag, TagModelErrors>>());
             expect(
               result.asFailure.failure,
-              equals(TagErrors.invalidMapRepresentation),
+              equals(TagModelErrors.invalidMapRepresentation),
             );
           }
         });
@@ -66,7 +67,7 @@ void main() {
 
       test('should return a Tag', () {
         final result = Tag.fromJsonString(sampleTagJsonString);
-        expect(result, isA<Ok<Tag>>());
+        expect(result, isA<Ok<Tag, TagModelErrors>>());
         expect(result.asOk.value, equals(sampleTag));
       });
     });
@@ -76,10 +77,10 @@ void main() {
 
       test('should return a Failure with invalid json string error', () {
         final result = Tag.fromJsonString(invalidJsonString);
-        expect(result, isA<Failure<Tag>>());
+        expect(result, isA<Failure<Tag, TagModelErrors>>());
         expect(
           result.asFailure.failure,
-          equals(TagErrors.invalidJsonString),
+          equals(TagModelErrors.invalidJsonString),
         );
       });
     });
@@ -92,10 +93,10 @@ void main() {
 
       test('should return a Failure with invalid map representation', () {
         final result = Tag.fromJsonString(invalidTagJsonString);
-        expect(result, isA<Failure<Tag>>());
+        expect(result, isA<Failure<Tag, TagModelErrors>>());
         expect(
           result.asFailure.failure,
-          equals(TagErrors.invalidMapRepresentation),
+          equals(TagModelErrors.invalidMapRepresentation),
         );
       });
     });
@@ -110,10 +111,10 @@ void main() {
 
       test('should return a Failure with invalid map representation', () {
         final result = Tag.fromJsonString(invalidTagJsonString);
-        expect(result, isA<Failure<Tag>>());
+        expect(result, isA<Failure<Tag, TagModelErrors>>());
         expect(
           result.asFailure.failure,
-          equals(TagErrors.invalidMapRepresentation),
+          equals(TagModelErrors.invalidMapRepresentation),
         );
       });
     });

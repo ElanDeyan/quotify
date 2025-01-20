@@ -3,6 +3,7 @@ import 'package:drift_database_service/src/database/connection/native_connection
 import 'package:drift_database_service/src/exceptions/database_errors.dart';
 import 'package:drift_database_service/src/extensions/tag_entry_extension.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
 
 import '../tables/tags.dart';
@@ -67,7 +68,7 @@ final class AppDatabase extends _$AppDatabase {
   /// error.
   ///
   /// Returns a [FutureResult] containing [Null] upon successful completion.
-  FutureResult<void> clearAllTags() => Result.guardAsync(
+  FutureResult<(), DatabaseErrors> clearAllTags() => Result.guardAsync(
         () => transaction(
           () async {
             final howManyTagsBeforeDelete = (await allTags).length;
@@ -77,7 +78,7 @@ final class AppDatabase extends _$AppDatabase {
             if (amountOfRowsAffected != howManyTagsBeforeDelete) {
               throw DatabaseErrors.notDeletedAllTags;
             }
-            return null;
+            return ();
           },
         ),
       );
@@ -98,20 +99,24 @@ final class AppDatabase extends _$AppDatabase {
   ///
   /// - Returns: A [FutureResult] containing the created [TagTable] entry or an
   /// error.
-  FutureResult<TagTable> createTag(TagEntry entry) async {
-    final operationResult = await Result.guardAsync(
+  FutureResult<TagTable, DatabaseErrors> createTag(TagEntry entry) async {
+    final operationResult = await Result.guardAsync<TagTable, DatabaseErrors>(
       () => transaction(
-        () => into(tags).insertReturningOrNull(
-          entry.toTagsCompanion(),
-          mode: InsertMode.insertOrAbort,
-        ),
+        () async {
+          final tagTableOrNull = await into(tags).insertReturningOrNull(
+            entry.toTagsCompanion(),
+            mode: InsertMode.insertOrAbort,
+          );
+
+          if (tagTableOrNull == null) throw DatabaseErrors.cannotCreateEntry;
+
+          return tagTableOrNull;
+        },
       ),
     );
 
     return switch (operationResult) {
-      Ok(:final value?) => Result.ok(value),
-      Ok(value: null) =>
-        Result.failure(DatabaseErrors.cannotCreateEntry, StackTrace.current),
+      Ok(:final value) => Result.ok(value),
       Failure(:final failure, :final stackTrace) =>
         Result.failure(failure, stackTrace),
     };
@@ -131,7 +136,8 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns:
   /// - A [FutureResult] containing the deleted [TagTable] if the operation is
   /// successful.
-  FutureResult<TagTable> deleteTag(Id id) async => Result.guardAsync(
+  FutureResult<TagTable, DatabaseErrors> deleteTag(Id id) async =>
+      Result.guardAsync(
         () => transaction(
           () async {
             final affectedRows = await (delete(tags)
@@ -208,7 +214,9 @@ final class AppDatabase extends _$AppDatabase {
   ///   - updatedTagEntry: The new values for the tag entry.
   ///
   /// - Returns: A [FutureResult] containing the updated [TagTable] entry.
-  FutureResult<TagTable> updateTag(FullTagEntry updatedTagEntry) async =>
+  FutureResult<TagTable, DatabaseErrors> updateTag(
+    FullTagEntry updatedTagEntry,
+  ) async =>
       Result.guardAsync(
         () => transaction(
           () async {

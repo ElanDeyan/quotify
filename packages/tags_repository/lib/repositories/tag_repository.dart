@@ -1,4 +1,6 @@
+import 'package:drift_database_service/drift_database_service.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../logic/models/tag.dart';
 import 'tag_entry.dart';
@@ -37,24 +39,24 @@ abstract interface class TagRepository {
   /// [tag] - The [TagEntry] object containing the details of the tag to create.
   ///
   /// Returns a [FutureResult] that completes with the created [Tag] object.
-  FutureResult<Tag> createTag(TagEntry tag);
+  FutureResult<Tag, DatabaseErrors> createTag(TagEntry tag);
 
   /// Updates an existing tag.
   ///
   /// [tag] - The [TagEntry] object containing the updated details of the tag.
   ///
   /// Returns a [FutureResult] that completes with the updated [Tag] object.
-  FutureResult<Tag> updateTag(FullTagEntry tag);
+  FutureResult<Tag, DatabaseErrors> updateTag(FullTagEntry tag);
 
   /// Deletes a tag by its ID.
   ///
   /// [id] - The ID of the tag to delete.
   ///
   /// Returns a [FutureResult] that completes with the deleted [Tag] object.
-  FutureResult<Tag> deleteTag(Id id);
+  FutureResult<Tag, DatabaseErrors> deleteTag(Id id);
 
   /// Clears all tags.
   ///
   /// Returns a [Future] that completes when all tags have been cleared.
-  FutureResult<void> clearAllTags();
+  FutureResult<(), DatabaseErrors> clearAllTags();
 }

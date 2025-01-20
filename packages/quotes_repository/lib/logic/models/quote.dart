@@ -6,6 +6,7 @@ import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/serialization/interfaces/encodable.dart';
 import 'package:tags_repository/logic/models/tag.dart';
 import 'package:tags_repository/logic/models/tag_errors.dart';
+import 'package:tags_repository/logic/models/tag_model_errors.dart';
 
 import 'quote_errors.dart';
 
@@ -188,7 +189,7 @@ final class Quote implements Encodable {
           continue;
         }
         return Result.failure(
-          TagErrors.invalidMapRepresentation,
+          TagModelErrors.invalidMapRepresentation,
           StackTrace.current,
         );
       }

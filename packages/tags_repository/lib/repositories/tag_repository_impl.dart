@@ -1,5 +1,6 @@
 import 'package:drift_database_service/drift_database_service.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../logic/models/tag.dart';
 import 'tag_entry.dart';
@@ -22,10 +23,10 @@ final class TagRepositoryImpl implements TagRepository {
       );
 
   @override
-  FutureResult<void> clearAllTags() => database.clearAllTags();
+  FutureResult<(), DatabaseErrors> clearAllTags() => database.clearAllTags();
 
   @override
-  FutureResult<Tag> createTag(TagEntry tag) async =>
+  FutureResult<Tag, DatabaseErrors> createTag(TagEntry tag) async =>
       switch (await database.createTag(tag)) {
         Ok(:final value) => Result.ok(value.toTag()),
         Failure(:final failure, :final stackTrace) =>
@@ -33,7 +34,7 @@ final class TagRepositoryImpl implements TagRepository {
       };
 
   @override
-  FutureResult<Tag> deleteTag(Id id) async =>
+  FutureResult<Tag, DatabaseErrors> deleteTag(Id id) async =>
       switch (await database.deleteTag(id)) {
         Ok(:final value) => Result.ok(value.toTag()),
         Failure(:final failure, :final stackTrace) =>
@@ -52,7 +53,7 @@ final class TagRepositoryImpl implements TagRepository {
       );
 
   @override
-  FutureResult<Tag> updateTag(FullTagEntry tag) async =>
+  FutureResult<Tag, DatabaseErrors> updateTag(FullTagEntry tag) async =>
       switch (await database.updateTag(tag)) {
         Ok(:final value) => Result.ok(value.toTag()),
         Failure(:final failure, :final stackTrace) =>

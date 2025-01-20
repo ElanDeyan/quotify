@@ -17,4 +17,6 @@ enum DatabaseErrors implements Exception {
 
   /// Error indicating that not all tags were deleted as expected.
   notDeletedAllTags,
+
+  unknownException,
 }

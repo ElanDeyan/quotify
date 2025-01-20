@@ -1,6 +1,6 @@
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
-import 'language_errors.dart';
+import 'language_model_errors.dart';
 
 /// Each enum value has a corresponding [languageCode] property assigned to it.
 /// The [languageCode] property is a [String] that holds the language code
@@ -22,14 +22,17 @@ enum Languages {
 
   /// Converts a [String] to a [Languages] enum value.
   /// If the [String] is not a valid language code, it returns a
-  /// [Result.failure] with [LanguageErrors.invalidLanguageCodeRepresentation].
-  static Result<Languages> fromLanguageCodeString(String languageCode) =>
+  /// [Result.failure] with
+  /// [LanguageModelErrors.invalidLanguageCodeRepresentation].
+  static Result<Languages, LanguageModelErrors> fromLanguageCodeString(
+    String languageCode,
+  ) =>
       switch (languageCode) {
         'pt_BR' => const Result.ok(Languages.brazilianPortuguese),
         'es' => const Result.ok(Languages.spanish),
         'en' => const Result.ok(Languages.english),
         _ => Result.failure(
-            LanguageErrors.invalidLanguageCodeRepresentation,
+            LanguageModelErrors.invalidLanguageCodeRepresentation,
             StackTrace.current,
           ),
       };

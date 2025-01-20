@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:quotify_utils/serialization/interfaces/encodable.dart';
 
-import 'tag_errors.dart';
+import 'tag_model_errors.dart';
 
 /// A [Tag] to categorize a Quote.
 @immutable
-final class Tag implements Encodable, Diagnosticable {
+final class Tag implements Encodable {
   /// A [Tag] to categorize a Quote.
   const Tag({required this.id, required this.label});
 
@@ -70,7 +71,7 @@ final class Tag implements Encodable, Diagnosticable {
   /// - Parameters:
   ///   - map: A map containing the tag's data.
   /// - Returns: A `Result` containing either a `Tag` object or an error.
-  static Result<Tag> fromMap(Map<String, Object?> map) {
+  static Result<Tag, TagModelErrors> fromMap(Map<String, Object?> map) {
     if (map case {'id': final int id, 'label': final String label}
         when !id.isNegative && label.trim().isNotEmpty) {
       return Result.ok(
@@ -79,7 +80,7 @@ final class Tag implements Encodable, Diagnosticable {
     }
 
     return Result.failure(
-      TagErrors.invalidMapRepresentation,
+      TagModelErrors.invalidMapRepresentation,
       StackTrace.current,
     );
   }
@@ -95,13 +96,13 @@ final class Tag implements Encodable, Diagnosticable {
   ///
   /// - Returns: A `Result<Tag>` object which is either a success containing the
   ///   `Tag` object or a failure containing the error and stack trace.
-  static Result<Tag> fromJsonString(String jsonString) {
+  static Result<Tag, TagModelErrors> fromJsonString(String jsonString) {
     late final Object? decodedJson;
 
     try {
       decodedJson = jsonDecode(jsonString);
     } on FormatException catch (error, stackTrace) {
-      return Result.failure(TagErrors.invalidJsonString, stackTrace);
+      return Result.failure(TagModelErrors.invalidJsonString, stackTrace);
     }
 
     if (decodedJson case final Map<String, Object?> map) {
@@ -109,24 +110,8 @@ final class Tag implements Encodable, Diagnosticable {
     }
 
     return Result.failure(
-      TagErrors.invalidMapRepresentation,
+      TagModelErrors.invalidMapRepresentation,
       StackTrace.current,
     );
-  }
-
-  @override
-  String toDiagnosticableString() {
-    return '''
-Class: Tag
-HashCode: $hashCode
-Modifiers:
-  - final
-Implements:
-  - Encodable
-  - Diagnosticable
-Members:
-  - id: $id
-  - label: $label
-''';
   }
 }

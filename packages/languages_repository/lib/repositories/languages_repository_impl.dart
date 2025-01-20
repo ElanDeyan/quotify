@@ -1,7 +1,8 @@
 import 'package:logging/logging.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
+import '../models/language_errors.dart';
 import '../models/languages.dart';
 import 'languages_repository.dart';
 import 'languages_repository_errors.dart';
@@ -28,7 +29,7 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
   }
 
   @override
-  FutureResult<Languages> fetchCurrentLanguage() async {
+  FutureResult<Languages, LanguageErrors> fetchCurrentLanguage() async {
     if (!(await _sharedPreferencesAsyncService
         .containsKey(LanguagesRepository.languageKey))) {
       _log.warning(
@@ -49,15 +50,17 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
   }
 
   @override
-  FutureResult<void> setCurrentLanguage(Languages language) async {
+  FutureResult<(), LanguageErrors> setCurrentLanguage(
+    Languages language,
+  ) async {
     try {
       await _sharedPreferencesAsyncService.setString(
         LanguagesRepository.languageKey,
         language.languageCode,
       );
 
-      return const Result.ok(null);
-    } catch (error, stackTrace) {
+      return const Result.ok(());
+    } on Object catch (error, stackTrace) {
       _log.warning('Fail at saving $language', error, stackTrace);
       return Result.failure(LanguagesRepositoryErrors.failAtSaving, stackTrace);
     }

@@ -1,7 +1,8 @@
+import '../logic/models/privacy_data_errors.dart';
 import 'privacy_repository.dart';
 
 /// [Exception]s related to [PrivacyRepository].
-enum PrivacyRepositoryErrors implements Exception {
+enum PrivacyRepositoryErrors implements PrivacyDataErrors {
   /// When some of the keys are missing.
   missingSomeKey,
 

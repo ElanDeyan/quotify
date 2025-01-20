@@ -1,6 +1,6 @@
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
-import 'theme_brightness_errors.dart';
+import 'theme_brightness_model_errors.dart';
 
 /// Represents different brightness themes in an application,
 /// allowing you to easily switch between these predefined options in your code.
@@ -29,12 +29,15 @@ enum ThemeBrightness {
   ///   string ([String]): The `fromString` method takes a [String] parameter
   /// named `string` and returns a `Result` containing a [ThemeBrightness]
   /// value based on the input string.
-  static Result<ThemeBrightness> fromString(String string) => switch (string) {
+  static Result<ThemeBrightness, ThemeBrightnessModelErrors> fromString(
+    String string,
+  ) =>
+      switch (string) {
         'light' => const Result.ok(ThemeBrightness.light),
         'dark' => const Result.ok(ThemeBrightness.dark),
         'system' => const Result.ok(ThemeBrightness.system),
         _ => Result.failure(
-            ThemeBrightnessErrors.invalidStringRepresentation,
+            ThemeBrightnessModelErrors.invalidStringRepresentation,
             StackTrace.current,
           ),
       };

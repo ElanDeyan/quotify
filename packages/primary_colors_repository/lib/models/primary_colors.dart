@@ -1,8 +1,8 @@
 // ignore_for_file: public_member_api_docs
 
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
-import 'primary_colors_errors.dart';
+import 'primary_colors_model_errors.dart';
 
 /// Represents various colors.
 enum PrimaryColors {
@@ -19,9 +19,12 @@ enum PrimaryColors {
   static const defaultColor = PrimaryColors.oxfordBlue;
 
   /// Converts a string to its equivalent [PrimaryColors] member.
-  /// Returns [PrimaryColorsErrors.invalidStringRepresentation] when
+  /// Returns [PrimaryColorsModelErrors.invalidStringRepresentation] when
   /// fails to convert.
-  static Result<PrimaryColors> fromString(String string) => switch (string) {
+  static Result<PrimaryColors, PrimaryColorsModelErrors> fromString(
+    String string,
+  ) =>
+      switch (string) {
         'coolBlush' => const Result.ok(PrimaryColors.coolBlush),
         'fireEngineRed' => const Result.ok(PrimaryColors.fireEngineRed),
         'icyLilac' => const Result.ok(PrimaryColors.icyLilac),
@@ -31,7 +34,7 @@ enum PrimaryColors {
         'softApricot' => const Result.ok(PrimaryColors.softApricot),
         'vanilla' => const Result.ok(PrimaryColors.vanilla),
         _ => Result.failure(
-            PrimaryColorsErrors.invalidStringRepresentation,
+            PrimaryColorsModelErrors.invalidStringRepresentation,
             StackTrace.current,
           ),
       };
