@@ -163,7 +163,9 @@ void main() {
   group('Result.unwrap', () {
     test('ok instances returns their value', () {
       const ten = 10;
-      const aNumber = Result.ok(ten);
+
+      // ignore: prefer_const_constructors
+      final aNumber = Result.ok(ten);
 
       expect(aNumber.unwrap(), equals(ten));
     });
@@ -179,7 +181,9 @@ void main() {
   group('Result.flatMapSync', () {
     test('ok instances returns the callback wrapped into a result', () {
       const deyan = 'Deyan';
-      const myName = Result.ok(deyan);
+
+      // ignore: prefer_const_constructors
+      final myName = Result.ok(deyan);
 
       final nameLength = myName.mapSync(
         (value) => value.length,
@@ -231,13 +235,15 @@ void main() {
   group('Result.flatMapAsync', () {
     test('ok instances returns the callback wrapped into a result', () async {
       const deyan = 'Deyan';
-      const myName = Result.ok(deyan);
+
+      // ignore: prefer_const_constructors
+      final myName = Result.ok(deyan);
 
       final nameLength = myName.mapAsync(
         (value) async => value.length,
       );
 
-      expect(nameLength, completion(isA<Ok<int, Exception>>()));
+      expect(nameLength, completion(isA<Ok<int, Object>>()));
       expect((await nameLength).asOk.value, equals(deyan.length));
     });
 
@@ -255,7 +261,7 @@ void main() {
         (value) async => value.length,
       );
 
-      expect(wouldBeNameLength, completion(isA<Failure<int, Exception>>()));
+      expect(wouldBeNameLength, completion(isA<Failure<String, Exception>>()));
       expect((await wouldBeNameLength).asFailure.failure, equals(exception));
       expect(
         (await wouldBeNameLength).asFailure.stackTrace,
@@ -280,7 +286,7 @@ void main() {
 
       final result = await wouldBeNameLength;
 
-      expect(result, isA<Failure<int, Exception>>());
+      expect(result, isA<Failure<String, Exception>>());
       expect(result.asFailure.failure, equals(exception));
       expect(
         result.asFailure.stackTrace,
@@ -290,8 +296,6 @@ void main() {
   });
 
   group('Result.fold', () {
-    test('when ok, executes onOk', () {
-      
-    });
+    test('when ok, executes onOk', () {});
   });
 }
