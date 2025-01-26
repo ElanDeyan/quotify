@@ -16,7 +16,7 @@ dependencies:
   quotify_utils: ^3.0.0
 
 dev_dependencies:
-  flutter_secure_storage: ^9.2.2
+  flutter_secure_storage: ^10.0.0-beta.4
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
