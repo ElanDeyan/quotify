@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:quotify_utils/serialization/interfaces/encodable.dart';
 import 'package:tags_repository/logic/models/tag.dart';
-import 'package:tags_repository/logic/models/tag_errors.dart';
 import 'package:tags_repository/logic/models/tag_model_errors.dart';
 
-import 'quote_errors.dart';
+import 'quote_model_errors.dart';
 
 /// A Quote class.
 @immutable
@@ -149,7 +149,7 @@ final class Quote implements Encodable {
   /// - `QuoteErrors.updatedAtDateBeforeCreatedAt`: If the `updatedAt` date
   /// is before the `createdAt` date.
   /// - `TagErrors.invalidMapRepresentation`: If any tag map is invalid.
-  static Result<Quote> fromMap(Map<String, Object?> map) {
+  static Result<Quote, Exception> fromMap(Map<String, Object?> map) {
     if (map
         case {
           'id': final int id,
@@ -174,7 +174,7 @@ final class Quote implements Encodable {
 
       if (updatedAtDateTime.isBefore(createdAtDateTime)) {
         return Result.failure(
-          QuoteErrors.updatedAtDateBeforeCreatedAt,
+          QuoteModelErrors.updatedAtDateBeforeCreatedAt,
           StackTrace.current,
         );
       }
@@ -210,7 +210,7 @@ final class Quote implements Encodable {
     }
 
     return Result.failure(
-      QuoteErrors.invalidMapRepresentation,
+      QuoteModelErrors.invalidMapRepresentation,
       StackTrace.current,
     );
   }
@@ -224,19 +224,22 @@ final class Quote implements Encodable {
   /// - Parameter jsonString: The JSON string to be converted.
   /// - Returns: A `Result` containing either a `Quote` object or a failure with
   ///   an error and stack trace.
-  static Result<Quote> fromJsonString(String jsonString) {
+  static Result<Quote, Exception> fromJsonString(String jsonString) {
     late final Object? decodedJson;
 
     try {
       decodedJson = jsonDecode(jsonString);
     } on FormatException catch (_, stackTrace) {
-      return Result.failure(QuoteErrors.invalidJsonString, stackTrace);
+      return Result.failure(QuoteModelErrors.invalidJsonString, stackTrace);
     }
 
     if (decodedJson case final Map<String, Object?> map) {
       return fromMap(map);
     }
 
-    return Result.failure(QuoteErrors.invalidJsonString, StackTrace.current);
+    return Result.failure(
+      QuoteModelErrors.invalidJsonString,
+      StackTrace.current,
+    );
   }
 }

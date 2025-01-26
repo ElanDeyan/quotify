@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
-import 'package:quotes_repository/logic/models/quote_errors.dart';
+import 'package:quotes_repository/logic/models/quote_model_errors.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:tags_repository/logic/models/tag.dart';
-import 'package:tags_repository/logic/models/tag_errors.dart';
 import 'package:tags_repository/logic/models/tag_model_errors.dart';
 
 void main() {
@@ -91,10 +91,10 @@ void main() {
         };
 
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like empty content should return a Failure', () {
@@ -111,10 +111,10 @@ void main() {
         };
 
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like empty author should return a Failure', () {
@@ -131,10 +131,10 @@ void main() {
         };
 
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like invalid sourceUri should return a Failure', () {
@@ -151,10 +151,10 @@ void main() {
         };
 
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like invalid createdAt should return a Failure', () {
@@ -171,10 +171,10 @@ void main() {
         };
 
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like invalid updatedAt should return a Failure', () {
@@ -190,10 +190,10 @@ void main() {
           'tags': [],
         };
         final result = Quote.fromMap(quoteMap);
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.invalidMapRepresentation),
+          equals(QuoteModelErrors.invalidMapRepresentation),
         );
       });
       test('like updatedAt before createdAt should return a Failure', () {
@@ -211,10 +211,10 @@ void main() {
 
         final result = Quote.fromMap(quoteMap);
 
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
-          equals(QuoteErrors.updatedAtDateBeforeCreatedAt),
+          equals(QuoteModelErrors.updatedAtDateBeforeCreatedAt),
         );
       });
       test('like at least one wrong tag map should return a Failure', () {
@@ -242,7 +242,7 @@ void main() {
 
         final result = Quote.fromMap(quoteMap);
 
-        expect(result, isA<Failure<Quote>>());
+        expect(result, isA<Failure<Quote, Exception>>());
         expect(
           result.asFailure.failure,
           equals(TagModelErrors.invalidMapRepresentation),
@@ -272,7 +272,7 @@ void main() {
 
         final result = Quote.fromMap(sampleQuote);
 
-        expect(result, isA<Ok<Quote>>());
+        expect(result, isA<Ok<Quote, Exception>>());
       });
     });
   });
@@ -296,7 +296,7 @@ void main() {
 
       final result = Quote.fromJsonString(jsonString);
 
-      expect(result, isA<Ok<Quote>>());
+      expect(result, isA<Ok<Quote, Exception>>());
     });
 
     test('should return Failure when JSON string is invalid', () {
@@ -304,8 +304,8 @@ void main() {
 
       final result = Quote.fromJsonString(jsonString);
 
-      expect(result, isA<Failure<Quote>>());
-      expect(result.asFailure.failure, QuoteErrors.invalidJsonString);
+      expect(result, isA<Failure<Quote, Exception>>());
+      expect(result.asFailure.failure, QuoteModelErrors.invalidJsonString);
     });
 
     test('should return Failure when JSON does not represent a map', () {
@@ -313,8 +313,8 @@ void main() {
 
       final result = Quote.fromJsonString(jsonString);
 
-      expect(result, isA<Failure<Quote>>());
-      expect(result.asFailure.failure, QuoteErrors.invalidJsonString);
+      expect(result, isA<Failure<Quote, Exception>>());
+      expect(result.asFailure.failure, QuoteModelErrors.invalidJsonString);
     });
   });
 
