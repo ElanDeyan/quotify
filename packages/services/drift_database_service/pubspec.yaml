@@ -14,6 +14,7 @@ dependencies:
     sdk: flutter
   path: ^1.9.0
   path_provider: ^2.1.5
+  quotes_repository: ^1.0.0
   quotify_utils: ^3.0.0
   sqlcipher_flutter_libs: ^0.6.4
   sqlite3: ^2.5.0

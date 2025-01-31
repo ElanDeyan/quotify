@@ -1,9 +1,15 @@
 import 'package:drift/drift.dart';
 import 'package:drift_database_service/src/database/connection/native_connection.dart';
 import 'package:drift_database_service/src/exceptions/database_errors.dart';
+import 'package:drift_database_service/src/extensions/quote_entry_extension.dart';
 import 'package:drift_database_service/src/extensions/tag_entry_extension.dart';
+import 'package:drift_database_service/src/tables/quotes.dart';
+import 'package:drift_database_service/src/utils/tags_set_to_string_converter.dart';
+import 'package:drift_database_service/src/utils/uri_to_nullable_string_converter.dart';
+import 'package:quotes_repository/repositories/quote_entry.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
+import 'package:tags_repository/logic/models/tag.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
 
 import '../tables/tags.dart';
@@ -11,7 +17,7 @@ import '../tables/tags.dart';
 part 'app_database.g.dart';
 
 /// Database for the tags and quotes.
-@DriftDatabase(tables: [Tags])
+@DriftDatabase(tables: [Tags, Quotes])
 final class AppDatabase extends _$AppDatabase {
   /// Constructs an instance of [AppDatabase] with the given encryption
   /// passphrase.
@@ -41,7 +47,7 @@ final class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// Retrieves all the tags from the database.
   ///
@@ -49,11 +55,15 @@ final class AppDatabase extends _$AppDatabase {
   /// representing all the tags in the database.
   Future<List<TagTable>> get allTags => select(tags).get();
 
+  Future<List<QuoteTable>> get allQuotes => select(quotes).get();
+
+  Stream<List<QuoteTable>> get watchAllQuotes => select(quotes).watch();
+
   /// A stream that emits a list of all tags from the `tags` table.
   ///
   /// This stream will automatically update whenever the data in the `tags`
   /// table changes.
-  Stream<List<TagTable>> get allTagsStream => select(tags).watch();
+  Stream<List<TagTable>> get watchAllTags => select(tags).watch();
 
   /// Clears all tags from the database.
   ///
@@ -83,6 +93,22 @@ final class AppDatabase extends _$AppDatabase {
         ),
       );
 
+  FutureResult<Unit, DatabaseErrors> clearAllQuotes() => Result.guardAsync(
+        () => transaction(
+          () async {
+            final howManyTagsBefore = (await allQuotes).length;
+
+            final amountOfRowsAffected = await delete(quotes).go();
+
+            if (amountOfRowsAffected != howManyTagsBefore) {
+              throw DatabaseErrors.notDeletedAllQuotes;
+            }
+
+            return ();
+          },
+        ),
+      );
+
   /// Creates a new tag in the database.
   ///
   /// This method inserts a new tag into the `tags` table. If a tag with the
@@ -105,12 +131,35 @@ final class AppDatabase extends _$AppDatabase {
         () async {
           final tagTableOrNull = await into(tags).insertReturningOrNull(
             entry.toTagsCompanion(),
-            mode: InsertMode.insertOrAbort,
+            mode: InsertMode.insertOrIgnore,
           );
 
           if (tagTableOrNull == null) throw DatabaseErrors.cannotCreateEntry;
 
           return tagTableOrNull;
+        },
+      ),
+    );
+
+    return switch (operationResult) {
+      Ok(:final value) => Result.ok(value),
+      Failure(:final failure, :final stackTrace) =>
+        Result.failure(failure, stackTrace),
+    };
+  }
+
+  FutureResult<QuoteTable, DatabaseErrors> createQuote(QuoteEntry entry) async {
+    final operationResult = await Result.guardAsync<QuoteTable, DatabaseErrors>(
+      () => transaction(
+        () async {
+          final quoteTableOrNull = await into(quotes).insertReturningOrNull(
+            entry.toQuotesCompanion(),
+            mode: InsertMode.insertOrIgnore,
+          );
+
+          if (quoteTableOrNull == null) throw DatabaseErrors.cannotCreateEntry;
+
+          return quoteTableOrNull;
         },
       ),
     );
@@ -155,6 +204,25 @@ final class AppDatabase extends _$AppDatabase {
         ),
       );
 
+  FutureResult<QuoteTable, DatabaseErrors> deleteQuote(Id id) async =>
+      Result.guardAsync(
+        () => transaction(
+          () async {
+            final affectedRows = await (delete(quotes)
+                  ..where(
+                    (tbl) => tbl.id.equals(id.toInt()),
+                  ))
+                .goAndReturn();
+
+            return switch (affectedRows) {
+              [final deletedTag] => deletedTag,
+              [] => throw DatabaseErrors.notFoundId,
+              [...] => throw DatabaseErrors.tooMuchRowsAffected,
+            };
+          },
+        ),
+      );
+
   /// Retrieves a tag from the database by its ID.
   ///
   /// This method performs a query on the `tags` table to find a tag
@@ -167,7 +235,13 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns a [Future] that completes with a [Maybe] of [TagTable] if
   /// a tag with the specified ID is found, or `null` if no such tag
   /// exists.
-  Future<TagTable?> getTagById(Id id) async => (select(tags)
+  Future<TagTable?> getTagById(Id id) => (select(tags)
+        ..where(
+          (tbl) => tbl.id.equals(id.toInt()),
+        ))
+      .getSingleOrNull();
+
+  Future<QuoteTable?> getQuoteById(Id id) => (select(quotes)
         ..where(
           (tbl) => tbl.id.equals(id.toInt()),
         ))
@@ -196,6 +270,19 @@ final class AppDatabase extends _$AppDatabase {
     }
 
     return foundTags;
+  }
+
+  Future<Set<QuoteTable>> getQuotesWithIds(Iterable<Id> ids) async {
+    if (ids.isEmpty) return const {};
+
+    final foundQuotes = <QuoteTable>{};
+
+    for (final id in ids) {
+      final quoteOrNull = await getQuoteById(id);
+      if (quoteOrNull != null) foundQuotes.add(quoteOrNull);
+    }
+
+    return foundQuotes;
   }
 
   /// Updates a tag in the database with the given [updatedTagEntry].
@@ -227,6 +314,37 @@ final class AppDatabase extends _$AppDatabase {
                 .writeReturning(
               TagsCompanion(
                 label: Value(updatedTagEntry.label),
+                updatedAt: Value(DateTime.now()),
+              ),
+            );
+
+            return switch (affectedRows) {
+              [final updatedRow] => updatedRow,
+              [] => throw DatabaseErrors.notFoundId,
+              [...] => throw DatabaseErrors.tooMuchRowsAffected,
+            };
+          },
+        ),
+      );
+
+  FutureResult<QuoteTable, DatabaseErrors> updateQuote(
+    FullQuoteEntry updatedQuoteEntry,
+  ) async =>
+      Result.guardAsync(
+        () => transaction(
+          () async {
+            final affectedRows = await (update(quotes)
+                  ..where(
+                    (tbl) => tbl.id.equals(updatedQuoteEntry.id.toInt()),
+                  ))
+                .writeReturning(
+              QuotesCompanion(
+                content: Value(updatedQuoteEntry.content),
+                author: Value(updatedQuoteEntry.author),
+                isFavorite: Value(updatedQuoteEntry.isFavorite),
+                source: Value(updatedQuoteEntry.source),
+                sourceUri: Value(updatedQuoteEntry.sourceUri),
+                tags: Value(updatedQuoteEntry.tags),
                 updatedAt: Value(DateTime.now()),
               ),
             );
