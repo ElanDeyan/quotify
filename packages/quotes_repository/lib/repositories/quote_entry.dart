@@ -9,10 +9,10 @@ sealed class QuoteEntry {
   const QuoteEntry({
     required this.content,
     required this.author,
-    required this.source,
-    required this.sourceUri,
-    required this.isFavorite,
-    required this.tags,
+    this.source,
+    this.sourceUri,
+    this.isFavorite = false,
+    this.tags = const {},
   });
 
   /// The content, the phrase itself.
@@ -44,10 +44,10 @@ final class PartialQuoteEntry extends QuoteEntry {
   const PartialQuoteEntry({
     required super.content,
     required super.author,
-    required super.source,
-    required super.sourceUri,
-    required super.isFavorite,
-    required super.tags,
+    super.isFavorite,
+    super.source,
+    super.sourceUri,
+    super.tags,
   });
 }
 
@@ -71,13 +71,13 @@ final class FullQuoteEntry extends QuoteEntry {
   const FullQuoteEntry({
     required super.content,
     required super.author,
-    required super.source,
-    required super.sourceUri,
-    required super.isFavorite,
-    required super.tags,
     required this.id,
     required this.createdAt,
     required this.updatedAt,
+    super.source,
+    super.sourceUri,
+    super.isFavorite,
+    super.tags,
   });
 
   /// The unique identifier for this quote entry.
