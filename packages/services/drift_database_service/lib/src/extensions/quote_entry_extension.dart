@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/drift_database_service.dart';
+import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:quotes_repository/repositories/quote_entry.dart';
 
 extension QuoteEntryExtension on QuoteEntry {

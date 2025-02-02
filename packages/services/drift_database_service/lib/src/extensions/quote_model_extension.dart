@@ -1,17 +1,19 @@
-import 'package:drift_database_service/drift_database_service.dart';
+import 'package:drift/drift.dart';
+import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
-import 'package:quotify_utils/quotify_utils.dart';
 
-extension QuoteModelExtension on QuoteTable {
-  Quote toQuoteModel() => Quote(
-        id: Id(id.toNatural()),
-        content: NonBlankString(content),
-        author: NonBlankString(author),
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        isFavorite: isFavorite,
-        source: source,
-        sourceUri: sourceUri,
-        tags: tags,
+/// Extension on [Quote].
+extension QuoteModelExtension on Quote {
+  /// Converts [Quote] to [QuotesCompanion].
+  QuotesCompanion toQuotesCompanion() => QuotesCompanion(
+        id: Value(id.toInt()),
+        content: Value(content),
+        author: Value(author),
+        isFavorite: Value(isFavorite),
+        source: Value(source),
+        sourceUri: Value(sourceUri),
+        createdAt: Value(createdAt),
+        updatedAt: Value(updatedAt),
+        tags: Value(tags),
       );
 }

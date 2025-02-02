@@ -3,7 +3,7 @@ import 'package:drift/native.dart';
 import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:drift_database_service/src/exceptions/database_errors.dart';
 import 'package:drift_database_service/src/extensions/quote_entry_extension.dart';
-import 'package:drift_database_service/src/extensions/quote_model_extension.dart';
+import 'package:drift_database_service/src/extensions/quote_table_extension.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
