@@ -247,6 +247,20 @@ final class AppDatabase extends _$AppDatabase {
         ))
       .getSingleOrNull();
 
+  Future<Set<QuoteTable>> getQuotesWithTagId(Id id) async {
+    final quotes = await allQuotes;
+
+    return {
+      for (final quote in quotes)
+        if (quote.tags
+            .map(
+              (e) => e.id,
+            )
+            .contains(id))
+          quote,
+    };
+  }
+
   /// Retrieves a set of `TagTable` entries corresponding to the provided IDs.
   ///
   /// This method takes an iterable of IDs and returns a set of `TagTable`

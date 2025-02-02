@@ -4,12 +4,14 @@ import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:drift_database_service/src/exceptions/database_errors.dart';
 import 'package:drift_database_service/src/extensions/quote_entry_extension.dart';
 import 'package:drift_database_service/src/extensions/quote_table_extension.dart';
+import 'package:drift_database_service/src/extensions/tag_table_extension.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
 import 'package:quotes_repository/repositories/quote_entry.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
+import 'package:tags_repository/repositories/tag_entry.dart';
 
 void main() {
   late AppDatabase database;
@@ -424,5 +426,75 @@ void main() {
         expect(foundQuotes, equals({...quotes}));
       },
     );
+  });
+
+  group('getQuotesWithTagId', () {
+    test('without quotes, return empty set', () async {
+      final sampleId = Id(Natural(faker.randomGenerator.integer(50)));
+
+      expect(database.allQuotes, completion(isEmpty));
+
+      final quotesWithTag = await database.getQuotesWithTagId(sampleId);
+
+      expect(quotesWithTag, isEmpty);
+    });
+
+    test('with inexistent tag id, simply return empty', () async {
+      for (var i = 0; i < 10; i++) {
+        await database.createQuote(
+          PartialQuoteEntry(
+            content: NonBlankString(faker.lorem.sentence()),
+            author: NonBlankString(faker.person.name()),
+          ),
+        );
+      }
+
+      expect(database.allTags, completion(isEmpty));
+
+      final sampleId = Id(Natural(faker.randomGenerator.integer(50)));
+
+      final quotesWithInexistentTagId =
+          await database.getQuotesWithTagId(sampleId);
+
+      expect(quotesWithInexistentTagId, isEmpty);
+    });
+
+    test('should return all quotes that have specific tag id', () async {
+      final sampleIdForTag = Id(Natural(faker.randomGenerator.integer(50)));
+      final addedTag = await database
+          .createTag(
+            FullTagEntry(
+              label: NonBlankString(faker.lorem.word()),
+              id: sampleIdForTag,
+            ),
+          )
+          .then(
+            (value) => value.asOk.value,
+          );
+
+      final addedTagAsTagModel = addedTag.toTag();
+
+      for (var i = 0; i < 10; i++) {
+        await database.createQuote(
+          PartialQuoteEntry(
+            content: NonBlankString(faker.lorem.sentence()),
+            author: NonBlankString(faker.person.name()),
+            tags: i.isEven ? const {} : {addedTagAsTagModel},
+          ),
+        );
+      }
+
+      const evenNumbersFromZeroToNine = 5;
+
+      final quotesWithTagId = await database.getQuotesWithTagId(sampleIdForTag);
+
+      expect(quotesWithTagId, hasLength(evenNumbersFromZeroToNine));
+      expect(
+        quotesWithTagId.every(
+          (element) => element.tags.contains(addedTagAsTagModel),
+        ),
+        isTrue,
+      );
+    });
   });
 }
