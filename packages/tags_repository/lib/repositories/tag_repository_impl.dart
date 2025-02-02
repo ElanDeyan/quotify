@@ -5,7 +5,7 @@ import 'package:quotify_utils/result.dart';
 import '../logic/models/tag.dart';
 import 'tag_entry.dart';
 import 'tag_repository.dart';
-import 'tag_table_extension.dart';
+
 
 /// Repository for operations related to [Tag]s.
 final class TagRepositoryImpl implements TagRepository {
