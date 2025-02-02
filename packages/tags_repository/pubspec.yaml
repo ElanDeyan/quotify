@@ -9,7 +9,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  drift_database_service: ^2.0.0
+  drift_database_service: ^3.0.0
   flutter:
     sdk: flutter
   meta: ^1.15.0
