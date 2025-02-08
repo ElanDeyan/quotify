@@ -284,7 +284,8 @@ void main() {
 
   group('Result.fold', () {
     test('when ok, executes onOk', () {
-      const myAge = Result.ok(22);
+      // ignore: prefer_const_constructors
+      final myAge = Result.ok(22);
 
       final myString = myAge.fold(
         onOk: (value) => value.toString(),
@@ -296,7 +297,8 @@ void main() {
 
     test('when failure, executes onFailure', () {
       const message = 'My message';
-      const myException = Result.failure(FormatException(message));
+      // ignore: prefer_const_constructors
+      final myException = Result.failure(FormatException(message));
 
       final myString = myException.fold(
         onOk: (value) => value.toString(),
