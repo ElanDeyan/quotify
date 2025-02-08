@@ -12,3 +12,4 @@ export 'src/non_blank_string.dart';
 export 'src/option.dart';
 export 'src/reactive.dart';
 export 'src/unit.dart';
+export 'src/queryable.dart';
