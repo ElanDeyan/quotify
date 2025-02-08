@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
-import 'package:tags_repository/logic/models/tag.dart';
 
 import '../logic/models/quote.dart';
 import '../logic/models/quote_errors.dart';
@@ -31,13 +30,13 @@ abstract interface class QuotesRepository {
   /// no quote with the given ID is found.
   Future<Quote?> getQuoteById(Id quoteId);
 
-  /// Retrieves quotes that are tagged with a specific tag.
+  /// Retrieves quotes that are tagged with a specific tag id.
   ///
-  /// [tag] - The tag to filter quotes by.
+  /// [id] - The tag id to filter quotes by.
   ///
   /// Returns a [Future] that completes with an [UnmodifiableListView] list of
   /// [Quote] objects that  have the specified tag.
-  Future<UnmodifiableListView<Quote>> getQuotesWithTag(Tag tag);
+  Future<UnmodifiableListView<Quote>> getQuotesWithTag(Id id);
 
   /// Creates a new quote.
   ///

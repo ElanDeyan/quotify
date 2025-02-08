@@ -12,7 +12,7 @@ import 'quote_model_errors.dart';
 
 /// A Quote class.
 @immutable
-final class Quote implements Encodable {
+final class Quote implements Encodable, Queryable {
   /// A Quote class.
   Quote({
     required this.id,
@@ -242,4 +242,39 @@ final class Quote implements Encodable {
       StackTrace.current,
     );
   }
+
+  @override
+  String get asQueryableString {
+    final buffer = StringBuffer()
+      ..writeAll(
+        [
+          content,
+          author,
+          if (source != null) source,
+          if (sourceUri != null) sourceUri.toString(),
+          ...tags.map(
+            (e) => e.label,
+          ),
+        ],
+        '\n',
+      );
+
+    return buffer.toString();
+  }
+
+  @override
+  bool hasMatchWith(
+    String string, {
+    bool caseSensitive = false,
+    bool multiline = true,
+    bool dotAll = false,
+    bool unicode = false,
+  }) =>
+      RegExp(
+        string,
+        multiLine: multiline,
+        unicode: unicode,
+        dotAll: dotAll,
+        caseSensitive: caseSensitive,
+      ).hasMatch(asQueryableString);
 }

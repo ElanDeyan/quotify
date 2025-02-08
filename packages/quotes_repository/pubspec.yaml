@@ -10,6 +10,7 @@ environment:
 
 dependencies:
   collection: ^1.19.0
+  drift_database_service: ^3.0.0
   flutter:
     sdk: flutter
   meta: ^1.15.0
