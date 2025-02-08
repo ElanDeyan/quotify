@@ -33,7 +33,7 @@ final class QuotesRepositoryImpl implements QuotesRepository {
       _appDatabase.createQuote(entry).then(
             (value) => value.mapSync(
               (value) => value.toQuoteModel(),
-              failureMapper: (_, __) => QuoteRepositoryErrors.cannotCreateQuote,
+              failureMapper: (_) => QuoteRepositoryErrors.cannotCreateQuote,
             ),
           );
 
@@ -42,8 +42,7 @@ final class QuotesRepositoryImpl implements QuotesRepository {
       _appDatabase.clearAllQuotes().then(
             (value) => value.mapSync(
               (value) => value,
-              failureMapper: (_, __) =>
-                  QuoteRepositoryErrors.cannotDeleteAllQuotes,
+              failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteAllQuotes,
             ),
           );
 
@@ -52,7 +51,7 @@ final class QuotesRepositoryImpl implements QuotesRepository {
       _appDatabase.deleteQuote(quoteId).then(
             (value) => value.mapSync(
               (value) => value.toQuoteModel(),
-              failureMapper: (_, __) => QuoteRepositoryErrors.cannotDeleteQuote,
+              failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteQuote,
             ),
           );
 
@@ -99,7 +98,7 @@ final class QuotesRepositoryImpl implements QuotesRepository {
       _appDatabase.updateQuote(entry).then(
             (value) => value.mapSync(
               (value) => value.toQuoteModel(),
-              failureMapper: (_, __) => QuoteRepositoryErrors.cannotUpdateQuote,
+              failureMapper: (_) => QuoteRepositoryErrors.cannotUpdateQuote,
             ),
           );
 }

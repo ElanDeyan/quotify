@@ -197,10 +197,8 @@ void main() {
         'failure instances returns the original failure and stackTraces '
         'wrapped into a result', () {
       final exception = Exception('oops');
-      const stackTrace = StackTrace.empty;
       final myFailure = Result<String, Exception>.failure(
         exception,
-        stackTrace,
       );
 
       final wouldBeNameLength = myFailure.mapSync(
@@ -209,17 +207,15 @@ void main() {
 
       expect(wouldBeNameLength, isA<Failure<int, Object>>());
       expect(wouldBeNameLength.asFailure.failure, equals(exception));
-      expect(wouldBeNameLength.asFailure.stackTrace, equals(stackTrace));
     });
 
     test(
         'even when callback throws failure instances returns the original '
         'failure and stackTraces wrapped into a result', () {
       final exception = Exception('oops');
-      const stackTrace = StackTrace.empty;
+
       final myFailure = Result<String, Exception>.failure(
         exception,
-        stackTrace,
       );
 
       final wouldBeNameLength = myFailure.mapSync(
@@ -228,7 +224,6 @@ void main() {
 
       expect(wouldBeNameLength, isA<Failure<int, Object>>());
       expect(wouldBeNameLength.asFailure.failure, equals(exception));
-      expect(wouldBeNameLength.asFailure.stackTrace, equals(stackTrace));
     });
   });
 
@@ -251,49 +246,39 @@ void main() {
         'failure instances returns the original failure and stackTraces '
         'wrapped into a result', () async {
       final exception = Exception('oops');
-      const stackTrace = StackTrace.empty;
+
       final myFailure = Result<String, Exception>.failure(
         exception,
-        stackTrace,
       );
 
       final wouldBeNameLength = myFailure.mapAsync(
         (value) async => value.length,
-        failureMapper: (exception, stackTrace) => exception,
+        failureMapper: (exception) => exception,
       );
 
       expect(wouldBeNameLength, completion(isA<Failure<int, Exception>>()));
       expect((await wouldBeNameLength).asFailure.failure, equals(exception));
-      expect(
-        (await wouldBeNameLength).asFailure.stackTrace,
-        equals(stackTrace),
-      );
     });
 
     test(
         'even when callback throws failure instances returns the original '
         'failure and stackTraces wrapped into a result', () async {
       final exception = Exception('oops');
-      const stackTrace = StackTrace.empty;
+
       final myFailure = Result<String, Exception>.failure(
         exception,
-        stackTrace,
       );
 
       final wouldBeNameLength = myFailure.mapAsync(
         (value) =>
             Future<int>.error(const FormatException('a different exception')),
-        failureMapper: (exception, stackTrace) => exception,
+        failureMapper: (exception) => exception,
       );
 
       final result = await wouldBeNameLength;
 
       expect(result, isA<Failure<int, Exception>>());
       expect(result.asFailure.failure, equals(exception));
-      expect(
-        result.asFailure.stackTrace,
-        equals(stackTrace),
-      );
     });
   });
 

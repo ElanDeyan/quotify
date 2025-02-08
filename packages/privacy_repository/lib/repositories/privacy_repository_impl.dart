@@ -113,8 +113,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
         .containsKey(PrivacyRepository.dataEncryptionKey))) {
       return (await Result.guardAsync(setEncryptionPassword)).mapAsync(
         (value) async => (),
-        failureMapper: (exception, stackTrace) =>
-            PrivacyRepositoryErrors.failAtWriting,
+        failureMapper: (_) => PrivacyRepositoryErrors.failAtWriting,
       );
     }
 
