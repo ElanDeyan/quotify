@@ -283,6 +283,27 @@ void main() {
   });
 
   group('Result.fold', () {
-    test('when ok, executes onOk', () {});
+    test('when ok, executes onOk', () {
+      const myAge = Result.ok(22);
+
+      final myString = myAge.fold(
+        onOk: (value) => value.toString(),
+        onFailure: (exception) => exception.toString(),
+      );
+
+      expect(myString, equals(22.toString()));
+    });
+
+    test('when failure, executes onFailure', () {
+      const message = 'My message';
+      const myException = Result.failure(FormatException(message));
+
+      final myString = myException.fold(
+        onOk: (value) => value.toString(),
+        onFailure: (exception) => exception.message,
+      );
+
+      expect(myString, equals(message));
+    });
   });
 }

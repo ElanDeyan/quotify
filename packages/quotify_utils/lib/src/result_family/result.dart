@@ -306,7 +306,7 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: The value if the result is `Ok`, otherwise the fallback value.
   T unwrapOrElse(T Function() callback) => switch (this) {
         Ok(:final value) => value,
-        Failure(failure: _) => callback(),
+        Failure() => callback(),
       };
 
   /// Recovers from a failure by synchronously executing the provided callback.
@@ -325,7 +325,7 @@ sealed class Result<T extends Object, E extends Object> {
     T Function(E exception) onFailure,
   ) =>
       switch (this) {
-        Ok(value: _) => this,
+        Ok() => this,
         Failure(:final failure) => Result.guardSync(() => onFailure(failure)),
       };
 
@@ -359,7 +359,7 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function(E exception) onFailure,
   ) async =>
       switch (this) {
-        Ok(value: _) => this,
+        Ok() => this,
         Failure(:final failure) =>
           await Result.guardAsync(() => onFailure(failure)),
       };
