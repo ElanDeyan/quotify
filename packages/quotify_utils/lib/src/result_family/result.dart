@@ -8,6 +8,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
 
@@ -38,7 +39,7 @@ sealed class Result<T extends Object, E extends Object> {
   const factory Result.ok(T value) = Ok;
 
   /// Create an instance of Result containing an error
-  const factory Result.failure(E failure, StackTrace stackTrace) = Failure;
+  const factory Result.failure(E failure, [StackTrace? stackTrace]) = Failure;
 
   /// A factory constructor that executes a synchronous computation and returns
   /// a `Result` object. If the computation completes successfully, it returns
@@ -81,16 +82,11 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Throws: Any exceptions that are not of type `E`.
   static FutureResult<T, E> guardAsync<T extends Object, E extends Object>(
     Future<T> Function() computation,
-  ) async {
-    try {
-      final result = await computation();
-      return Result.ok(result);
-    } on E catch (error, stackTrace) {
-      return Result.failure(error, stackTrace);
-    } on Object {
-      rethrow;
-    }
-  }
+  ) =>
+      Future.sync(computation).then(Result<T, E>.ok).catchError(
+            (Object error) => Result<T, E>.failure(error as E),
+            test: (error) => error is E,
+          );
 
   /// Executes an asynchronous computation with a specified timeout and returns
   /// a `FutureResult` containing either the result of the computation or a
@@ -117,23 +113,35 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function() computation, {
     required Duration timeout,
     required E failureOnTimeout,
-  }) async {
-    try {
-      final operationResult = await computation().timeout(
-        timeout,
-        onTimeout: () => throw TimeoutException('Operation timed out', timeout),
-      );
+  }) async =>
+          Future.sync(computation)
+              .timeout(timeout)
+              .then(Result<T, E>.ok)
+              .catchError(
+            (Object error) {
+              if (error is TimeoutException) {
+                return Result<T, E>.failure(failureOnTimeout);
+              }
 
-      return Result.ok(operationResult);
-    } on TimeoutException catch (_, stackTrace) {
-      return Result.failure(failureOnTimeout, stackTrace);
-    } on E catch (exception, stackTrace) {
-      return Result.failure(exception, stackTrace);
-    } on Object {
-      rethrow;
-    }
-  }
+              return Result<T, E>.failure(error as E);
+            },
+            test: (error) => error is E || error is TimeoutException,
+          );
 
+  /// Converts a stream of values of type `T` into a stream of `Result<T, E>`
+  /// objects.
+  ///
+  /// Each value emitted by the input stream is wrapped in a `Result.ok` object.
+  /// If an error occurs in the input stream, it is caught and wrapped in a
+  /// `Result.failure` object, provided the error is of type `E`.
+  ///
+  /// The resulting stream is a broadcast stream, meaning it can be listened to
+  /// multiple times.
+  ///
+  /// - Parameters:
+  ///   - stream: The input stream of values of type `T`.
+  ///
+  /// - Returns: A broadcast stream of `Result<T, E>` objects.
   static Stream<Result<T, E>> guardStream<T extends Object, E extends Object>(
     Stream<T> stream,
   ) =>
@@ -142,8 +150,10 @@ sealed class Result<T extends Object, E extends Object> {
             Result<T, E>.ok,
           )
           .handleError(
-            (Object error, StackTrace stackTrace) =>
-                Result<T, E>.failure(error as E, stackTrace),
+            (Object error, StackTrace stackTrace) => Result<T, E>.failure(
+              error as E,
+              stackTrace == StackTrace.empty ? null : stackTrace,
+            ),
             test: (error) => error is E,
           )
           .asBroadcastStream();
@@ -152,10 +162,14 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function() computation, {
     int maxAttempts = 1,
     Duration delay = const Duration(milliseconds: 500),
-    bool Function(E failure, StackTrace stackTrace)? retryIf,
+    Duration Function(int attempt)? delayStrategy,
+    bool Function(E failure)? retryIf,
   }) async {
     assert(maxAttempts > 0, 'maxAttempts should be higher than 0');
     assert(!delay.isNegative, 'delay should be positive');
+
+    delayStrategy ??= (attempt) => delay * (math.pow(2, attempt));
+
     late Result<T, E> lastResult;
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -164,10 +178,10 @@ sealed class Result<T extends Object, E extends Object> {
       switch (lastResult) {
         case Ok():
           return lastResult;
-        case Failure(:final failure, :final stackTrace):
-          if (retryIf?.call(failure, stackTrace) ?? true) {
+        case Failure(:final failure):
+          if (retryIf?.call(failure) ?? true) {
             if (attempt < maxAttempts) {
-              await Future<void>.delayed(delay * attempt);
+              await Future<void>.delayed(delayStrategy(attempt));
               continue;
             }
           }
@@ -222,13 +236,12 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: A new `Result` of type `Result<R, F>`.
   Result<R, F> mapSync<R extends Object, F extends Object>(
     R Function(T value) callback, {
-    F Function(E exception, StackTrace stackTrace)? failureMapper,
+    F Function(E exception)? failureMapper,
   }) =>
       switch (this) {
         Ok<T, E>(:final value) => Result.guardSync(() => callback(value)),
-        Failure<T, E>(:final failure, :final stackTrace) => Result.failure(
-            failureMapper?.call(failure, stackTrace) ?? failure as F,
-            stackTrace,
+        Failure<T, E>(:final failure) => Result.failure(
+            failureMapper?.call(failure) ?? failure as F,
           ),
       };
 
@@ -253,13 +266,12 @@ sealed class Result<T extends Object, E extends Object> {
   /// result is `Failure`.
   FutureResult<R, F> mapAsync<R extends Object, F extends Object>(
     Future<R> Function(T value) callback, {
-    F Function(E exception, StackTrace stackTrace)? failureMapper,
+    F Function(E exception)? failureMapper,
   }) async =>
       switch (this) {
         Ok(:final value) => await Result.guardAsync(() => callback(value)),
-        Failure(:final failure, :final stackTrace) => Result.failure(
-            failureMapper?.call(failure, stackTrace) ?? failure as F,
-            stackTrace,
+        Failure(:final failure) => Result.failure(
+            failureMapper?.call(failure) ?? failure as F,
           ),
       };
 
@@ -280,12 +292,11 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: The return value of the called function.
   R fold<R extends Object>({
     required R Function(T value) onOk,
-    required R Function(E exception, StackTrace stackTrace) onFailure,
+    required R Function(E exception) onFailure,
   }) =>
       switch (this) {
         Ok(:final value) => onOk(value),
-        Failure(:final failure, :final stackTrace) =>
-          onFailure(failure, stackTrace),
+        Failure(:final failure) => onFailure(failure),
       };
 
   /// Returns the value if the result is `Ok`, otherwise returns the provided
@@ -293,9 +304,9 @@ sealed class Result<T extends Object, E extends Object> {
   ///
   /// - Parameter fallback: The value to return if the result is `Failure`.
   /// - Returns: The value if the result is `Ok`, otherwise the fallback value.
-  T getOrElse(T Function() callback) => switch (this) {
+  T unwrapOrElse(T Function() callback) => switch (this) {
         Ok(:final value) => value,
-        Failure(failure: _, stackTrace: _) => callback(),
+        Failure() => callback(),
       };
 
   /// Recovers from a failure by synchronously executing the provided callback.
@@ -311,12 +322,11 @@ sealed class Result<T extends Object, E extends Object> {
   ///
   /// Returns a new `Result` based on the outcome of the [onFailure] callback.
   Result<T, E> recoverSync(
-    T Function(E exception, StackTrace stackTrace) onFailure,
+    T Function(E exception) onFailure,
   ) =>
       switch (this) {
-        Ok(value: _) => this,
-        Failure(:final failure, :final stackTrace) =>
-          Result.guardSync(() => onFailure(failure, stackTrace)),
+        Ok() => this,
+        Failure(:final failure) => Result.guardSync(() => onFailure(failure)),
       };
 
   /// Recovers from a failure by executing the provided synchronous recovery
@@ -346,12 +356,12 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: A `Result` instance which is either the original `Ok` instance
   ///   or a new `Result` based on the outcome of the `onFailure` function.
   FutureResult<T, E> recoverAsync(
-    Future<T> Function(E exception, StackTrace stackTrace) onFailure,
+    Future<T> Function(E exception) onFailure,
   ) async =>
       switch (this) {
-        Ok(value: _) => this,
-        Failure(:final failure, :final stackTrace) =>
-          await Result.guardAsync(() => onFailure(failure, stackTrace)),
+        Ok() => this,
+        Failure(:final failure) =>
+          await Result.guardAsync(() => onFailure(failure)),
       };
 
   /// Filters the `Result` based on a predicate function applied to the
@@ -375,7 +385,7 @@ sealed class Result<T extends Object, E extends Object> {
   ) =>
       switch (this) {
         Ok(:final value) when !predicateOnOk(value) =>
-          Result.failure(exceptionOnFalse, StackTrace.current),
+          Result.failure(exceptionOnFalse),
         _ => this,
       };
 
@@ -403,7 +413,7 @@ sealed class Result<T extends Object, E extends Object> {
             (acc, predicatePair) =>
                 acc.where(predicatePair.$1, predicatePair.$2(value)),
           ),
-        Failure(failure: _, stackTrace: _) => this,
+        Failure() => this,
       };
 
   /// Executes the provided callbacks based on the result type.
@@ -421,12 +431,20 @@ sealed class Result<T extends Object, E extends Object> {
   ///   - onFailure: A callback to be executed if the result is `Failure`.
   void tap({
     void Function(T value)? onOk,
-    void Function(E failure, StackTrace stackTrace)? onFailure,
+    void Function(E failure)? onFailure,
   }) =>
       switch (this) {
         Ok(:final value) => onOk?.call(value),
-        Failure(:final failure, :final stackTrace) =>
-          onFailure?.call(failure, stackTrace)
+        Failure(:final failure) => onFailure?.call(failure)
+      };
+
+  Future<void> tapAsync({
+    Future<void> Function(T value)? onOk,
+    Future<void> Function(E failure)? onFailure,
+  }) async =>
+      switch (this) {
+        Ok(:final value) => onOk?.call(value),
+        Failure(:final failure) => onFailure?.call(failure)
       };
 
   /// Converts the current result to a nullable value.
@@ -438,7 +456,7 @@ sealed class Result<T extends Object, E extends Object> {
   /// - `T?`: The contained value if the result is `Ok`, otherwise `null`.
   T? toNullable() => switch (this) {
         Ok(:final value) => value,
-        Failure(failure: _, stackTrace: _) => null,
+        Failure() => null,
       };
 
   /// Convenience method to cast to [Ok]
@@ -483,21 +501,26 @@ final class Ok<T extends Object, E extends Object> extends Result<T, E> {
 @immutable
 final class Failure<T extends Object, E extends Object> extends Result<T, E> {
   /// Subclass of Result for errors
-  const Failure(this.failure, this.stackTrace);
+  const Failure(this.failure, [this._stackTrace]);
 
   /// Returned error in result
   final E failure;
 
+  /// Stack trace related to this [Failure]. If null, when calling the
+  /// [stackTrace] getter it will return [StackTrace.current].
+  final StackTrace? _stackTrace;
+
   /// Stack trace related to this [Failure].
-  final StackTrace stackTrace;
+  ///
+  StackTrace get stackTrace => _stackTrace ?? StackTrace.current;
 
   @override
   bool operator ==(covariant Failure<T, E> other) =>
-      failure == other.failure && stackTrace == other.stackTrace;
+      failure == other.failure && _stackTrace == other._stackTrace;
 
   @override
-  int get hashCode => Object.hashAll([failure, stackTrace]);
+  int get hashCode => Object.hashAll([failure, _stackTrace]);
 
   @override
-  String toString() => 'Result<$T>.error(\n\t$failure,\n\t$stackTrace,\n)';
+  String toString() => 'Result<$T>.error(\n\t$failure,\n\t$_stackTrace,\n)';
 }
