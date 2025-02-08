@@ -8,6 +8,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
 
@@ -161,10 +162,13 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function() computation, {
     int maxAttempts = 1,
     Duration delay = const Duration(milliseconds: 500),
+    Duration Function(int attempt)? delayStrategy,
     bool Function(E failure)? retryIf,
   }) async {
     assert(maxAttempts > 0, 'maxAttempts should be higher than 0');
     assert(!delay.isNegative, 'delay should be positive');
+
+    delayStrategy ??= (attempt) => delay * (math.pow(2, attempt));
 
     late Result<T, E> lastResult;
 
@@ -177,7 +181,7 @@ sealed class Result<T extends Object, E extends Object> {
         case Failure(:final failure):
           if (retryIf?.call(failure) ?? true) {
             if (attempt < maxAttempts) {
-              await Future<void>.delayed(delay * attempt);
+              await Future<void>.delayed(delayStrategy(attempt));
               continue;
             }
           }
@@ -429,6 +433,15 @@ sealed class Result<T extends Object, E extends Object> {
     void Function(T value)? onOk,
     void Function(E failure)? onFailure,
   }) =>
+      switch (this) {
+        Ok(:final value) => onOk?.call(value),
+        Failure(:final failure) => onFailure?.call(failure)
+      };
+
+  Future<void> tapAsync({
+    Future<void> Function(T value)? onOk,
+    Future<void> Function(E failure)? onFailure,
+  }) async =>
       switch (this) {
         Ok(:final value) => onOk?.call(value),
         Failure(:final failure) => onFailure?.call(failure)
