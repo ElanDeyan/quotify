@@ -1,8 +1,8 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
-import 'package:primary_colors_repository/models/primary_colors_errors.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:primary_colors_repository/models/primary_colors_model_errors.dart';
+import 'package:quotify_utils/result.dart';
 
 Iterable<String> _generateWrongPrimaryColorStringRepresentation() sync* {
   final primaryColorsNames = PrimaryColors.values.map((color) => color.name);
@@ -30,9 +30,10 @@ void main() {
           expect(
             PrimaryColors.fromString(color.name),
             allOf([
-              isA<Ok<PrimaryColors>>(),
+              isA<Ok<PrimaryColors, PrimaryColorsModelErrors>>(),
               predicate(
-                (Ok<PrimaryColors> result) => result.value == color,
+                (Ok<PrimaryColors, PrimaryColorsModelErrors> result) =>
+                    result.value == color,
               ),
             ]),
           );
@@ -48,11 +49,11 @@ void main() {
           expect(
             PrimaryColors.fromString(wrongSample),
             allOf([
-              isA<Failure<PrimaryColors>>(),
+              isA<Failure<PrimaryColors, PrimaryColorsModelErrors>>(),
               predicate(
-                (Failure<PrimaryColors> result) =>
+                (Failure<PrimaryColors, PrimaryColorsModelErrors> result) =>
                     result.failure ==
-                    PrimaryColorsErrors.invalidStringRepresentation,
+                    PrimaryColorsModelErrors.invalidStringRepresentation,
               ),
             ]),
           );

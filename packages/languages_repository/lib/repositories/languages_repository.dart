@@ -1,5 +1,6 @@
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
+import '../models/language_errors.dart';
 import '../models/languages.dart';
 
 /// A repository that provides methods to get the current language.
@@ -12,8 +13,8 @@ abstract interface class LanguagesRepository {
   Future<void> initialize();
 
   /// Gets the current language.
-  FutureResult<Languages> fetchCurrentLanguage();
+  FutureResult<Languages, LanguageErrors> fetchCurrentLanguage();
 
   /// Sets the current language.
-  FutureResult<void> setCurrentLanguage(Languages language);
+  FutureResult<(), LanguageErrors> setCurrentLanguage(Languages language);
 }

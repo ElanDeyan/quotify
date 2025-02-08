@@ -1,8 +1,8 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:languages_repository/models/language_errors.dart';
+import 'package:languages_repository/models/language_model_errors.dart';
 import 'package:languages_repository/models/languages.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 void main() {
   group('With valid language', () {
@@ -11,7 +11,7 @@ void main() {
 
       for (final sample in samples) {
         final result = Languages.fromLanguageCodeString(sample.languageCode);
-        expect(result, isA<Ok<Languages>>());
+        expect(result, isA<Ok<Languages, LanguageModelErrors>>());
         expect(result.asOk.value, equals(sample));
       }
     });
@@ -28,10 +28,10 @@ void main() {
 
       for (final sample in samples) {
         final result = Languages.fromLanguageCodeString(sample);
-        expect(result, isA<Failure<Languages>>());
+        expect(result, isA<Failure<Languages, LanguageModelErrors>>());
         expect(
           result.asFailure.failure,
-          equals(LanguageErrors.invalidLanguageCodeRepresentation),
+          equals(LanguageModelErrors.invalidLanguageCodeRepresentation),
         );
       }
     });

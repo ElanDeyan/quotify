@@ -1,6 +1,7 @@
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../logic/models/theme_brightness.dart';
+import '../logic/models/theme_brightness_errors.dart';
 import 'theme_brightness_repository_errors.dart';
 
 /// Defines methods for fetching and saving [ThemeBrightness]
@@ -17,10 +18,12 @@ abstract interface class ThemeBrightnessRepository {
   ///
   /// It returns a [FutureResult] object that will eventually
   /// contain a [ThemeBrightness] on [Ok]. Can return a [Failure] with some
-  /// [ThemeBrightnessRepositoryErrors].
-  FutureResult<ThemeBrightness> fetchThemeBrightness();
+  /// [ThemeBrightnessErrors].
+  FutureResult<ThemeBrightness, ThemeBrightnessErrors> fetchThemeBrightness();
 
   /// Defines a function for saving the [ThemeBrightness] settings
   /// asynchronously.
-  FutureResult<void> saveThemeBrightness(ThemeBrightness themeBrightness);
+  FutureResult<(), ThemeBrightnessRepositoryErrors> saveThemeBrightness(
+    ThemeBrightness themeBrightness,
+  );
 }

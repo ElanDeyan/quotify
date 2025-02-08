@@ -1,6 +1,8 @@
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../models/primary_colors.dart';
+import '../models/primary_colors_errors.dart';
+import 'primary_colors_repository_errors.dart';
 
 /// Defines methods for fetching and saving [PrimaryColors].
 abstract interface class PrimaryColorsRepository {
@@ -12,8 +14,10 @@ abstract interface class PrimaryColorsRepository {
   Future<void> initialize();
 
   /// Function for fetching the [PrimaryColors].
-  FutureResult<PrimaryColors> fetchPrimaryColor();
+  FutureResult<PrimaryColors, PrimaryColorsErrors> fetchPrimaryColor();
 
   /// Defines a method for saving the [PrimaryColors] data.
-  FutureResult<void> savePrimaryColor(PrimaryColors primaryColor);
+  FutureResult<(), PrimaryColorsRepositoryErrors> savePrimaryColor(
+    PrimaryColors primaryColor,
+  );
 }

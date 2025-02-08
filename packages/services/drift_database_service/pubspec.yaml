@@ -1,0 +1,29 @@
+name: drift_database_service
+description: "A new Flutter package project."
+version: 3.1.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  drift: ^2.22.1
+  flutter:
+    sdk: flutter
+  path: ^1.9.0
+  path_provider: ^2.1.5
+  quotes_repository: ^1.0.0
+  quotify_utils: ^3.0.0
+  sqlcipher_flutter_libs: ^0.6.4
+  sqlite3: ^2.5.0
+  tags_repository: ^1.0.0
+
+dev_dependencies:
+  build_runner: ^2.4.14
+  drift_dev: ^2.22.1
+  faker: ^2.2.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0

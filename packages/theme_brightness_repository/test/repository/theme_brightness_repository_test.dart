@@ -1,11 +1,12 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness_errors.dart';
+import 'package:theme_brightness_repository/logic/models/theme_brightness_model_errors.dart';
 import 'package:theme_brightness_repository/repository/theme_brightness_repository.dart';
 import 'package:theme_brightness_repository/repository/theme_brightness_repository_errors.dart';
 import 'package:theme_brightness_repository/repository/theme_brightness_repository_impl.dart';
@@ -97,7 +98,7 @@ void main() {
 
         final result = await themeBrightnessRepository.fetchThemeBrightness();
 
-        expect(result, isA<Failure<ThemeBrightness>>());
+        expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
         expect(
           result.asFailure.failure,
           equals(ThemeBrightnessRepositoryErrors.missing),
@@ -134,7 +135,7 @@ void main() {
 
         final result = await themeBrightnessRepository.fetchThemeBrightness();
 
-        expect(result, isA<Ok<ThemeBrightness>>());
+        expect(result, isA<Ok<ThemeBrightness, ThemeBrightnessErrors>>());
         expect(result.asOk.value, equals(sample));
 
         verify(
@@ -173,10 +174,10 @@ void main() {
 
         final result = await themeBrightnessRepository.fetchThemeBrightness();
 
-        expect(result, isA<Failure<ThemeBrightness>>());
+        expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
         expect(
           result.asFailure.failure,
-          equals(ThemeBrightnessErrors.invalidStringRepresentation),
+          equals(ThemeBrightnessModelErrors.invalidStringRepresentation),
         );
 
         verify(
@@ -207,7 +208,7 @@ void main() {
         final result =
             await themeBrightnessRepository.saveThemeBrightness(sample);
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), ThemeBrightnessRepositoryErrors>>());
 
         verify(
           () => sharedPreferencesAsyncService.setString(
@@ -244,7 +245,7 @@ void main() {
           final result =
               await themeBrightnessRepository.saveThemeBrightness(sample);
 
-          expect(result, isA<Failure<void>>());
+          expect(result, isA<Failure<(), ThemeBrightnessRepositoryErrors>>());
 
           verify(
             () => sharedPreferencesAsyncService.setString(

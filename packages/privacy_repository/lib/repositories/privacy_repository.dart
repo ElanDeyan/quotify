@@ -1,8 +1,9 @@
 import 'package:meta/meta.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 import '../logic/models/privacy_data.dart';
 import 'privacy_data_entry.dart';
+import 'privacy_data_repository_errors.dart';
 
 /// Defines methods and constants related to privacy data management and
 /// password generation.
@@ -23,21 +24,23 @@ abstract interface class PrivacyRepository {
   /// - encryption password
   /// - allow error reporting
   /// - accepted data usage
-  FutureResult<void> initialize();
+  FutureResult<(), Iterable<PrivacyRepositoryErrors>> initialize();
 
   /// Sets default value (if are missing) for encryption password
   @visibleForTesting
-  FutureResult<void> setEncryptionPasswordIfMissing();
+  FutureResult<(), PrivacyRepositoryErrors> setEncryptionPasswordIfMissing();
 
   /// Sets default values (if are missing) for privacy data.
   @visibleForTesting
-  FutureResult<void> setPrivacyDataIfMissing();
+  FutureResult<(), PrivacyRepositoryErrors> setPrivacyDataIfMissing();
 
   /// Fetches public [PrivacyData] related to user preferences.
-  FutureResult<PrivacyData> fetchPrivacyData();
+  FutureResult<PrivacyData, PrivacyRepositoryErrors> fetchPrivacyData();
 
   /// Saves [privacyDataEntry] to the data storage.
-  FutureResult<void> savePrivacyData(PrivacyDataEntry privacyDataEntry);
+  FutureResult<(), PrivacyRepositoryErrors> savePrivacyData(
+    PrivacyDataEntry privacyDataEntry,
+  );
 
   /// Generates a random and secure password with 16-32 chars.
   @visibleForTesting
@@ -45,11 +48,12 @@ abstract interface class PrivacyRepository {
 
   /// Sets the encryption password to the data storage by
   /// calling [generateRandomSecurePassword].
-  FutureResult<void> setEncryptionPassword();
+  FutureResult<(), Object> setEncryptionPassword();
 
   /// Fetches the encryption password from the data storage.
-  FutureResult<String> fetchEncryptionPassword();
+  FutureResult<String, PrivacyRepositoryErrors> fetchEncryptionPassword();
 
+  /// Helper to ensure the generated password is valid.
   @visibleForTesting
   bool isEncryptionPasswordValid(String password);
 }

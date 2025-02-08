@@ -1,10 +1,9 @@
 import 'package:languages_repository/models/languages.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
 import 'package:privacy_repository/logic/models/privacy_data.dart';
+import 'package:quotes_repository/logic/models/quote.dart';
+import 'package:tags_repository/logic/models/tag.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
-
-import '../../../quotes/logic/models/quote.dart';
-import '../../../tags/logic/models/tag.dart';
 
 /// Represents User preferences and data.
 final class Backup {

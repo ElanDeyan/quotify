@@ -1,8 +1,9 @@
 import 'package:logging/logging.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
 import '../models/primary_colors.dart';
+import '../models/primary_colors_errors.dart';
 import 'primary_colors_repository.dart';
 import 'primary_colors_repository_errors.dart';
 
@@ -36,7 +37,7 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   }
 
   @override
-  FutureResult<PrimaryColors> fetchPrimaryColor() async {
+  FutureResult<PrimaryColors, PrimaryColorsErrors> fetchPrimaryColor() async {
     if (!(await _sharedPreferencesAsyncService
         .containsKey(PrimaryColorsRepository.primaryColorKey))) {
       _log.warning(
@@ -56,22 +57,24 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   }
 
   @override
-  FutureResult<void> savePrimaryColor(PrimaryColors primaryColor) async {
+  FutureResult<(), PrimaryColorsRepositoryErrors> savePrimaryColor(
+    PrimaryColors primaryColor,
+  ) async {
     try {
       await _sharedPreferencesAsyncService.setString(
         PrimaryColorsRepository.primaryColorKey,
         primaryColor.name,
       );
 
-      return const Result.ok(null);
-    } catch (error, stackTrace) {
+      return const Result.ok(());
+    } on Object catch (error, stackTrace) {
       _log.warning(
         'Failed in save $primaryColor',
         error,
         stackTrace,
       );
 
-      return Result<void>.failure(
+      return Result.failure(
         PrimaryColorsRepositoryErrors.failAtSaving,
         stackTrace,
       );

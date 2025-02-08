@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:meta/meta.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:quotify_utils/serialization/interfaces/encodable.dart';
 
 import '../../repositories/privacy_data_entry.dart';
 import '../../repositories/privacy_repository.dart';
-import 'privacy_data_errors.dart';
+import 'privacy_data_model_errors.dart';
 
 /// Represents public data related to user privacy
 @immutable
@@ -53,8 +53,10 @@ final class PrivacyData implements Encodable {
       };
 
   /// Returns a [Result] with either [Ok], with a [PrivacyData] object, or a
-  /// [Failure] with some of [PrivacyDataErrors] enum members.
-  static Result<PrivacyData> fromMap(Map<String, Object?> map) {
+  /// [Failure] with some of [PrivacyDataModelErrors] enum members.
+  static Result<PrivacyData, PrivacyDataModelErrors> fromMap(
+    Map<String, Object?> map,
+  ) {
     if (map
         case {
           PrivacyRepository.allowErrorReportingKey: final bool
@@ -70,7 +72,7 @@ final class PrivacyData implements Encodable {
     }
 
     return Result.failure(
-      PrivacyDataErrors.invalidMapFormat,
+      PrivacyDataModelErrors.invalidMapFormat,
       StackTrace.current,
     );
   }
@@ -80,15 +82,17 @@ final class PrivacyData implements Encodable {
   String toJsonString() => jsonEncode(toMap());
 
   /// Returns a [Result] with either [Ok], with a [PrivacyData] object, or a
-  /// [Failure] with some of [PrivacyDataErrors] enum members.
-  static Result<PrivacyData> fromJsonString(String jsonString) {
+  /// [Failure] with some of [PrivacyDataModelErrors] enum members.
+  static Result<PrivacyData, PrivacyDataModelErrors> fromJsonString(
+    String jsonString,
+  ) {
     late final Object? decodedJsonString;
 
     try {
       decodedJsonString = jsonDecode(jsonString);
     } on FormatException catch (error, stackTrace) {
       return Result.failure(
-        PrivacyDataErrors.invalidJsonStringFormat,
+        PrivacyDataModelErrors.invalidJsonStringFormat,
         stackTrace,
       );
     }
@@ -98,7 +102,7 @@ final class PrivacyData implements Encodable {
     }
 
     return Result.failure(
-      PrivacyDataErrors.invalidJsonStringFormat,
+      PrivacyDataModelErrors.invalidJsonStringFormat,
       StackTrace.current,
     );
   }

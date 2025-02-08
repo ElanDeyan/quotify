@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:privacy_repository/logic/models/privacy_data.dart';
-import 'package:privacy_repository/logic/models/privacy_data_errors.dart';
+import 'package:privacy_repository/logic/models/privacy_data_model_errors.dart';
 import 'package:privacy_repository/repositories/privacy_repository.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 void main() {
   const seed = 32;
@@ -50,7 +50,7 @@ void main() {
 
           final result = PrivacyData.fromMap(map);
 
-          expect(result, isA<Ok<PrivacyData>>());
+          expect(result, isA<Ok<PrivacyData, PrivacyDataModelErrors>>());
           expect(result.asOk.value, equals(privacyData));
         },
       );
@@ -63,10 +63,11 @@ void main() {
         'should return Failure with PrivacyDataErrors.invalidMapFormat',
         () {
           final result = PrivacyData.fromMap(sampleMap);
-          expect(result, isA<Failure<PrivacyData>>());
+          expect(result, isA<Failure<PrivacyData, PrivacyDataModelErrors>>());
+          final failure = result.asFailure.failure;
           expect(
-            (result as Failure<PrivacyData>).failure,
-            equals(PrivacyDataErrors.invalidMapFormat),
+            failure,
+            equals(PrivacyDataModelErrors.invalidMapFormat),
           );
         },
       );
@@ -99,11 +100,11 @@ void main() {
             final result = PrivacyData.fromJsonString(sample);
             expect(
               result,
-              isA<Failure<PrivacyData>>(),
+              isA<Failure<PrivacyData, PrivacyDataModelErrors>>(),
             );
             expect(
               result.asFailure.failure,
-              isA<PrivacyDataErrors>(),
+              isA<PrivacyDataModelErrors>(),
             );
           }
         },
@@ -116,7 +117,7 @@ void main() {
 
         final result = PrivacyData.fromJsonString(jsonString);
 
-        expect(result, isA<Ok<PrivacyData>>());
+        expect(result, isA<Ok<PrivacyData, PrivacyDataModelErrors>>());
         expect(result.asOk.value, privacyData);
       });
     });

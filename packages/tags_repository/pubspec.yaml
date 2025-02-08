@@ -1,0 +1,22 @@
+name: tags_repository
+description: "A new Flutter package project."
+version: 1.0.0
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  drift_database_service: ^3.1.0
+  flutter:
+    sdk: flutter
+  meta: ^1.15.0
+  quotify_utils: ^3.0.0
+
+dev_dependencies:
+  faker: ^2.2.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0

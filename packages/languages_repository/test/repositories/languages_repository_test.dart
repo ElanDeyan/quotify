@@ -1,12 +1,13 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:languages_repository/models/language_errors.dart';
+import 'package:languages_repository/models/language_model_errors.dart';
 import 'package:languages_repository/models/languages.dart';
 import 'package:languages_repository/repositories/languages_repository.dart';
 import 'package:languages_repository/repositories/languages_repository_errors.dart';
 import 'package:languages_repository/repositories/languages_repository_impl.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
 
@@ -96,7 +97,7 @@ void main() {
 
         final result = await languagesRepository.fetchCurrentLanguage();
 
-        expect(result, isA<Failure<Languages>>());
+        expect(result, isA<Failure<Languages, LanguageErrors>>());
         expect(
           result.asFailure.failure,
           equals(LanguagesRepositoryErrors.missingLanguageCode),
@@ -134,7 +135,7 @@ void main() {
 
         final result = await languagesRepository.fetchCurrentLanguage();
 
-        expect(result, isA<Ok<Languages>>());
+        expect(result, isA<Ok<Languages, LanguageErrors>>());
         expect(result.asOk.value, equals(sample));
 
         verify(
@@ -173,10 +174,10 @@ void main() {
 
         final result = await languagesRepository.fetchCurrentLanguage();
 
-        expect(result, isA<Failure<Languages>>());
+        expect(result, isA<Failure<Languages, LanguageErrors>>());
         expect(
           result.asFailure.failure,
-          equals(LanguageErrors.invalidLanguageCodeRepresentation),
+          equals(LanguageModelErrors.invalidLanguageCodeRepresentation),
         );
 
         verify(
@@ -206,7 +207,7 @@ void main() {
 
         final result = await languagesRepository.setCurrentLanguage(sample);
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), LanguageErrors>>());
 
         verify(
           () => sharedPreferencesAsyncService.setString(
@@ -243,7 +244,7 @@ void main() {
 
           final result = await languagesRepository.setCurrentLanguage(sample);
 
-          expect(result, isA<Failure<void>>());
+          expect(result, isA<Failure<(), LanguageErrors>>());
 
           verify(
             () => sharedPreferencesAsyncService.setString(

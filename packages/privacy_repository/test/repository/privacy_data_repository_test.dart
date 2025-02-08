@@ -7,7 +7,7 @@ import 'package:privacy_repository/repositories/privacy_data_entry.dart';
 import 'package:privacy_repository/repositories/privacy_data_repository_errors.dart';
 import 'package:privacy_repository/repositories/privacy_repository.dart';
 import 'package:privacy_repository/repositories/privacy_repository_impl.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 
 final class MockFlutterSecureStorageService extends Mock
     implements FlutterSecureStorageService {}
@@ -109,7 +109,7 @@ void main() {
         () async {
           final result = await privacyRepository.fetchPrivacyData();
 
-          expect(result, isA<Failure<PrivacyData>>());
+          expect(result, isA<Failure<PrivacyData, PrivacyRepositoryErrors>>());
           expect(
             result.asFailure.failure,
             equals(PrivacyRepositoryErrors.missingSomeKey),
@@ -142,7 +142,7 @@ void main() {
         () async {
           final result = await privacyRepository.fetchPrivacyData();
 
-          expect(result, isA<Failure<PrivacyData>>());
+          expect(result, isA<Failure<PrivacyData, PrivacyRepositoryErrors>>());
           expect(
             result.asFailure.failure,
             equals(PrivacyRepositoryErrors.missingSomeKey),
@@ -173,11 +173,15 @@ void main() {
           ).thenAnswer((_) async => 'hello!');
         });
         test(
-          'should return a Failure with PrivacyRepositoryErrors.invalidBooleanString',
+          'should return a Failure with '
+          'PrivacyRepositoryErrors.invalidBooleanString',
           () async {
             final result = await privacyRepository.fetchPrivacyData();
 
-            expect(result, isA<Failure<PrivacyData>>());
+            expect(
+              result,
+              isA<Failure<PrivacyData, PrivacyRepositoryErrors>>(),
+            );
             expect(
               result.asFailure.failure,
               equals(PrivacyRepositoryErrors.invalidBooleanString),
@@ -218,7 +222,7 @@ void main() {
       test('should return Ok with the PrivacyData', () async {
         final result = await privacyRepository.fetchPrivacyData();
 
-        expect(result, isA<Ok<PrivacyData>>());
+        expect(result, isA<Ok<PrivacyData, PrivacyRepositoryErrors>>());
         expect(
           result.asOk.value,
           equals(expectedPrivacyData),
@@ -295,7 +299,7 @@ void main() {
 
           final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<void>>());
+          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
         },
       );
 
@@ -307,7 +311,7 @@ void main() {
 
           final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<void>>());
+          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
         },
       );
       test(
@@ -320,7 +324,7 @@ void main() {
 
           final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<void>>());
+          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
         },
       );
     });
@@ -419,7 +423,7 @@ void main() {
       test('should return Failure with PrivacyRepository.missingKey', () async {
         final result = await privacyRepository.fetchEncryptionPassword();
 
-        expect(result, isA<Failure<String>>());
+        expect(result, isA<Failure<String, PrivacyRepositoryErrors>>());
         expect(
           result.asFailure.failure,
           equals(PrivacyRepositoryErrors.missingSomeKey),
@@ -438,7 +442,7 @@ void main() {
       test(' should return Failure with invalidEncryptionPassword', () async {
         final result = await privacyRepository.fetchEncryptionPassword();
 
-        expect(result, isA<Failure<String>>());
+        expect(result, isA<Failure<String, PrivacyRepositoryErrors>>());
         expect(
           result.asFailure.failure,
           equals(PrivacyRepositoryErrors.invalidEncryptionPassword),
@@ -459,7 +463,7 @@ void main() {
       test('should return Ok with the password', () async {
         final result = await privacyRepository.fetchEncryptionPassword();
 
-        expect(result, isA<Ok<String>>());
+        expect(result, isA<Ok<String, PrivacyRepositoryErrors>>());
         expect(
           result.asOk.value,
           equals(samplePassword),
@@ -489,7 +493,7 @@ void main() {
       test('should return ok', () async {
         final result = await privacyRepository.setEncryptionPassword();
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), Object>>());
       });
     });
 
@@ -513,7 +517,7 @@ void main() {
       test('should return failure', () async {
         final result = await privacyRepository.setEncryptionPassword();
 
-        expect(result, isA<Failure<void>>());
+        expect(result, isA<Failure<(), Object>>());
       });
     });
   });
@@ -538,7 +542,7 @@ void main() {
 
       test('should call secureStorageService.write once', () async {
         final result = await privacyRepository.setEncryptionPasswordIfMissing();
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
       });
     });
 
@@ -561,7 +565,7 @@ void main() {
 
       test('should not call secureStorageService.write', () async {
         final result = await privacyRepository.setEncryptionPasswordIfMissing();
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
       });
     });
   });
@@ -600,7 +604,7 @@ void main() {
 
       test('should write only in the missing key', () async {
         final result = await privacyRepository.setPrivacyDataIfMissing();
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
       });
     });
 
@@ -638,7 +642,7 @@ void main() {
 
       test('should write both keys', () async {
         final result = await privacyRepository.setPrivacyDataIfMissing();
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
       });
     });
 
@@ -676,7 +680,7 @@ void main() {
 
       test('should not write', () async {
         final result = await privacyRepository.setPrivacyDataIfMissing();
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
       });
     });
   });

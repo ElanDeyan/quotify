@@ -1,8 +1,9 @@
 import 'package:logging/logging.dart';
-import 'package:quotify_utils/quotify_utils.dart';
+import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 
 import '../logic/models/theme_brightness.dart';
+import '../logic/models/theme_brightness_errors.dart';
 import 'theme_brightness_repository.dart';
 import 'theme_brightness_repository_errors.dart';
 
@@ -34,12 +35,13 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   }
 
   @override
-  FutureResult<ThemeBrightness> fetchThemeBrightness() async {
+  FutureResult<ThemeBrightness, ThemeBrightnessErrors>
+      fetchThemeBrightness() async {
     if (!(await _sharedPreferencesAsyncService
         .containsKey(ThemeBrightnessRepository.themeBrightnessRepositoryKey))) {
-      return const Result.failure(
+      return Result.failure(
         ThemeBrightnessRepositoryErrors.missing,
-        StackTrace.empty,
+        StackTrace.current,
       );
     }
 
@@ -50,7 +52,7 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   }
 
   @override
-  FutureResult<void> saveThemeBrightness(
+  FutureResult<(), ThemeBrightnessRepositoryErrors> saveThemeBrightness(
     ThemeBrightness themeBrightness,
   ) async {
     try {
@@ -59,8 +61,8 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
         themeBrightness.name,
       );
 
-      return const Result.ok(null);
-    } catch (error, stackTrace) {
+      return const Result.ok(());
+    } on Object catch (error, stackTrace) {
       _log.warning('Something went wrong!', error, stackTrace);
       return Result.failure(
         ThemeBrightnessRepositoryErrors.failAtSaving,
