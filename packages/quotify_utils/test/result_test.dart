@@ -259,9 +259,10 @@ void main() {
 
       final wouldBeNameLength = myFailure.mapAsync(
         (value) async => value.length,
+        failureMapper: (exception, stackTrace) => exception,
       );
 
-      expect(wouldBeNameLength, completion(isA<Failure<String, Exception>>()));
+      expect(wouldBeNameLength, completion(isA<Failure<int, Exception>>()));
       expect((await wouldBeNameLength).asFailure.failure, equals(exception));
       expect(
         (await wouldBeNameLength).asFailure.stackTrace,
@@ -282,11 +283,12 @@ void main() {
       final wouldBeNameLength = myFailure.mapAsync(
         (value) =>
             Future<int>.error(const FormatException('a different exception')),
+        failureMapper: (exception, stackTrace) => exception,
       );
 
       final result = await wouldBeNameLength;
 
-      expect(result, isA<Failure<String, Exception>>());
+      expect(result, isA<Failure<int, Exception>>());
       expect(result.asFailure.failure, equals(exception));
       expect(
         result.asFailure.stackTrace,
