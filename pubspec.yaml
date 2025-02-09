@@ -18,6 +18,7 @@ workspace:
   - packages/privacy_repository
   - packages/quotes_repository
   - packages/tags_repository
+  - packages/backup_repository
 
 dependencies:
   flutter:

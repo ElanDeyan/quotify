@@ -1,0 +1,26 @@
+name: backup_repository
+description: "A new Flutter package project."
+version: 0.0.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.6.2
+  flutter: ">=1.17.0"
+
+dependencies:
+  cross_file: ^0.3.4+2
+  flutter:
+    sdk: flutter
+  languages_repository: ^0.0.1
+  primary_colors_repository: ^0.0.1
+  privacy_repository: ^1.0.0
+  quotes_repository: ^1.0.1
+  quotify_utils: ^3.3.0
+  tags_repository: ^1.0.0
+  theme_brightness_repository: ^0.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
