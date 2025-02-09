@@ -21,7 +21,7 @@ import 'natural.dart';
 /// Methods:
 /// - `toInt()`: Converts the wrapped `Natural` value to an `int`.
 @immutable
-extension type const Id(Natural _self) {
+extension type const Id(Natural _self) implements Object {
   /// Converts to [int].
   int toInt() => _self;
 }

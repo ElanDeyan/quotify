@@ -2,12 +2,10 @@ import 'package:meta/meta.dart';
 
 /// An [int] extension for >= 0 integers.
 @immutable
-extension type const Natural._(int _self) implements int {
+extension type const Natural._(int _self) implements int, Object {
   /// An [int] extension for >= 0 integers.
-  factory Natural(int integer) {
-    assert(integer >= 0, 'Integer should be higher than zero');
-    return Natural._(integer);
-  }
+  const Natural(this._self)
+      : assert(_self >= 0, 'Integer should be higher than zero');
 }
 
 /// Extension on [int] to convert an integer to a [Natural] number.
