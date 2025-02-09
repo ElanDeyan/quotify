@@ -1,8 +1,8 @@
 import '../../result.dart';
 
 /// Extensions for a list of Results.
-extension ListOfResultsExtension<T extends Object, E extends Object>
-    on List<Result<T, E>> {
+extension IterableOfResultsExtension<T extends Object, E extends Object>
+    on Iterable<Result<T, E>> {
   /// Checks if all elements in the list are successful results.
   ///
   /// Returns `true` if all elements are `Ok`, otherwise `false`.
