@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:drift_database_service/drift_database_service.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
@@ -16,7 +18,7 @@ abstract interface class TagRepository {
   ///
   /// Returns a [Future] that completes with an unmodifiable list of all
   /// [Tag] objects.
-  Future<List<Tag>> get allTags;
+  Future<UnmodifiableListView<Tag>> get allTags;
 
   /// Retrieves a tag by its ID.
   ///
@@ -32,7 +34,7 @@ abstract interface class TagRepository {
   ///
   /// Returns a [Future] that completes with an unmodifiable list of
   /// [Tag] objects corresponding to the given IDs.
-  Future<List<Tag>> getTagsByIds(Iterable<Id> ids);
+  Future<UnmodifiableListView<Tag>> getTagsByIds(Iterable<Id> ids);
 
   /// Creates a new tag.
   ///

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:drift_database_service/drift_database_service.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
@@ -5,7 +7,6 @@ import 'package:quotify_utils/result.dart';
 import '../logic/models/tag.dart';
 import 'tag_entry.dart';
 import 'tag_repository.dart';
-
 
 /// Repository for operations related to [Tag]s.
 final class TagRepositoryImpl implements TagRepository {
@@ -16,7 +17,7 @@ final class TagRepositoryImpl implements TagRepository {
   final AppDatabase database;
 
   @override
-  Future<List<Tag>> get allTags async => List.unmodifiable(
+  Future<UnmodifiableListView<Tag>> get allTags async => UnmodifiableListView(
         (await database.allTags).map(
           (e) => e.toTag(),
         ),
@@ -46,7 +47,8 @@ final class TagRepositoryImpl implements TagRepository {
       database.getTagById(id).then((value) => value?.toTag());
 
   @override
-  Future<List<Tag>> getTagsByIds(Iterable<Id> ids) async => List.unmodifiable(
+  Future<UnmodifiableListView<Tag>> getTagsByIds(Iterable<Id> ids) async =>
+      UnmodifiableListView(
         (await database.getTagsWithIds(ids)).map(
           (e) => e.toTag(),
         ),
