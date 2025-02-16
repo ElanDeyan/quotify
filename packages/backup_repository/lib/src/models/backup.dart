@@ -42,17 +42,35 @@ final class Backup implements Encodable {
   /// All added [Quote]s.
   final Set<Quote> quotes;
 
+  /// Method to copy.
+  Backup copyWith({
+    ThemeBrightness? themeBrightness,
+    PrimaryColors? primaryColor,
+    Languages? language,
+    PrivacyData? privacyData,
+    Set<Tag>? tags,
+    Set<Quote>? quotes,
+  }) =>
+      Backup(
+        themeBrightness: themeBrightness ?? this.themeBrightness,
+        primaryColor: primaryColor ?? this.primaryColor,
+        language: language ?? this.language,
+        privacyData: privacyData ?? this.privacyData,
+        tags: tags ?? this.tags,
+        quotes: quotes ?? this.quotes,
+      );
+
   @override
   String toJsonString() => jsonEncode(toMap());
 
   @override
   Map<String, Object?> toMap() => {
-        'themeBrightness': themeBrightness.name,
-        'primaryColor': primaryColor.name,
-        'language': language.languageCode,
-        'privacyData': privacyData.toMap(),
-        'tags': [for (final tag in tags) tag.toMap()],
-        'quotes': [for (final quote in quotes) quote.toMap()],
+        ThemeBrightness.jsonKey: themeBrightness.name,
+        PrimaryColors.jsonKey: primaryColor.name,
+        Languages.jsonKey: language.languageCode,
+        PrivacyData.jsonKey: privacyData.toMap(),
+        Tag.listOfTagsJsonKey: [for (final tag in tags) tag.toMap()],
+        Quote.listOfQuotesJsonKey: [for (final quote in quotes) quote.toMap()],
       };
 
   /// Returns a [Result] that can contains a [Backup] if successful or an
@@ -60,12 +78,12 @@ final class Backup implements Encodable {
   static Result<Backup, BackupModelErrors> fromMap(Map<String, Object?> map) {
     if (map
         case {
-          'themeBrightness': final String themeBrightnessString,
-          'primaryColor': final String primaryColorString,
-          'language': final String languageCode,
-          'privacyData': final Map<String, Object?> privacyDataMap,
-          'tags': final List<Object?> listOfTagsMap,
-          'quotes': final List<Object?> listOfQuotesMap,
+          ThemeBrightness.jsonKey: final String themeBrightnessString,
+          PrimaryColors.jsonKey: final String primaryColorString,
+          Languages.jsonKey: final String languageCode,
+          PrivacyData.jsonKey: final Map<String, Object?> privacyDataMap,
+          Tag.listOfTagsJsonKey: final List<Object?> listOfTagsMap,
+          Quote.listOfQuotesJsonKey: final List<Object?> listOfQuotesMap,
         }) {
       final ThemeBrightness themeBrightness;
       if (ThemeBrightness.fromString(themeBrightnessString)
@@ -140,7 +158,7 @@ final class Backup implements Encodable {
     return const Result.failure(BackupModelErrors.invalidMapRepresentation);
   }
 
-  /// Forwards to [fromMap] when [jsonString] is a json map, or 
+  /// Forwards to [fromMap] when [jsonString] is a json map, or
   /// [BackupModelErrors.invalidJsonString] when isn't it.
   static Result<Backup, BackupModelErrors> fromJsonString(String jsonString) {
     final Object? decodedJsonString;
@@ -160,4 +178,7 @@ final class Backup implements Encodable {
 
     return const Result.failure(BackupModelErrors.invalidJsonString);
   }
+
+  /// Key for using in serialization.
+  static const jsonKey = 'backup';
 }
