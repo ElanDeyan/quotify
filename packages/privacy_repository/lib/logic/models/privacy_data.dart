@@ -112,4 +112,7 @@ final class PrivacyData implements Encodable {
         allowErrorReporting: allowErrorReporting,
         acceptedDataUsage: acceptedDataUsage,
       );
+
+  /// Key for using in serialization.
+  static const jsonKey = 'privacyData';
 }

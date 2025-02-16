@@ -114,4 +114,7 @@ final class Tag implements Encodable {
       StackTrace.current,
     );
   }
+
+  /// Key for using in serialization of a tags list.
+  static const listOfTagsJsonKey = 'tags';
 }

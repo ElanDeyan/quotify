@@ -40,4 +40,7 @@ enum Languages {
   /// This variable serves as a default language setting in the
   /// context of the [Languages] enum.
   static const defaultLanguage = Languages.english;
+
+  /// Key for using in serialization.
+  static const jsonKey = 'language';
 }

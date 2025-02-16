@@ -41,4 +41,7 @@ enum ThemeBrightness {
             StackTrace.current,
           ),
       };
+
+  /// Key for using in serialization.
+  static const jsonKey = 'themeBrightness';
 }

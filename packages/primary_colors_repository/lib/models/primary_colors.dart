@@ -38,4 +38,7 @@ enum PrimaryColors {
             StackTrace.current,
           ),
       };
+
+  /// Key to be used in serialization
+  static const jsonKey = 'primaryColor';
 }

@@ -277,4 +277,7 @@ final class Quote implements Encodable, Queryable {
         dotAll: dotAll,
         caseSensitive: caseSensitive,
       ).hasMatch(asQueryableString);
+
+  /// Key for using in serialization of quotes.
+  static const listOfQuotesJsonKey = 'quotes';
 }
