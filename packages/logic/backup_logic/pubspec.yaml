@@ -1,11 +1,11 @@
-name: backup_repository
-description: "A new Flutter package project."
+name: backup_logic
+description: Logic layer for the backup feature
 version: 0.0.1
 
 resolution: workspace
 
 environment:
-  sdk: ^3.6.2
+  sdk: ^3.7.0
   flutter: ">=1.17.0"
 
 dependencies:

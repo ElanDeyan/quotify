@@ -1,6 +1,6 @@
 import '../models/backup_errors.dart';
 
-enum BackupRepositoryErrors implements BackupErrors {
+enum BackupUseCasesErrors implements BackupErrors {
   failAtRequestingThemeBrightnessRepository,
   failAtRequestingPrimaryColorsRepository,
   failAtRequestingLanguagesRepository,

@@ -10,6 +10,7 @@ export 'src/maybe.dart';
 export 'src/natural.dart';
 export 'src/non_blank_string.dart';
 export 'src/option.dart';
+export 'src/queryable.dart';
 export 'src/reactive.dart';
 export 'src/unit.dart';
-export 'src/queryable.dart';
+export 'src/use_case.dart';
