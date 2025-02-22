@@ -381,6 +381,46 @@ void main() {
         }
       });
     });
+    group('if is valid', () {
+      test('should return OK with the backup data', () {
+        final backupWithDefaultData = _backupWithDefaultData();
+
+        final sampleMap = backupWithDefaultData.toMap();
+
+        final result = Backup.fromMap(sampleMap);
+
+        expect(result, isA<Ok<Backup, BackupModelErrors>>());
+        expect(result.asOk.value, equals(backupWithDefaultData));
+      });
+    });
+  });
+
+  group('fromJsonString', () {
+    test(
+      'when not valid json string return failure with invalidJsonString',
+      () {
+        final result = Backup.fromJsonString('true');
+
+        expect(result, isA<Failure<Backup, BackupModelErrors>>());
+        expect(result.asFailure.failure, BackupModelErrors.invalidJsonString);
+      },
+    );
+
+    test('when not a json map return failure with invalidJsonString', () {
+      final result = Backup.fromJsonString('[{"key": 10}]');
+
+      expect(result, isA<Failure<Backup, BackupModelErrors>>());
+      expect(result.asFailure.failure, BackupModelErrors.invalidJsonString);
+    });
+
+    test('when is a json map return Result of fromMap', () {
+      final backupWithDefaultData = _backupWithDefaultData();
+      final sampleJsonString = backupWithDefaultData.toJsonString();
+      final result = Backup.fromJsonString(sampleJsonString);
+
+      expect(result, isA<Ok<Backup, BackupModelErrors>>());
+      expect(result.asOk.value, backupWithDefaultData);
+    });
   });
 }
 

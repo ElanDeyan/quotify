@@ -9,10 +9,12 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  collection: ^1.19.1
   cross_file: ^0.3.4+2
   flutter:
     sdk: flutter
   languages_repository: ^0.0.1
+  meta: ^1.16.0
   primary_colors_repository: ^0.0.1
   privacy_repository: ^1.0.0
   quotes_repository: ^1.0.1

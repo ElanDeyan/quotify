@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:languages_repository/models/languages.dart';
+import 'package:meta/meta.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
 import 'package:privacy_repository/logic/models/privacy_data.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
@@ -12,6 +14,7 @@ import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
 import 'backup_model_errors.dart';
 
 /// Represents User preferences and data.
+@immutable
 final class Backup implements Encodable {
   /// Represents User preferences and data.
   const Backup({
@@ -42,6 +45,29 @@ final class Backup implements Encodable {
   /// All added [Quote]s.
   final Set<Quote> quotes;
 
+  @override
+  bool operator ==(covariant Backup other) {
+    const tagSetEquality = SetEquality<Tag>();
+    const quoteSetEquality = SetEquality<Quote>();
+
+    return themeBrightness == other.themeBrightness &&
+        primaryColor == other.primaryColor &&
+        language == other.language &&
+        privacyData == other.privacyData &&
+        tagSetEquality.equals(tags, other.tags) &&
+        quoteSetEquality.equals(quotes, other.quotes);
+  }
+
+  @override
+  int get hashCode => Object.hashAllUnordered([
+    themeBrightness,
+    primaryColor,
+    language,
+    privacyData,
+    tags,
+    quotes,
+  ]);
+
   /// Method to copy.
   Backup copyWith({
     ThemeBrightness? themeBrightness,
@@ -50,44 +76,43 @@ final class Backup implements Encodable {
     PrivacyData? privacyData,
     Set<Tag>? tags,
     Set<Quote>? quotes,
-  }) =>
-      Backup(
-        themeBrightness: themeBrightness ?? this.themeBrightness,
-        primaryColor: primaryColor ?? this.primaryColor,
-        language: language ?? this.language,
-        privacyData: privacyData ?? this.privacyData,
-        tags: tags ?? this.tags,
-        quotes: quotes ?? this.quotes,
-      );
+  }) => Backup(
+    themeBrightness: themeBrightness ?? this.themeBrightness,
+    primaryColor: primaryColor ?? this.primaryColor,
+    language: language ?? this.language,
+    privacyData: privacyData ?? this.privacyData,
+    tags: tags ?? this.tags,
+    quotes: quotes ?? this.quotes,
+  );
 
   @override
   String toJsonString() => jsonEncode(toMap());
 
   @override
   Map<String, Object?> toMap() => {
-        ThemeBrightness.jsonKey: themeBrightness.name,
-        PrimaryColors.jsonKey: primaryColor.name,
-        Languages.jsonKey: language.languageCode,
-        PrivacyData.jsonKey: privacyData.toMap(),
-        Tag.listOfTagsJsonKey: [for (final tag in tags) tag.toMap()],
-        Quote.listOfQuotesJsonKey: [for (final quote in quotes) quote.toMap()],
-      };
+    ThemeBrightness.jsonKey: themeBrightness.name,
+    PrimaryColors.jsonKey: primaryColor.name,
+    Languages.jsonKey: language.languageCode,
+    PrivacyData.jsonKey: privacyData.toMap(),
+    Tag.listOfTagsJsonKey: [for (final tag in tags) tag.toMap()],
+    Quote.listOfQuotesJsonKey: [for (final quote in quotes) quote.toMap()],
+  };
 
   /// Returns a [Result] that can contains a [Backup] if successful or an
   /// [BackupModelErrors] if something went wrong.
   static Result<Backup, BackupModelErrors> fromMap(Map<String, Object?> map) {
-    if (map
-        case {
-          ThemeBrightness.jsonKey: final String themeBrightnessString,
-          PrimaryColors.jsonKey: final String primaryColorString,
-          Languages.jsonKey: final String languageCode,
-          PrivacyData.jsonKey: final Map<String, Object?> privacyDataMap,
-          Tag.listOfTagsJsonKey: final List<Object?> listOfTagsMap,
-          Quote.listOfQuotesJsonKey: final List<Object?> listOfQuotesMap,
-        }) {
+    if (map case {
+      ThemeBrightness.jsonKey: final String themeBrightnessString,
+      PrimaryColors.jsonKey: final String primaryColorString,
+      Languages.jsonKey: final String languageCode,
+      PrivacyData.jsonKey: final Map<String, Object?> privacyDataMap,
+      Tag.listOfTagsJsonKey: final List<Object?> listOfTagsMap,
+      Quote.listOfQuotesJsonKey: final List<Object?> listOfQuotesMap,
+    }) {
       final ThemeBrightness themeBrightness;
-      if (ThemeBrightness.fromString(themeBrightnessString)
-          case Ok(:final value)) {
+      if (ThemeBrightness.fromString(themeBrightnessString) case Ok(
+        :final value,
+      )) {
         themeBrightness = value;
       } else {
         return const Result.failure(BackupModelErrors.invalidThemeBrightness);
@@ -101,8 +126,9 @@ final class Backup implements Encodable {
       }
 
       final Languages language;
-      if (Languages.fromLanguageCodeString(languageCode)
-          case Ok(:final value)) {
+      if (Languages.fromLanguageCodeString(languageCode) case Ok(
+        :final value,
+      )) {
         language = value;
       } else {
         return const Result.failure(BackupModelErrors.invalidLanguageCode);
@@ -116,7 +142,10 @@ final class Backup implements Encodable {
       }
 
       final Set<Tag> tags;
-      if (listOfTagsMap case final List<Map<String, Object?>> listOfMap) {
+      if (listOfTagsMap.isEmpty) {
+        tags = const {};
+      } else if (listOfTagsMap
+          case final List<Map<String, Object?>> listOfMap) {
         final results = listOfMap.map(Tag.fromMap);
         if (results.anyFailure()) {
           return const Result.failure(
@@ -130,7 +159,10 @@ final class Backup implements Encodable {
       }
 
       final Set<Quote> quotes;
-      if (listOfQuotesMap case final List<Map<String, Object?>> listOfMap) {
+      if (listOfQuotesMap.isEmpty) {
+        quotes = const {};
+      } else if (listOfQuotesMap
+          case final List<Map<String, Object?>> listOfMap) {
         final results = listOfMap.map(Quote.fromMap);
         if (results.anyFailure()) {
           return const Result.failure(
@@ -166,10 +198,7 @@ final class Backup implements Encodable {
     try {
       decodedJsonString = jsonDecode(jsonString);
     } on Object catch (_, stackTrace) {
-      return Result.failure(
-        BackupModelErrors.invalidJsonString,
-        stackTrace,
-      );
+      return Result.failure(BackupModelErrors.invalidJsonString, stackTrace);
     }
 
     if (decodedJsonString case final Map<String, Object?> map) {
