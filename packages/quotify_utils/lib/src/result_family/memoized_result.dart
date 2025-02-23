@@ -1,45 +1,45 @@
 import '../../result.dart';
 
 /// A class that memoizes the result of a computation.
-/// 
+///
 /// The [MemoizedResult] class is used to cache the result of a computation
 /// so that it is only computed once and reused on subsequent accesses.
-/// 
+///
 /// The computation is provided as a function that returns a value of type [T].
 /// The result is wrapped in a [Result] object that can also contain an error
 /// of type [E].
-/// 
+///
 /// The [MemoizedResult] class provides methods to access the memoized result
-/// and to invalidate the cached result, forcing a recomputation on the next 
+/// and to invalidate the cached result, forcing a recomputation on the next
 /// access.
 final class MemoizedResult<T extends Object, E extends Object> {
   /// Creates a [MemoizedResult] with the given computation function.
-  /// 
+  ///
   /// The computation function is provided as a parameter and is used to
   /// compute the result when needed.
   MemoizedResult(this._computation);
 
   /// The computation function that produces the result.
-  /// 
+  ///
   /// This function is called to compute the result when it is first accessed
   /// or when the cached result is invalidated.
   final T Function() _computation;
 
   /// The cached result of the computation.
-  /// 
+  ///
   /// This field stores the result of the computation wrapped in a [Result]
   /// object. It is initially `null` and is computed on the first access.
   Result<T, E>? memoizedResult;
 
   /// Gets the memoized result of the computation.
-  /// 
+  ///
   /// If the result has already been computed and cached, it is returned.
   /// Otherwise, the computation function is called to compute the result,
   /// which is then cached and returned.
   Result<T, E> get value => memoizedResult ??= Result.guardSync(_computation);
 
   /// Invalidates the cached result.
-  /// 
+  ///
   /// This method sets the cached result to `null`, forcing a recomputation
   /// on the next access to the [value] getter.
   void invalidate() => memoizedResult = null;

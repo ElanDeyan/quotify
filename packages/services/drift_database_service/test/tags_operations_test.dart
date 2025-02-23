@@ -24,7 +24,7 @@ void main() {
   });
 
   group('allTags', () {
-    test('without any entry, should return empty list', () async {
+    test('without any entry, should return empty list', () {
       expect(database.allTags, completion(isEmpty));
     });
 
@@ -284,7 +284,7 @@ void main() {
   });
 
   group('getTagsByIds', () {
-    test('with empty Id list, should return an empty list', () async {
+    test('with empty Id list, should return an empty list', () {
       expect(database.getTagsWithIds([]), completion(isEmpty));
     });
 

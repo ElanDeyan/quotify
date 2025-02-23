@@ -1,5 +1,5 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:collection/wrappers.dart';
+import 'package:collection/collection.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:languages_repository/models/languages.dart';

@@ -93,7 +93,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<(), Iterable<PrivacyRepositoryErrors>> initialize() async =>
+  FutureResult<(), Iterable<PrivacyRepositoryErrors>> initialize() =>
       Result.guardAsync(() async {
         final results = await Future.wait([
           setPrivacyDataIfMissing(),
@@ -242,7 +242,7 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   }
 
   @override
-  FutureResult<(), Object> setEncryptionPassword() async {
+  FutureResult<(), Object> setEncryptionPassword() {
     final password = generateRandomSecurePassword();
 
     return Result.guardAsync(

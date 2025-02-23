@@ -29,7 +29,7 @@ void main() {
   });
 
   group('allQuotes', () {
-    test('without any entry, should return empty list', () async {
+    test('without any entry, should return empty list', () {
       expect(database.allQuotes, completion(isEmpty));
     });
 
@@ -363,7 +363,7 @@ void main() {
   });
 
   group('getQuotesByIds', () {
-    test('with empty Id list, should return an empty list', () async {
+    test('with empty Id list, should return an empty list', () {
       expect(database.getQuotesWithIds([]), completion(isEmpty));
     });
 

@@ -7,7 +7,7 @@ import '../models/languages.dart';
 abstract interface class LanguagesRepository {
   /// This variable is used to store the key that will be used to save and
   /// retrieve the language data in the repository.
-  static const String languageKey = 'language';
+  static const languageKey = 'language';
 
   /// Defines a function for initializing the repository.
   Future<void> initialize();

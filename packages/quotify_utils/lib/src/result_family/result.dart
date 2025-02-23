@@ -113,7 +113,7 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function() computation, {
     required Duration timeout,
     required E failureOnTimeout,
-  }) async =>
+  }) =>
           Future.sync(computation)
               .timeout(timeout)
               .then(Result<T, E>.ok)

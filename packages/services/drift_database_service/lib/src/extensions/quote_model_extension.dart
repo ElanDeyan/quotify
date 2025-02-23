@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
+
+import '../database/app_database.dart';
 
 /// Extension on [Quote].
 extension QuoteModelExtension on Quote {

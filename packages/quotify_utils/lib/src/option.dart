@@ -1,5 +1,5 @@
 /// A sealed class representing an optional value of type [T].
-/// 
+///
 /// This class has two possible states:
 /// - [Some]: Represents a value of type [T].
 /// - [None]: Represents the absence of a value.
@@ -15,7 +15,7 @@ sealed class Option<T extends Object> {
 }
 
 /// A class representing a value of type [T].
-/// 
+///
 /// This class is a subtype of [Option] and indicates that a value is present.
 final class Some<T extends Object> extends Option<T> {
   /// Creates an instance of [Some] with the given [value].
@@ -26,7 +26,7 @@ final class Some<T extends Object> extends Option<T> {
 }
 
 /// A class representing the absence of a value.
-/// 
+///
 /// This class is a subtype of [Option] and indicates that no value is present.
 final class None<T extends Object> extends Option<T> {
   /// Creates an instance of [None].

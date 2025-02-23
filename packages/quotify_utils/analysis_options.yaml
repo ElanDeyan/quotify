@@ -1,8 +1,14 @@
 include: package:very_good_analysis/analysis_options.yaml
+
 analyzer:
   errors:
     always_use_package_imports: ignore
 
 linter:
   rules:
-    - prefer_relative_imports
+    prefer_relative_imports: true
+    unnecessary_underscores: true
+    strict_top_level_inference: true
+    unnecessary_async: true
+    omit_obvious_property_types: true
+    specify_nonobvious_property_types: true

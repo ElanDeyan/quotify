@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/mixins/created_at_and_updated_at_mixin.dart';
-import 'package:drift_database_service/src/mixins/int_id_primary_key_mixin.dart';
-import 'package:drift_database_service/src/utils/tags_set_to_string_converter.dart';
-import 'package:drift_database_service/src/utils/uri_to_nullable_string_converter.dart';
+
+import '../mixins/created_at_and_updated_at_mixin.dart';
+import '../mixins/int_id_primary_key_mixin.dart';
+import '../utils/tags_set_to_string_converter.dart';
+import '../utils/uri_to_nullable_string_converter.dart';
 
 @DataClassName('QuoteTable')
+
 /// Represents the Quotes table in the database.
 ///
 /// This table contains the following columns:

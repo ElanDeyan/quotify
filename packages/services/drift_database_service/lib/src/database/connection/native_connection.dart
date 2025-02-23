@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:drift_database_service/src/database/connection/setup_sql_cipher.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-final _token = RootIsolateToken.instance!;
+import 'setup_sql_cipher.dart';
+
+final RootIsolateToken _token = RootIsolateToken.instance!;
 
 /// Establishes a connection to the database using the provided
 /// encryption passphrase.

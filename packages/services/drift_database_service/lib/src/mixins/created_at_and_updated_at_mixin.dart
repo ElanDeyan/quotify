@@ -12,10 +12,11 @@ import 'package:drift/drift.dart';
 /// Defaults to the [currentDateAndTime].
 mixin CreatedAtAndUpdatedAtMixin on Table {
   /// Created at [Column].
-  late final createdAt = dateTime().clientDefault(DateTime.now)();
+  late final Column<DateTime> createdAt =
+      dateTime().clientDefault(DateTime.now)();
 
   /// Updated at [Column].
-  late final updatedAt = dateTime().clientDefault(
+  late final Column<DateTime> updatedAt = dateTime().clientDefault(
     DateTime.now,
   )();
 }

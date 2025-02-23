@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:quotes_repository/repositories/quote_entry.dart';
+
+import '../database/app_database.dart';
 
 extension QuoteEntryExtension on QuoteEntry {
   QuotesCompanion toQuotesCompanion() => switch (this) {

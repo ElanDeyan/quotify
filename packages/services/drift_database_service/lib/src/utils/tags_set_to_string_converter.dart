@@ -33,7 +33,7 @@ final class TagsSetToStringConverter extends TypeConverter<Set<Tag>, String> {
   @override
   Set<Tag> fromSql(String fromDb) {
     late final Object? decoded;
-    
+
     try {
       decoded = jsonDecode(fromDb);
     } on Object {

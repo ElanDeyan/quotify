@@ -19,7 +19,7 @@ enum ThemeBrightness {
   system;
 
   /// A default value.
-  static const defaultTheme = ThemeBrightness.system;
+  static const ThemeBrightness defaultTheme = ThemeBrightness.system;
 
   /// Converts a [String] representation of a [ThemeBrightness] into a [Result]
   /// containing the corresponding [ThemeBrightness] value or an error if the

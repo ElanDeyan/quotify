@@ -8,7 +8,7 @@ import 'primary_colors_repository_errors.dart';
 abstract interface class PrimaryColorsRepository {
   /// This variable is used to store the key that will be used to save and
   /// retrieve the primary color data in the repository.
-  static const String primaryColorKey = 'primaryColor';
+  static const primaryColorKey = 'primaryColor';
 
   /// Defines a function for initializing the repository.
   Future<void> initialize();

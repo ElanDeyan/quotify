@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/mixins/created_at_and_updated_at_mixin.dart';
-import 'package:drift_database_service/src/mixins/int_id_primary_key_mixin.dart';
+
+import '../mixins/created_at_and_updated_at_mixin.dart';
+import '../mixins/int_id_primary_key_mixin.dart';
 
 /// Represents the `tags` table in the database with additional mixins for
 /// primary key and timestamp fields.

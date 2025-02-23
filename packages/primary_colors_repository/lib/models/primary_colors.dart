@@ -16,7 +16,7 @@ enum PrimaryColors {
   vanilla;
 
   /// Default color.
-  static const defaultColor = PrimaryColors.oxfordBlue;
+  static const PrimaryColors defaultColor = PrimaryColors.oxfordBlue;
 
   /// Converts a string to its equivalent [PrimaryColors] member.
   /// Returns [PrimaryColorsModelErrors.invalidStringRepresentation] when

@@ -1,18 +1,18 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/database/connection/native_connection.dart';
-import 'package:drift_database_service/src/exceptions/database_errors.dart';
-import 'package:drift_database_service/src/extensions/quote_entry_extension.dart';
-import 'package:drift_database_service/src/extensions/tag_entry_extension.dart';
-import 'package:drift_database_service/src/tables/quotes.dart';
-import 'package:drift_database_service/src/utils/tags_set_to_string_converter.dart';
-import 'package:drift_database_service/src/utils/uri_to_nullable_string_converter.dart';
 import 'package:quotes_repository/repositories/quote_entry.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 import 'package:tags_repository/logic/models/tag.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
 
+import '../exceptions/database_errors.dart';
+import '../extensions/quote_entry_extension.dart';
+import '../extensions/tag_entry_extension.dart';
+import '../tables/quotes.dart';
 import '../tables/tags.dart';
+import '../utils/tags_set_to_string_converter.dart';
+import '../utils/uri_to_nullable_string_converter.dart';
+import 'connection/native_connection.dart';
 
 part 'app_database.g.dart';
 
@@ -185,8 +185,7 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns:
   /// - A [FutureResult] containing the deleted [TagTable] if the operation is
   /// successful.
-  FutureResult<TagTable, DatabaseErrors> deleteTag(Id id) async =>
-      Result.guardAsync(
+  FutureResult<TagTable, DatabaseErrors> deleteTag(Id id) => Result.guardAsync(
         () => transaction(
           () async {
             final affectedRows = await (delete(tags)
@@ -204,7 +203,7 @@ final class AppDatabase extends _$AppDatabase {
         ),
       );
 
-  FutureResult<QuoteTable, DatabaseErrors> deleteQuote(Id id) async =>
+  FutureResult<QuoteTable, DatabaseErrors> deleteQuote(Id id) =>
       Result.guardAsync(
         () => transaction(
           () async {
@@ -317,7 +316,7 @@ final class AppDatabase extends _$AppDatabase {
   /// - Returns: A [FutureResult] containing the updated [TagTable] entry.
   FutureResult<TagTable, DatabaseErrors> updateTag(
     FullTagEntry updatedTagEntry,
-  ) async =>
+  ) =>
       Result.guardAsync(
         () => transaction(
           () async {
@@ -343,7 +342,7 @@ final class AppDatabase extends _$AppDatabase {
 
   FutureResult<QuoteTable, DatabaseErrors> updateQuote(
     FullQuoteEntry updatedQuoteEntry,
-  ) async =>
+  ) =>
       Result.guardAsync(
         () => transaction(
           () async {

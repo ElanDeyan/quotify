@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:drift_database_service/src/database/app_database.dart';
 import 'package:tags_repository/repositories/tag_entry.dart';
+
+import '../database/app_database.dart';
 
 /// Extension on `TagEntry` to convert it to a `TagsCompanion`.
 extension TagEntryExtension on TagEntry {
