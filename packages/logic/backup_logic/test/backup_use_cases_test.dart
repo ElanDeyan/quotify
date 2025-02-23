@@ -29,8 +29,8 @@ void main() {
     late MockThemeBrightnessRepository themeBrightnessRepository;
     late MockPrimaryColorsRepository primaryColorsRepository;
     late MockLanguagesRepository languagesRepository;
-    late MockPrivacyDataRepository privacyRepository;
-    late MockTagsRepository tagRepository;
+    late MockPrivacyRepository privacyRepository;
+    late MockTagRepository tagRepository;
     late MockQuotesRepository quotesRepository;
 
     late FetchBackupData fetchBackupData;
@@ -39,8 +39,8 @@ void main() {
       themeBrightnessRepository = MockThemeBrightnessRepository();
       primaryColorsRepository = MockPrimaryColorsRepository();
       languagesRepository = MockLanguagesRepository();
-      privacyRepository = MockPrivacyDataRepository();
-      tagRepository = MockTagsRepository();
+      privacyRepository = MockPrivacyRepository();
+      tagRepository = MockTagRepository();
       quotesRepository = MockQuotesRepository();
 
       fetchBackupData = FetchBackupData(

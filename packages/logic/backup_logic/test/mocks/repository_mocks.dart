@@ -15,9 +15,8 @@ final class MockPrimaryColorsRepository extends Mock
 final class MockLanguagesRepository extends Mock
     implements LanguagesRepository {}
 
-final class MockPrivacyDataRepository extends Mock
-    implements PrivacyRepository {}
+final class MockPrivacyRepository extends Mock implements PrivacyRepository {}
 
-final class MockTagsRepository extends Mock implements TagRepository {}
+final class MockTagRepository extends Mock implements TagRepository {}
 
 final class MockQuotesRepository extends Mock implements QuotesRepository {}
