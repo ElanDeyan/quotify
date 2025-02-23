@@ -1,5 +1,3 @@
-// ignore_for_file: one_member_abstracts
-
 import 'package:languages_repository/models/languages.dart';
 import 'package:languages_repository/repositories/languages_repository.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
@@ -15,8 +13,10 @@ import 'package:theme_brightness_repository/repository/theme_brightness_reposito
 
 import '../../backup_logic.dart';
 
+/// Represents to fetch a [Backup] instance from the repositories.
 final class FetchBackupData
     implements UseCase<(), FutureResult<Backup, BackupUseCasesErrors>> {
+  /// Creates [FetchBackupData].
   const FetchBackupData({
     required this.quotesRepository,
     required this.tagRepository,
