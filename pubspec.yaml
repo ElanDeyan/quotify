@@ -29,7 +29,7 @@ dependencies:
   privacy_repository: ^1.0.0
   pub_semver: ^2.1.5
   quotes_repository: ^1.0.0
-  quotify_utils: ^3.0.0
+  quotify_utils: ^4.0.0
   shared_preferences_service: ^1.0.0
   tags_repository: ^1.0.0
   theme_brightness_repository: ^0.0.1

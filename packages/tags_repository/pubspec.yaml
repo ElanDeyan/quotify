@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.15.0
-  quotify_utils: ^3.0.0
+  quotify_utils: ^4.0.0
 
 dev_dependencies:
   faker: ^2.2.0
