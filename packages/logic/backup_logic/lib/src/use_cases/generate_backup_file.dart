@@ -33,16 +33,22 @@ final class GenerateBackupFile
     }
     tempFile.createSync(recursive: true);
 
-    final fileBytes = await Isolate.run(
-      () => _encryptBackupJsonString(backupAsJsonString, password),
-      debugName: 'EncryptBackup#${backup.hashCode}',
+    final fileBytes = await Result.guardAsync(
+      () => Isolate.run(
+        () => _encryptBackupJsonString(backupAsJsonString, password),
+        debugName: 'EncryptBackup#${backup.hashCode}',
+      ),
     );
 
-    try {
-      return Ok(XFile(path, bytes: fileBytes, name: backupFileName));
-    } finally {
-      tempFile.deleteSync();
+    if (fileBytes case Ok(value: final fileBytes)) {
+      try {
+        return Result.ok(XFile(path, bytes: fileBytes, name: backupFileName));
+      } finally {
+        tempFile.deleteSync();
+      }
     }
+
+    return const Result.failure(BackupUseCasesErrors.unknown);
   }
 
   @visibleForTesting
