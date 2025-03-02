@@ -4,13 +4,12 @@ import 'package:quotify_utils/result.dart';
 import '../../backup_logic.dart';
 
 final class RestoreBackup
-    implements
-        UseCase<({Backup backup}), FutureResult<Unit, BackupUseCasesErrors>> {
+    implements UseCase<FutureResult<Unit, BackupUseCasesErrors>> {
+  const RestoreBackup({required this.backup});
+
+  final Backup backup;
   @override
-  FutureResult<Unit, BackupUseCasesErrors> call([
-    ({Backup backup})? arguments,
-  ]) {
-    assert(arguments != null, 'Should be non-null');
+  FutureResult<Unit, BackupUseCasesErrors> call() {
     // TODO: implement call
     throw UnimplementedError();
   }

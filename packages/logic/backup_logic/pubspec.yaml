@@ -11,15 +11,18 @@ environment:
 dependencies:
   collection: ^1.19.1
   cross_file: ^0.3.4+2
+  cryptography: ^2.7.0
+  encrypt: ^5.0.3
   flutter:
     sdk: flutter
   languages_repository: ^0.0.1
   meta: ^1.16.0
   mocktail: ^1.0.4
+  path_provider: ^2.1.5
   primary_colors_repository: ^0.0.1
   privacy_repository: ^1.0.0
   quotes_repository: ^1.0.1
-  quotify_utils: ^3.3.0
+  quotify_utils: ^4.0.0
   tags_repository: ^1.0.0
   theme_brightness_repository: ^0.0.1
 
@@ -27,4 +30,6 @@ dev_dependencies:
   faker: ^2.2.0
   flutter_test:
     sdk: flutter
+  path_provider_platform_interface: ^2.1.2
+  plugin_platform_interface: ^2.1.8
   very_good_analysis: ^7.0.0

@@ -10,16 +10,13 @@ import 'package:quotify_utils/result.dart';
 import '../../backup_logic.dart';
 
 final class ParseBackupFile
-    implements
-        UseCase<
-          (XFile file, {Min8LengthPassword password}),
-          FutureResult<Backup, BackupErrors>
-        > {
+    implements UseCase<FutureResult<Backup, BackupErrors>> {
+  const ParseBackupFile({required this.file, required this.password});
+
+  final XFile file;
+  final Min8LengthPassword password;
   @override
-  FutureResult<Backup, BackupErrors> call([
-    (XFile, {Min8LengthPassword password})? arguments,
-  ]) {
-    assert(arguments != null, 'Should be non-null');
+  FutureResult<Backup, BackupErrors> call() {
     // TODO: implement call
     throw UnimplementedError();
   }

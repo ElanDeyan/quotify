@@ -15,7 +15,7 @@ import '../../backup_logic.dart';
 
 /// Represents to fetch a [Backup] instance from the repositories.
 final class FetchBackupData
-    implements UseCase<(), FutureResult<Backup, BackupUseCasesErrors>> {
+    implements UseCase<FutureResult<Backup, BackupUseCasesErrors>> {
   /// Creates [FetchBackupData].
   const FetchBackupData({
     required this.quotesRepository,
@@ -39,9 +39,7 @@ final class FetchBackupData
   final ThemeBrightnessRepository themeBrightnessRepository;
 
   @override
-  FutureResult<Backup, BackupUseCasesErrors> call([
-    covariant void arguments,
-  ]) async {
+  FutureResult<Backup, BackupUseCasesErrors> call() async {
     final ThemeBrightness themeBrightness;
     if (await themeBrightnessRepository.fetchThemeBrightness() case Ok(
       :final value,

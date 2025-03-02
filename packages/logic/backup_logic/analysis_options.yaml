@@ -12,3 +12,4 @@ linter:
     unnecessary_async: true
     omit_obvious_property_types: true
     specify_nonobvious_property_types: true
+    require_trailing_commas: false

@@ -45,6 +45,14 @@ final class Backup implements Encodable {
   /// All added [Quote]s.
   final Set<Quote> quotes;
 
+  /// Extension for backup files.
+  static const backupFileExtension = '.quotify_backup.txt';
+
+  String get backupFileName => 'quotify_backup_$hashCode';
+
+  String get backupFileNameWithExtension =>
+      '$backupFileName$backupFileExtension';
+
   @override
   bool operator ==(covariant Backup other) {
     const tagSetEquality = SetEquality<Tag>();
