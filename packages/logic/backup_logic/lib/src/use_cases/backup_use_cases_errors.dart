@@ -5,5 +5,6 @@ enum BackupUseCasesErrors implements BackupErrors {
   failAtRequestingPrimaryColorsRepository,
   failAtRequestingLanguagesRepository,
   failAtRequestingPrivacyRepository,
+  failAtDecryptingBackup,
   unknown,
 }
