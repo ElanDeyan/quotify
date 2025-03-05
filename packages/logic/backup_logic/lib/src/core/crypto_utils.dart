@@ -1,10 +1,7 @@
 import 'package:cryptography/cryptography.dart';
 
 const ivLength = 16;
-const saltLength = 16;
+const saltLength = 32;
 
-final pbkdf2 = Pbkdf2(
-  macAlgorithm: Hmac.sha256(),
-  iterations: 10000,
-  bits: 256,
-);
+Argon2id get argon2id =>
+    Argon2id(hashLength: 32, iterations: 3, memory: 2048, parallelism: 2);

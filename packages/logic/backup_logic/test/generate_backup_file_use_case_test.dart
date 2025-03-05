@@ -62,12 +62,18 @@ void main() {
 
       final XFile(:name) = result.asOk.value;
 
-      expect(name, equals(await generateBackupFile.backupFileTempPath));
+      expect(
+        name,
+        equals(
+          'quotify_backup_${sampleBackup.hashCode}'
+          '${Backup.backupFileExtension}',
+        ),
+      );
     });
 
     test(
       'should return Ok with a file that has encrypted backup json string',
-      () async {'should return Ok with a file that has encrypted backup json string',
+      () async {
         final generateBackupFile = GenerateBackupFile(
           backup: sampleBackup,
           password: Min8LengthPassword(samplePassword),

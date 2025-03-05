@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:meta/meta.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 
@@ -25,36 +22,18 @@ final class GenerateBackupFile
     final backupAsJsonString = backup.toJsonString();
     final backupFileName = backup.backupFileNameWithExtension;
 
-    final path = await backupFileTempPath;
-
-    final tempFile = File(path);
-    if (tempFile.existsSync()) {
-      tempFile.deleteSync();
-    }
-    tempFile.createSync(recursive: true);
-
-    final fileBytes = await Result.guardAsync(
-      () => Isolate.run(
-        () => _encryptBackupJsonString(backupAsJsonString, password),
-        debugName: 'EncryptBackup#${backup.hashCode}',
-      ),
+    final fileBytes = await Isolate.run(
+      () => _encryptBackupJsonString(backupAsJsonString, password),
     );
 
-    if (fileBytes case Ok(value: final fileBytes)) {
-      try {
-        return Result.ok(XFile(path, bytes: fileBytes, name: backupFileName));
-      } finally {
-        tempFile.deleteSync();
-      }
-    }
+    final xFile = XFile.fromData(
+      fileBytes,
+      name: backupFileName,
+      path: backupFileName,
+    );
 
-    return const Result.failure(BackupUseCasesErrors.unknown);
+    return Result.ok(xFile);
   }
-
-  @visibleForTesting
-  Future<String> get backupFileTempPath async =>
-      '${(await getApplicationCacheDirectory()).path}'
-      '/quotify/backup/${backup.backupFileNameWithExtension}';
 
   /// Return a [Uint8List] following the pattern:
   /// salt ([saltLength]) + IV ([ivLength]) + [encrypted cipher text]
@@ -66,7 +45,7 @@ final class GenerateBackupFile
       for (var i = 0; i < saltLength; i++) Random.secure().nextInt(256),
     ];
 
-    final newSecretKey = await pbkdf2.deriveKeyFromPassword(
+    final newSecretKey = await argon2id.deriveKeyFromPassword(
       password: password,
       nonce: salt,
     );
@@ -78,7 +57,7 @@ final class GenerateBackupFile
     final key = Key(secretKeyBytes);
     final iv = IV.fromSecureRandom(ivLength);
 
-    // Keeping default value to be clear
+    // Keeping default value of padding to be clear
     // ignore: avoid_redundant_argument_values
     final encrypter = Encrypter(AES(key, mode: AESMode.cbc, padding: 'PKCS7'));
 
