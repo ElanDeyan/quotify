@@ -22,6 +22,7 @@ dependencies:
   privacy_repository: ^1.0.0
   quotes_repository: ^1.0.1
   quotify_utils: ^4.0.0
+  share_plus: ^10.1.4
   tags_repository: ^1.0.0
   theme_brightness_repository: ^0.0.1
 
