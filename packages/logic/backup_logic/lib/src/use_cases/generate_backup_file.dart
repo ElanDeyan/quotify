@@ -1,5 +1,4 @@
 import 'dart:isolate';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
@@ -8,7 +7,7 @@ import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 
 import '../../backup_logic.dart';
-import '../core/crypto_utils.dart';
+import '../core/crypto_constants.dart';
 
 final class GenerateBackupFile
     implements UseCase<FutureResult<XFile, BackupErrors>> {
@@ -46,14 +45,9 @@ final class GenerateBackupFile
     String jsonString,
     Min8LengthPassword password,
   ) async {
-    final salt = [
-      for (var i = 0; i < saltLength; i++) Random.secure().nextInt(256),
-    ];
+    final salt = getSaltByLength(saltLength.toNatural());
 
-    final newSecretKey = await argon2id.deriveKeyFromPassword(
-      password: password,
-      nonce: salt,
-    );
+    final newSecretKey = await deriveKeyFromPassword(password, salt: salt);
 
     final secretKeyBytes = Uint8List.fromList(
       await newSecretKey.extractBytes(),
@@ -64,7 +58,7 @@ final class GenerateBackupFile
 
     // Keeping default value of padding to be clear
     // ignore: avoid_redundant_argument_values
-    final encrypter = Encrypter(AES(key, mode: AESMode.cbc, padding: 'PKCS7'));
+    final encrypter = Encrypter(encryptionAlgorithm(key));
 
     final encryptedData = encrypter.encrypt(jsonString, iv: iv);
 
