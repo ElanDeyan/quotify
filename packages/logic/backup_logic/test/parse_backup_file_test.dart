@@ -1,5 +1,4 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:backup_logic/src/use_cases/parse_backup_file.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
