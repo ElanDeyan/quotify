@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:backup_logic/backup_logic.dart';
+import 'package:collection/collection.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:languages_repository/models/languages.dart';
@@ -89,7 +90,9 @@ void main() {
                 label: NonBlankString(faker.lorem.word()),
               ),
           };
-          final sampleBackup = _backupWithDefaultData().copyWith(tags: tags);
+          final sampleBackup = _backupWithDefaultData().copyWith(
+            tags: UnmodifiableSetView(tags),
+          );
 
           final tagsFromBackupMap = sampleBackup.toMap()[Tag.listOfTagsJsonKey];
 
@@ -106,7 +109,9 @@ void main() {
         test('should be empty list if there are no tags', () {
           const tags = <Tag>{};
 
-          final sampleBackup = _backupWithDefaultData().copyWith(tags: tags);
+          final sampleBackup = _backupWithDefaultData().copyWith(
+            tags: UnmodifiableSetView(tags),
+          );
 
           expect(
             sampleBackup.toMap()[Tag.listOfTagsJsonKey],
@@ -128,7 +133,7 @@ void main() {
               ),
           };
           final sampleBackup = _backupWithDefaultData().copyWith(
-            quotes: quotes,
+            quotes: UnmodifiableSetView(quotes),
           );
 
           final quotesFromBackupMap =
@@ -148,7 +153,7 @@ void main() {
           const quotes = <Quote>{};
 
           final sampleBackup = _backupWithDefaultData().copyWith(
-            quotes: quotes,
+            quotes: UnmodifiableSetView(quotes),
           );
 
           expect(
@@ -429,8 +434,8 @@ Backup _backupWithDefaultData() => const Backup(
   primaryColor: PrimaryColors.defaultColor,
   language: Languages.defaultLanguage,
   privacyData: PrivacyData.initial(),
-  tags: {},
-  quotes: {},
+  tags: UnmodifiableSetView.empty(),
+  quotes: UnmodifiableSetView.empty(),
 );
 
 List<Map<String, Object?>> _wrongTagsMapList() {

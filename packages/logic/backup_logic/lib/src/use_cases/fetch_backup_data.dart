@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:languages_repository/models/languages.dart';
 import 'package:languages_repository/repositories/languages_repository.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
@@ -87,9 +88,11 @@ final class FetchBackupData
       );
     }
 
-    final tags = Set.of(await _tagRepository.allTags);
+    final tags = UnmodifiableSetView((await _tagRepository.allTags).toSet());
 
-    final quotes = Set.of(await _quotesRepository.allQuotes);
+    final quotes = UnmodifiableSetView(
+      (await _quotesRepository.allQuotes).toSet(),
+    );
 
     return Result.ok(
       Backup(

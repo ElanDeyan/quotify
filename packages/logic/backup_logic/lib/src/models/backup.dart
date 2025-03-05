@@ -40,10 +40,10 @@ final class Backup implements Encodable {
   final PrivacyData privacyData;
 
   /// All added [Tag]s.
-  final Set<Tag> tags;
+  final UnmodifiableSetView<Tag> tags;
 
   /// All added [Quote]s.
-  final Set<Quote> quotes;
+  final UnmodifiableSetView<Quote> quotes;
 
   /// Extension for backup files.
   static const backupFileExtension = '.quotify_backup.txt';
@@ -55,6 +55,8 @@ final class Backup implements Encodable {
 
   @override
   bool operator ==(covariant Backup other) {
+    if (identical(this, other)) return true;
+
     const tagSetEquality = SetEquality<Tag>();
     const quoteSetEquality = SetEquality<Quote>();
 
@@ -82,8 +84,8 @@ final class Backup implements Encodable {
     PrimaryColors? primaryColor,
     Languages? language,
     PrivacyData? privacyData,
-    Set<Tag>? tags,
-    Set<Quote>? quotes,
+    UnmodifiableSetView<Tag>? tags,
+    UnmodifiableSetView<Quote>? quotes,
   }) => Backup(
     themeBrightness: themeBrightness ?? this.themeBrightness,
     primaryColor: primaryColor ?? this.primaryColor,
@@ -149,9 +151,9 @@ final class Backup implements Encodable {
         return const Result.failure(BackupModelErrors.invalidPrivacyDataMap);
       }
 
-      final Set<Tag> tags;
+      final UnmodifiableSetView<Tag> tags;
       if (listOfTagsMap.isEmpty) {
-        tags = const {};
+        tags = const UnmodifiableSetView.empty();
       } else if (listOfTagsMap
           case final List<Map<String, Object?>> listOfMap) {
         final results = listOfMap.map(Tag.fromMap);
@@ -161,14 +163,14 @@ final class Backup implements Encodable {
           );
         }
 
-        tags = Set.of(results.allOks.map((e) => e.value));
+        tags = UnmodifiableSetView(results.allOks.map((e) => e.value).toSet());
       } else {
         return const Result.failure(BackupModelErrors.missingListOfMaps);
       }
 
-      final Set<Quote> quotes;
+      final UnmodifiableSetView<Quote> quotes;
       if (listOfQuotesMap.isEmpty) {
-        quotes = const {};
+        quotes = const UnmodifiableSetView.empty();
       } else if (listOfQuotesMap
           case final List<Map<String, Object?>> listOfMap) {
         final results = listOfMap.map(Quote.fromMap);
@@ -178,7 +180,9 @@ final class Backup implements Encodable {
           );
         }
 
-        quotes = Set.of(results.allOks.map((e) => e.value));
+        quotes = UnmodifiableSetView(
+          results.allOks.map((e) => e.value).toSet(),
+        );
       } else {
         return const Result.failure(BackupModelErrors.missingListOfMaps);
       }

@@ -38,7 +38,7 @@ Backup sampleBackupGenerator({
         primaryColor ?? PrimaryColors.values.sample(1, Random(seed)).single,
     language: language ?? Languages.values.sample(1, Random(seed)).single,
     privacyData: privacyData ?? const PrivacyData.initial(),
-    tags: tags,
-    quotes: quotes,
+    tags: UnmodifiableSetView(tags),
+    quotes: UnmodifiableSetView(quotes),
   );
 }
