@@ -1,19 +1,19 @@
 import 'package:backup_logic/backup_logic.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotify_utils/result.dart';
 
 import 'utils/sample_backup_generator.dart';
+import 'utils/sample_backup_password_generator.dart';
 
 void main() {
   late Backup sampleBackup;
-  late Min8LengthPassword password;
+  late BackupPassword password;
   late XFile sampleBackupFile;
 
   setUp(() async {
     sampleBackup = sampleBackupGenerator();
-    password = Min8LengthPassword(faker.randomGenerator.numberOfLength(8));
+    password = sampleBackupPasswordGenerator();
     sampleBackupFile =
         (await GenerateBackupFile(backup: sampleBackup, password: password)())
             .asOk
@@ -36,9 +36,7 @@ void main() {
   test(
     'if different password, should return a failure with a backup error',
     () async {
-      final differentPassword = Min8LengthPassword(
-        faker.randomGenerator.numberOfLength(8),
-      );
+      final differentPassword = sampleBackupPasswordGenerator();
 
       expect(password, isNot(differentPassword));
 

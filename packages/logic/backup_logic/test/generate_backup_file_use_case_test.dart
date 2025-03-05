@@ -1,13 +1,12 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:backup_logic/src/use_cases/generate_backup_file.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:quotify_utils/result.dart';
 
 import 'utils/fake_path_provider_platform.dart';
 import 'utils/sample_backup_generator.dart';
+import 'utils/sample_backup_password_generator.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,17 +15,17 @@ void main() {
   });
   group('on successful case', () {
     late Backup sampleBackup;
-    late Min8LengthPassword samplePassword;
+    late BackupPassword samplePassword;
 
     setUp(() {
       sampleBackup = sampleBackupGenerator();
-      samplePassword = Min8LengthPassword(faker.internet.password());
+      samplePassword = sampleBackupPasswordGenerator();
     });
 
     test('should return Ok with a XFile', () async {
       final generateBackupFile = GenerateBackupFile(
         backup: sampleBackup,
-        password: Min8LengthPassword(samplePassword),
+        password: samplePassword,
       );
 
       final result = await generateBackupFile();
@@ -37,7 +36,7 @@ void main() {
     test('should return Ok with a XFile with expected extension', () async {
       final generateBackupFile = GenerateBackupFile(
         backup: sampleBackup,
-        password: Min8LengthPassword(samplePassword),
+        password: samplePassword,
       );
 
       final result = await generateBackupFile();
@@ -53,7 +52,7 @@ void main() {
         "with backup's name 'quotify_backup_{hashCode}'", () async {
       final generateBackupFile = GenerateBackupFile(
         backup: sampleBackup,
-        password: Min8LengthPassword(samplePassword),
+        password: samplePassword,
       );
 
       final result = await generateBackupFile();
@@ -76,7 +75,7 @@ void main() {
       () async {
         final generateBackupFile = GenerateBackupFile(
           backup: sampleBackup,
-          password: Min8LengthPassword(samplePassword),
+          password: samplePassword,
         );
 
         final result = await generateBackupFile();

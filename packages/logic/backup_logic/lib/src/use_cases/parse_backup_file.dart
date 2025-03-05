@@ -11,14 +11,12 @@ import '../core/crypto_constants.dart';
 
 final class ParseBackupFile
     implements UseCase<FutureResult<Backup, BackupErrors>> {
-  const ParseBackupFile({
-    required XFile file,
-    required Min8LengthPassword password,
-  }) : _password = password,
-       _backupFile = file;
+  const ParseBackupFile({required XFile file, required BackupPassword password})
+    : _password = password,
+      _backupFile = file;
 
   final XFile _backupFile;
-  final Min8LengthPassword _password;
+  final BackupPassword _password;
   @override
   FutureResult<Backup, BackupErrors> call() async {
     final fileBytes = await _backupFile.readAsBytes();
@@ -53,7 +51,7 @@ final class ParseBackupFile
     required Uint8List saltBytes,
     required Uint8List ivBytes,
     required Uint8List fileEncryptedContentAsBytes,
-    required Min8LengthPassword password,
+    required BackupPassword password,
   }) async {
     final secretKey = await deriveKeyFromPassword(password, salt: saltBytes);
 

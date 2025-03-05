@@ -13,12 +13,12 @@ final class GenerateBackupFile
     implements UseCase<FutureResult<XFile, BackupErrors>> {
   const GenerateBackupFile({
     required Backup backup,
-    required Min8LengthPassword password,
+    required BackupPassword password,
   }) : _password = password,
        _backup = backup;
 
   final Backup _backup;
-  final Min8LengthPassword _password;
+  final BackupPassword _password;
 
   @override
   FutureResult<XFile, BackupErrors> call() async {
@@ -43,7 +43,7 @@ final class GenerateBackupFile
   /// salt ([saltLength]) + IV ([ivLength]) + [encrypted cipher text]
   Future<Uint8List> _encryptBackupJsonString(
     String jsonString,
-    Min8LengthPassword password,
+    BackupPassword password,
   ) async {
     final salt = getSaltByLength(saltLength.toNatural());
 

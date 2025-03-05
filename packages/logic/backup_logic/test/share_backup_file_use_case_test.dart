@@ -3,17 +3,17 @@ library;
 
 import 'package:backup_logic/backup_logic.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'utils/sample_backup_generator.dart';
+import 'utils/sample_backup_password_generator.dart';
 
 void main() {
   test('sharing backup file', () async {
     late XFile? sharedFile;
     final generateBackupFileUseCase = GenerateBackupFile(
       backup: sampleBackupGenerator(),
-      password: Min8LengthPassword(faker.randomGenerator.numberOfLength(8)),
+      password: sampleBackupPasswordGenerator(),
     );
 
     final backupFile = (await generateBackupFileUseCase()).asOk.value;
