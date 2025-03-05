@@ -12,18 +12,23 @@ import '../core/crypto_utils.dart';
 
 final class GenerateBackupFile
     implements UseCase<FutureResult<XFile, BackupErrors>> {
-  const GenerateBackupFile({required this.backup, required this.password});
+  const GenerateBackupFile({
+    required Backup backup,
+    required Min8LengthPassword password,
+  }) : _password = password,
+       _backup = backup;
 
-  final Backup backup;
-  final Min8LengthPassword password;
+  final Backup _backup;
+  final Min8LengthPassword _password;
 
   @override
   FutureResult<XFile, BackupErrors> call() async {
-    final backupAsJsonString = backup.toJsonString();
-    final backupFileName = backup.backupFileNameWithExtension;
+    final backupAsJsonString = _backup.toJsonString();
+    final backupFileName = _backup.backupFileNameWithExtension;
 
     final fileBytes = await Isolate.run(
-      () => _encryptBackupJsonString(backupAsJsonString, password),
+      () => _encryptBackupJsonString(backupAsJsonString, _password),
+      debugName: 'encryptBackupJsonString',
     );
 
     final xFile = XFile.fromData(
