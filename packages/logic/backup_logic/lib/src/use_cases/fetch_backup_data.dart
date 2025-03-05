@@ -18,30 +18,35 @@ final class FetchBackupData
     implements UseCase<FutureResult<Backup, BackupUseCasesErrors>> {
   /// Creates [FetchBackupData].
   const FetchBackupData({
-    required this.quotesRepository,
-    required this.tagRepository,
-    required this.languagesRepository,
-    required this.primaryColorsRepository,
-    required this.privacyRepository,
-    required this.themeBrightnessRepository,
-  });
+    required QuotesRepository quotesRepository,
+    required TagRepository tagRepository,
+    required LanguagesRepository languagesRepository,
+    required PrimaryColorsRepository primaryColorsRepository,
+    required PrivacyRepository privacyRepository,
+    required ThemeBrightnessRepository themeBrightnessRepository,
+  }) : _themeBrightnessRepository = themeBrightnessRepository,
+       _privacyRepository = privacyRepository,
+       _primaryColorsRepository = primaryColorsRepository,
+       _languagesRepository = languagesRepository,
+       _tagRepository = tagRepository,
+       _quotesRepository = quotesRepository;
 
-  final QuotesRepository quotesRepository;
+  final QuotesRepository _quotesRepository;
 
-  final TagRepository tagRepository;
+  final TagRepository _tagRepository;
 
-  final LanguagesRepository languagesRepository;
+  final LanguagesRepository _languagesRepository;
 
-  final PrimaryColorsRepository primaryColorsRepository;
+  final PrimaryColorsRepository _primaryColorsRepository;
 
-  final PrivacyRepository privacyRepository;
+  final PrivacyRepository _privacyRepository;
 
-  final ThemeBrightnessRepository themeBrightnessRepository;
+  final ThemeBrightnessRepository _themeBrightnessRepository;
 
   @override
   FutureResult<Backup, BackupUseCasesErrors> call() async {
     final ThemeBrightness themeBrightness;
-    if (await themeBrightnessRepository.fetchThemeBrightness() case Ok(
+    if (await _themeBrightnessRepository.fetchThemeBrightness() case Ok(
       :final value,
     )) {
       themeBrightness = value;
@@ -52,7 +57,7 @@ final class FetchBackupData
     }
 
     final PrimaryColors primaryColor;
-    if (await primaryColorsRepository.fetchPrimaryColor() case Ok(
+    if (await _primaryColorsRepository.fetchPrimaryColor() case Ok(
       :final value,
     )) {
       primaryColor = value;
@@ -63,7 +68,7 @@ final class FetchBackupData
     }
 
     final Languages language;
-    if (await languagesRepository.fetchCurrentLanguage() case Ok(
+    if (await _languagesRepository.fetchCurrentLanguage() case Ok(
       :final value,
     )) {
       language = value;
@@ -74,7 +79,7 @@ final class FetchBackupData
     }
 
     final PrivacyData privacyData;
-    if (await privacyRepository.fetchPrivacyData() case Ok(:final value)) {
+    if (await _privacyRepository.fetchPrivacyData() case Ok(:final value)) {
       privacyData = value;
     } else {
       return const Result.failure(
@@ -82,9 +87,9 @@ final class FetchBackupData
       );
     }
 
-    final tags = Set.of(await tagRepository.allTags);
+    final tags = Set.of(await _tagRepository.allTags);
 
-    final quotes = Set.of(await quotesRepository.allQuotes);
+    final quotes = Set.of(await _quotesRepository.allQuotes);
 
     return Result.ok(
       Backup(
