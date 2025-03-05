@@ -1,8 +1,3 @@
-// FutureResult<Backup, BackupErrors> parseBackupFile(
-//   XFile file, {
-//   required Min8LengthPassword password,
-// });
-
 import 'dart:isolate';
 import 'dart:typed_data';
 
