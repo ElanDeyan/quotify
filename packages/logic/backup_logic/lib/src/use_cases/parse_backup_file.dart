@@ -17,9 +17,20 @@ final class ParseBackupFile
 
   final XFile _backupFile;
   final BackupPassword _password;
+
   @override
   FutureResult<Backup, BackupErrors> call() async {
+    if (!_backupFile.name.endsWith(Backup.backupFileExtension)) {
+      return const Result.failure(BackupUseCasesErrors.wrongFileExtension);
+    }
+
     final fileBytes = await _backupFile.readAsBytes();
+
+    if (fileBytes.length <= saltLength + ivLength) {
+      return const Result.failure(
+        BackupUseCasesErrors.backupFileLengthIsTooShort,
+      );
+    }
 
     final (saltStartIndex, saltEndIndex) = (0, saltLength);
     final (ivStartIndex, ivEndIndex) = (saltEndIndex, saltEndIndex + ivLength);
