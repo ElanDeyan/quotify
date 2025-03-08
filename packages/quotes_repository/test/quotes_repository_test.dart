@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
@@ -17,11 +18,11 @@ void main() {
       final author = NonBlankString(faker.person.name());
       final createdAt = faker.date.dateTime(maxYear: 2024);
       final updatedAt = faker.date.dateTime(minYear: 2025);
-      final tags = {
+      final tags = UnmodifiableSetView({
         Tag(id: Id(5.toNatural()), label: NonBlankString(faker.lorem.word())),
         Tag(id: Id(6.toNatural()), label: NonBlankString(faker.lorem.word())),
         Tag(id: Id(7.toNatural()), label: NonBlankString(faker.lorem.word())),
-      };
+      });
 
       final sample1 = Quote(
         id: Id(10.toNatural()),
@@ -49,10 +50,9 @@ void main() {
       final author = NonBlankString(faker.person.name());
       final createdAt = faker.date.dateTime(maxYear: 2024);
       final updatedAt = faker.date.dateTime(minYear: 2025);
-      final tags1 = {
+      final tags1 = UnmodifiableSetView({
         Tag(id: Id(5.toNatural()), label: NonBlankString(faker.lorem.word())),
-      };
-      final tags2 = <Tag>{};
+      });
 
       final sample1 = Quote(
         id: Id(10.toNatural()),
@@ -68,7 +68,7 @@ void main() {
         author: author,
         createdAt: createdAt,
         updatedAt: updatedAt,
-        tags: tags2,
+        // empty tags set
       );
 
       expect(sample1, isNot(sample2));
@@ -230,7 +230,7 @@ void main() {
           'tags': [
             for (var i = 0; i < 3; i++)
               Tag(
-                id: Id(Natural(10)),
+                id: const Id(Natural(10)),
                 label: NonBlankString(faker.lorem.word()),
               ).toMap(),
             {
@@ -264,7 +264,7 @@ void main() {
           'tags': [
             for (var i = 0; i < 3; i++)
               Tag(
-                id: Id(Natural(10)),
+                id: const Id(Natural(10)),
                 label: NonBlankString(faker.lorem.word()),
               ).toMap(),
           ],
@@ -325,9 +325,9 @@ void main() {
       author: NonBlankString(faker.person.name()),
       createdAt: faker.date.dateTime(maxYear: 2024),
       updatedAt: faker.date.dateTime(minYear: 2025),
-      tags: {
+      tags: UnmodifiableSetView({
         Tag(id: Id(5.toNatural()), label: NonBlankString(faker.lorem.word())),
-      },
+      }),
     );
 
     final quoteAsMap = sampleQuote.toMap();
@@ -342,9 +342,9 @@ void main() {
       author: NonBlankString(faker.person.name()),
       createdAt: faker.date.dateTime(maxYear: 2024),
       updatedAt: faker.date.dateTime(minYear: 2025),
-      tags: {
+      tags: UnmodifiableSetView({
         Tag(id: Id(5.toNatural()), label: NonBlankString(faker.lorem.word())),
-      },
+      }),
     );
 
     final sampleQuoteJsonString = sampleQuote.toJsonString();

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 
@@ -15,6 +16,6 @@ extension QuoteTableExtension on QuoteTable {
         isFavorite: isFavorite,
         source: source,
         sourceUri: sourceUri,
-        tags: tags,
+        tags: UnmodifiableSetView(tags),
       );
 }

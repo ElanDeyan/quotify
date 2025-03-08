@@ -1,6 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:faker/faker.dart';
 import 'package:quotes_repository/logic/models/quote.dart';
 import 'package:quotify_utils/quotify_utils.dart';
+
 import 'sample_tag_generator.dart';
 
 Quote sampleQuoteGenerator({
@@ -16,5 +18,7 @@ Quote sampleQuoteGenerator({
   sourceUri: containsSourceUri ? Uri.parse(faker.internet.httpsUrl()) : null,
   createdAt: DateTime.now(),
   updatedAt: DateTime.now().add(const Duration(minutes: 5)),
-  tags: {for (var i = 0; i < howManyTags.toInt(); i++) sampleTagGenerator()},
+  tags: UnmodifiableSetView({
+    for (var i = 0; i < howManyTags.toInt(); i++) sampleTagGenerator(),
+  }),
 );

@@ -20,7 +20,7 @@ dependencies:
   mocktail: ^1.0.4
   primary_colors_repository: ^0.0.1
   privacy_repository: ^1.0.0
-  quotes_repository: ^1.0.1
+  quotes_repository: ^2.0.0
   quotify_utils: ^4.0.0
   share_plus: ^10.1.4
   tags_repository: ^1.0.0

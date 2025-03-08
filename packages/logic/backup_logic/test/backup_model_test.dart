@@ -472,8 +472,10 @@ Quote _sampleQuote() {
             : null,
     tags:
         faker.randomGenerator.boolean()
-            ? {for (var i = 0; i < sampleTagsLength; i++) _sampleTag()}
-            : const {},
+            ? UnmodifiableSetView({
+              for (var i = 0; i < sampleTagsLength; i++) _sampleTag(),
+            })
+            : const UnmodifiableSetView.empty(),
   );
 }
 

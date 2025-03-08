@@ -26,7 +26,9 @@ Backup sampleBackupGenerator({
   final quotes = {
     for (var i = 0; i < quotesQuantity.toInt(); i++)
       sampleQuoteGenerator().copyWith(
-        tags: tags.sample(Random(seed).nextInt(tagsQuantity.toInt())).toSet(),
+        tags: UnmodifiableSetView(
+          tags.sample(Random(seed).nextInt(tagsQuantity.toInt())).toSet(),
+        ),
       ),
   };
 

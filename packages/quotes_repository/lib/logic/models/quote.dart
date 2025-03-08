@@ -23,7 +23,7 @@ final class Quote implements Encodable, Queryable {
     this.source,
     this.sourceUri,
     this.isFavorite = false,
-    this.tags = const {},
+    this.tags = const UnmodifiableSetView.empty(),
   }) : assert(
           !updatedAt.isBefore(createdAt),
           'Updated at should be equal or after createdAt',
@@ -54,8 +54,8 @@ final class Quote implements Encodable, Queryable {
   /// when creating.
   final DateTime updatedAt;
 
-  /// [Set] of [Tag]s related to this quote.
-  final Set<Tag> tags;
+  /// [UnmodifiableSetView] of [Tag]s related to this quote.
+  final UnmodifiableSetView<Tag> tags;
 
   @override
   bool operator ==(covariant Quote other) =>
@@ -92,7 +92,7 @@ final class Quote implements Encodable, Queryable {
     bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
-    Set<Tag>? tags,
+    UnmodifiableSetView<Tag>? tags,
   }) =>
       Quote(
         id: id ?? this.id,
@@ -204,7 +204,7 @@ final class Quote implements Encodable, Queryable {
           isFavorite: isFavorite,
           createdAt: createdAtDateTime,
           updatedAt: updatedAtDateTime,
-          tags: tagsSet,
+          tags: UnmodifiableSetView(tagsSet),
         ),
       );
     }
