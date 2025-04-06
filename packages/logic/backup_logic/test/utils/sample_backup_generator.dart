@@ -12,13 +12,13 @@ import 'sample_quote_generator.dart';
 import 'sample_tag_generator.dart';
 
 Backup sampleBackupGenerator({
-  int seed = 50,
-  ThemeBrightness? themeBrightness,
-  PrimaryColors? primaryColor,
-  Languages? language,
-  PrivacyData? privacyData,
-  Natural tagsQuantity = const Natural(0),
-  Natural quotesQuantity = const Natural(0),
+  final int seed = 50,
+  final ThemeBrightness? themeBrightness,
+  final PrimaryColors? primaryColor,
+  final Languages? language,
+  final PrivacyData? privacyData,
+  final Natural tagsQuantity = Natural.zero,
+  final Natural quotesQuantity = Natural.zero,
 }) {
   final tags = {
     for (var i = 0; i < tagsQuantity.toInt(); i++) sampleTagGenerator(),

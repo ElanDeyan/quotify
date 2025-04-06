@@ -1,18 +1,12 @@
 import 'package:backup_logic/backup_logic.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:quotify_utils/result.dart';
 
-import 'utils/fake_path_provider_platform.dart';
 import 'utils/sample_backup_generator.dart';
 import 'utils/sample_backup_password_generator.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  setUp(() {
-    PathProviderPlatform.instance = FakePathProviderPlatform();
-  });
   group('on successful case', () {
     late Backup sampleBackup;
     late BackupPassword samplePassword;

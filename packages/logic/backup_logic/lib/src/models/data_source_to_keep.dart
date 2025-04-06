@@ -1,0 +1,1 @@
+enum DataSourceToUse { local, backup }
