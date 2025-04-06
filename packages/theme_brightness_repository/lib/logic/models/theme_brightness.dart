@@ -31,16 +31,15 @@ enum ThemeBrightness {
   /// value based on the input string.
   static Result<ThemeBrightness, ThemeBrightnessModelErrors> fromString(
     String string,
-  ) =>
-      switch (string) {
-        'light' => const Result.ok(ThemeBrightness.light),
-        'dark' => const Result.ok(ThemeBrightness.dark),
-        'system' => const Result.ok(ThemeBrightness.system),
-        _ => Result.failure(
-            ThemeBrightnessModelErrors.invalidStringRepresentation,
-            StackTrace.current,
-          ),
-      };
+  ) => switch (string) {
+    'light' => const Result.ok(ThemeBrightness.light),
+    'dark' => const Result.ok(ThemeBrightness.dark),
+    'system' => const Result.ok(ThemeBrightness.system),
+    _ => Result.failure(
+      ThemeBrightnessModelErrors.invalidStringRepresentation,
+      StackTrace.current,
+    ),
+  };
 
   /// Key for using in serialization.
   static const jsonKey = 'themeBrightness';

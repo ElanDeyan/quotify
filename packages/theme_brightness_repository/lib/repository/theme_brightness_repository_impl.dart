@@ -26,8 +26,9 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
   Future<void> initialize() => _setDefaultIfMissing();
 
   Future<void> _setDefaultIfMissing() async {
-    if (await _sharedPreferencesAsyncService
-        .containsKey(ThemeBrightnessRepository.themeBrightnessRepositoryKey)) {
+    if (await _sharedPreferencesAsyncService.containsKey(
+      ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+    )) {
       return;
     }
 
@@ -36,17 +37,19 @@ final class ThemeBrightnessRepositoryImpl implements ThemeBrightnessRepository {
 
   @override
   FutureResult<ThemeBrightness, ThemeBrightnessErrors>
-      fetchThemeBrightness() async {
-    if (!(await _sharedPreferencesAsyncService
-        .containsKey(ThemeBrightnessRepository.themeBrightnessRepositoryKey))) {
+  fetchThemeBrightness() async {
+    if (!(await _sharedPreferencesAsyncService.containsKey(
+      ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+    ))) {
       return Result.failure(
         ThemeBrightnessRepositoryErrors.missing,
         StackTrace.current,
       );
     }
 
-    final storedValue = await _sharedPreferencesAsyncService
-        .getString(ThemeBrightnessRepository.themeBrightnessRepositoryKey);
+    final storedValue = await _sharedPreferencesAsyncService.getString(
+      ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+    );
 
     return ThemeBrightness.fromString(storedValue ?? '');
   }

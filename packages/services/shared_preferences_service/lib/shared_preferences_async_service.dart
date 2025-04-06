@@ -12,8 +12,9 @@ final class SharedPreferencesAsyncService {
 
   /// This variable is used for logging messages related to the
   /// [SharedPreferencesAsyncService] class.
-  static final sharedPreferencesAsyncServiceLogger =
-      Logger('SharedPreferencesAsyncService');
+  static final sharedPreferencesAsyncServiceLogger = Logger(
+    'SharedPreferencesAsyncService',
+  );
 
   /// The function [containsKey] checks if a [key] exists in the shared
   /// preferences asynchronously and returns a [Future] of [bool]

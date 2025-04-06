@@ -41,9 +41,7 @@ final class TagsSetToStringConverter extends TypeConverter<Set<Tag>, String> {
     }
 
     if (decoded case final List<Object?> list) {
-      if (list.every(
-        (element) => element is Map<String, Object?>,
-      )) {
+      if (list.every((element) => element is Map<String, Object?>)) {
         final listOfMaps = list.cast<Map<String, Object?>>();
         return {
           for (final map in listOfMaps)

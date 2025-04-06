@@ -8,5 +8,5 @@ enum LanguagesRepositoryErrors implements LanguageErrors {
 
   /// This error type represents a specific error scenario related
   /// to failing at saving data within the `LanguagesRepository`.
-  failAtSaving;
+  failAtSaving,
 }

@@ -57,10 +57,7 @@ void main() {
 
     group('without an existent value', () {
       test('should return null', () {
-        expect(
-          secureStorageService.read(sampleKey),
-          completion(isNull),
-        );
+        expect(secureStorageService.read(sampleKey), completion(isNull));
       });
     });
   });
@@ -86,12 +83,7 @@ void main() {
 
         expect(
           secureStorageService.read(sampleKey),
-          completion(
-            allOf([
-              isNot(sampleValue1),
-              equals(sampleValue2),
-            ]),
-          ),
+          completion(allOf([isNot(sampleValue1), equals(sampleValue2)])),
         );
       });
     });

@@ -82,11 +82,12 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Throws: Any exceptions that are not of type `E`.
   static FutureResult<T, E> guardAsync<T extends Object, E extends Object>(
     Future<T> Function() computation,
-  ) =>
-      Future.sync(computation).then(Result<T, E>.ok).catchError(
-            (Object error) => Result<T, E>.failure(error as E),
-            test: (error) => error is E,
-          );
+  ) => Future.sync(computation)
+      .then(Result<T, E>.ok)
+      .catchError(
+        (Object error) => Result<T, E>.failure(error as E),
+        test: (error) => error is E,
+      );
 
   /// Executes an asynchronous computation with a specified timeout and returns
   /// a `FutureResult` containing either the result of the computation or a
@@ -109,24 +110,19 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: A `FutureResult` containing either the result of the
   ///   computation or a failure.
   static FutureResult<T, E>
-      guardAsyncWithTimeout<T extends Object, E extends Object>(
+  guardAsyncWithTimeout<T extends Object, E extends Object>(
     Future<T> Function() computation, {
     required Duration timeout,
     required E failureOnTimeout,
-  }) =>
-          Future.sync(computation)
-              .timeout(timeout)
-              .then(Result<T, E>.ok)
-              .catchError(
-            (Object error) {
-              if (error is TimeoutException) {
-                return Result<T, E>.failure(failureOnTimeout);
-              }
+  }) => Future.sync(
+    computation,
+  ).timeout(timeout).then(Result<T, E>.ok).catchError((Object error) {
+    if (error is TimeoutException) {
+      return Result<T, E>.failure(failureOnTimeout);
+    }
 
-              return Result<T, E>.failure(error as E);
-            },
-            test: (error) => error is E || error is TimeoutException,
-          );
+    return Result<T, E>.failure(error as E);
+  }, test: (error) => error is E || error is TimeoutException);
 
   /// Converts a stream of values of type `T` into a stream of `Result<T, E>`
   /// objects.
@@ -146,9 +142,7 @@ sealed class Result<T extends Object, E extends Object> {
     Stream<T> stream,
   ) =>
       stream
-          .map(
-            Result<T, E>.ok,
-          )
+          .map(Result<T, E>.ok)
           .handleError(
             (Object error, StackTrace stackTrace) => Result<T, E>.failure(
               error as E,
@@ -194,18 +188,17 @@ sealed class Result<T extends Object, E extends Object> {
 
   @override
   bool operator ==(covariant Result<T, E> other) => switch ((this, other)) {
-        (final Ok<T, E> first, final Ok<T, E> second) => first == second,
-        (final Ok<T, E> _, final Failure<T, E> _) => false,
-        (final Failure<T, E> _, final Ok<T, E> _) => false,
-        (final Failure<T, E> first, final Failure<T, E> second) =>
-          first == second,
-      };
+    (final Ok<T, E> first, final Ok<T, E> second) => first == second,
+    (final Ok<T, E> _, final Failure<T, E> _) => false,
+    (final Failure<T, E> _, final Ok<T, E> _) => false,
+    (final Failure<T, E> first, final Failure<T, E> second) => first == second,
+  };
 
   @override
   int get hashCode => switch (this) {
-        final Ok<T, E> ok => ok.hashCode,
-        final Failure<T, E> failure => failure.hashCode,
-      };
+    final Ok<T, E> ok => ok.hashCode,
+    final Failure<T, E> failure => failure.hashCode,
+  };
 
   /// Unwraps the result, returning the value if it is an `Ok` instance,
   /// or throwing the failure if it is a `Failure` instance.
@@ -213,10 +206,10 @@ sealed class Result<T extends Object, E extends Object> {
   /// Throws:
   /// - The failure contained in the `Failure` instance.
   T unwrap() => switch (this) {
-        Ok<T, E>(:final value) => value,
-        Failure<T, E>(:final failure, :final stackTrace) =>
-          Error.throwWithStackTrace(failure, stackTrace),
-      };
+    Ok<T, E>(:final value) => value,
+    Failure<T, E>(:final failure, :final stackTrace) =>
+      Error.throwWithStackTrace(failure, stackTrace),
+  };
 
   /// Maps the current `Result` to a new `Result` by applying the provided
   /// synchronous callback function to the value if the result is `Ok`.
@@ -237,13 +230,12 @@ sealed class Result<T extends Object, E extends Object> {
   Result<R, F> mapSync<R extends Object, F extends Object>(
     R Function(T value) callback, {
     F Function(E exception)? failureMapper,
-  }) =>
-      switch (this) {
-        Ok<T, E>(:final value) => Result.guardSync(() => callback(value)),
-        Failure<T, E>(:final failure) => Result.failure(
-            failureMapper?.call(failure) ?? failure as F,
-          ),
-      };
+  }) => switch (this) {
+    Ok<T, E>(:final value) => Result.guardSync(() => callback(value)),
+    Failure<T, E>(:final failure) => Result.failure(
+      failureMapper?.call(failure) ?? failure as F,
+    ),
+  };
 
   /// Transforms the current `Result` into a `FutureResult` by applying
   /// an asynchronous callback function to the value if the result is `Ok`.
@@ -267,13 +259,12 @@ sealed class Result<T extends Object, E extends Object> {
   FutureResult<R, F> mapAsync<R extends Object, F extends Object>(
     Future<R> Function(T value) callback, {
     F Function(E exception)? failureMapper,
-  }) async =>
-      switch (this) {
-        Ok(:final value) => await Result.guardAsync(() => callback(value)),
-        Failure(:final failure) => Result.failure(
-            failureMapper?.call(failure) ?? failure as F,
-          ),
-      };
+  }) async => switch (this) {
+    Ok(:final value) => await Result.guardAsync(() => callback(value)),
+    Failure(:final failure) => Result.failure(
+      failureMapper?.call(failure) ?? failure as F,
+    ),
+  };
 
   /// Applies one of two functions to the result, depending on whether it is an
   /// `Ok` or a `Failure`.
@@ -293,11 +284,10 @@ sealed class Result<T extends Object, E extends Object> {
   R fold<R extends Object>({
     required R Function(T value) onOk,
     required R Function(E exception) onFailure,
-  }) =>
-      switch (this) {
-        Ok(:final value) => onOk(value),
-        Failure(:final failure) => onFailure(failure),
-      };
+  }) => switch (this) {
+    Ok(:final value) => onOk(value),
+    Failure(:final failure) => onFailure(failure),
+  };
 
   /// Returns the value if the result is `Ok`, otherwise returns the provided
   /// fallback value if the result is `Failure`.
@@ -305,9 +295,9 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Parameter fallback: The value to return if the result is `Failure`.
   /// - Returns: The value if the result is `Ok`, otherwise the fallback value.
   T unwrapOrElse(T Function() callback) => switch (this) {
-        Ok(:final value) => value,
-        Failure() => callback(),
-      };
+    Ok(:final value) => value,
+    Failure() => callback(),
+  };
 
   /// Recovers from a failure by synchronously executing the provided callback.
   ///
@@ -321,13 +311,10 @@ sealed class Result<T extends Object, E extends Object> {
   /// - stackTrace: The stack trace associated with the failure.
   ///
   /// Returns a new `Result` based on the outcome of the [onFailure] callback.
-  Result<T, E> recoverSync(
-    T Function(E exception) onFailure,
-  ) =>
-      switch (this) {
-        Ok() => this,
-        Failure(:final failure) => Result.guardSync(() => onFailure(failure)),
-      };
+  Result<T, E> recoverSync(T Function(E exception) onFailure) => switch (this) {
+    Ok() => this,
+    Failure(:final failure) => Result.guardSync(() => onFailure(failure)),
+  };
 
   /// Recovers from a failure by executing the provided synchronous recovery
   /// function.
@@ -357,12 +344,12 @@ sealed class Result<T extends Object, E extends Object> {
   ///   or a new `Result` based on the outcome of the `onFailure` function.
   FutureResult<T, E> recoverAsync(
     Future<T> Function(E exception) onFailure,
-  ) async =>
-      switch (this) {
-        Ok() => this,
-        Failure(:final failure) =>
-          await Result.guardAsync(() => onFailure(failure)),
-      };
+  ) async => switch (this) {
+    Ok() => this,
+    Failure(:final failure) => await Result.guardAsync(
+      () => onFailure(failure),
+    ),
+  };
 
   /// Filters the `Result` based on a predicate function applied to the
   /// `Ok` value.
@@ -382,12 +369,12 @@ sealed class Result<T extends Object, E extends Object> {
   Result<T, E> where(
     bool Function(T value) predicateOnOk,
     E exceptionOnFalse,
-  ) =>
-      switch (this) {
-        Ok(:final value) when !predicateOnOk(value) =>
-          Result.failure(exceptionOnFalse),
-        _ => this,
-      };
+  ) => switch (this) {
+    Ok(:final value) when !predicateOnOk(value) => Result.failure(
+      exceptionOnFalse,
+    ),
+    _ => this,
+  };
 
   /// Applies a list of predicates with corresponding error functions to the
   /// current `Result` object. If the current object is an `Ok` variant, it
@@ -406,15 +393,14 @@ sealed class Result<T extends Object, E extends Object> {
   ///   depending on the evaluation of the predicates.
   Result<T, E> whereAll(
     List<(bool Function(T value), E Function(T value))> predicatesWithErrors,
-  ) =>
-      switch (this) {
-        Ok(:final value) => predicatesWithErrors.fold(
-            this,
-            (acc, predicatePair) =>
-                acc.where(predicatePair.$1, predicatePair.$2(value)),
-          ),
-        Failure() => this,
-      };
+  ) => switch (this) {
+    Ok(:final value) => predicatesWithErrors.fold(
+      this,
+      (acc, predicatePair) =>
+          acc.where(predicatePair.$1, predicatePair.$2(value)),
+    ),
+    Failure() => this,
+  };
 
   /// Executes the provided callbacks based on the result type.
   ///
@@ -432,20 +418,18 @@ sealed class Result<T extends Object, E extends Object> {
   void tap({
     void Function(T value)? onOk,
     void Function(E failure)? onFailure,
-  }) =>
-      switch (this) {
-        Ok(:final value) => onOk?.call(value),
-        Failure(:final failure) => onFailure?.call(failure)
-      };
+  }) => switch (this) {
+    Ok(:final value) => onOk?.call(value),
+    Failure(:final failure) => onFailure?.call(failure),
+  };
 
   Future<void> tapAsync({
     Future<void> Function(T value)? onOk,
     Future<void> Function(E failure)? onFailure,
-  }) async =>
-      switch (this) {
-        Ok(:final value) => onOk?.call(value),
-        Failure(:final failure) => onFailure?.call(failure)
-      };
+  }) async => switch (this) {
+    Ok(:final value) => onOk?.call(value),
+    Failure(:final failure) => onFailure?.call(failure),
+  };
 
   /// Converts the current result to a nullable value.
   ///
@@ -455,9 +439,9 @@ sealed class Result<T extends Object, E extends Object> {
   /// Returns:
   /// - `T?`: The contained value if the result is `Ok`, otherwise `null`.
   T? toNullable() => switch (this) {
-        Ok(:final value) => value,
-        Failure() => null,
-      };
+    Ok(:final value) => value,
+    Failure() => null,
+  };
 
   /// Convenience method to cast to [Ok]
   @visibleForTesting

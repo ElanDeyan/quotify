@@ -14,12 +14,11 @@ interface class FlutterSecureStorageService {
     String key, {
     AndroidOptions? androidOptions,
     IOSOptions? iosOptions,
-  }) =>
-      _flutterSecureStorage.read(
-        key: key,
-        aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
-        iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
-      );
+  }) => _flutterSecureStorage.read(
+    key: key,
+    aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
+    iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
+  );
 
   /// Writes the [value] to the provided [key].
   Future<void> write(
@@ -27,23 +26,21 @@ interface class FlutterSecureStorageService {
     String value, {
     AndroidOptions? androidOptions,
     IOSOptions? iosOptions,
-  }) =>
-      _flutterSecureStorage.write(
-        key: key,
-        value: value,
-        aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
-        iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
-      );
+  }) => _flutterSecureStorage.write(
+    key: key,
+    value: value,
+    aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
+    iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
+  );
 
   /// Checks if the [key] exists.
   Future<bool> containsKey(
     String key, {
     AndroidOptions? androidOptions,
     IOSOptions? iosOptions,
-  }) =>
-      _flutterSecureStorage.containsKey(
-        key: key,
-        aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
-        iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
-      );
+  }) => _flutterSecureStorage.containsKey(
+    key: key,
+    aOptions: androidOptions ?? _flutterSecureStorage.aOptions,
+    iOptions: iosOptions ?? _flutterSecureStorage.iOptions,
+  );
 }

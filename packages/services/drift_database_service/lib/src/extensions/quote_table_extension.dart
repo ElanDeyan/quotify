@@ -8,14 +8,14 @@ import '../database/app_database.dart';
 extension QuoteTableExtension on QuoteTable {
   /// Converts a [QuoteTable] to a [Quote].
   Quote toQuoteModel() => Quote(
-        id: Id(id.toNatural()),
-        content: NonBlankString(content),
-        author: NonBlankString(author),
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        isFavorite: isFavorite,
-        source: source,
-        sourceUri: sourceUri,
-        tags: UnmodifiableSetView(tags),
-      );
+    id: Id(id.toNatural()),
+    content: NonBlankString(content),
+    author: NonBlankString(author),
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    isFavorite: isFavorite,
+    source: source,
+    sourceUri: sourceUri,
+    tags: UnmodifiableSetView(tags),
+  );
 }

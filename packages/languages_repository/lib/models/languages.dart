@@ -26,16 +26,15 @@ enum Languages {
   /// [LanguageModelErrors.invalidLanguageCodeRepresentation].
   static Result<Languages, LanguageModelErrors> fromLanguageCodeString(
     String languageCode,
-  ) =>
-      switch (languageCode) {
-        'pt_BR' => const Result.ok(Languages.brazilianPortuguese),
-        'es' => const Result.ok(Languages.spanish),
-        'en' => const Result.ok(Languages.english),
-        _ => Result.failure(
-            LanguageModelErrors.invalidLanguageCodeRepresentation,
-            StackTrace.current,
-          ),
-      };
+  ) => switch (languageCode) {
+    'pt_BR' => const Result.ok(Languages.brazilianPortuguese),
+    'es' => const Result.ok(Languages.spanish),
+    'en' => const Result.ok(Languages.english),
+    _ => Result.failure(
+      LanguageModelErrors.invalidLanguageCodeRepresentation,
+      StackTrace.current,
+    ),
+  };
 
   /// This variable serves as a default language setting in the
   /// context of the [Languages] enum.

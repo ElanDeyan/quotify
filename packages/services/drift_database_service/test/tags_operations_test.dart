@@ -53,49 +53,41 @@ void main() {
       expect(database.allTags, completion(hasLength(1)));
     });
 
-    test(
-      'having a tag with same label, will create a new one, '
-      'but with different Id',
-      () async {
-        final sampleEntry =
-            HalfTagEntry(label: NonBlankString(faker.lorem.word()));
+    test('having a tag with same label, will create a new one, '
+        'but with different Id', () async {
+      final sampleEntry = HalfTagEntry(
+        label: NonBlankString(faker.lorem.word()),
+      );
 
-        final firstAdded = await database.createTag(sampleEntry);
-        final secondAdded = await database.createTag(sampleEntry);
+      final firstAdded = await database.createTag(sampleEntry);
+      final secondAdded = await database.createTag(sampleEntry);
 
-        expect(firstAdded, isA<Ok<TagTable, DatabaseErrors>>());
-        expect(secondAdded, isA<Ok<TagTable, DatabaseErrors>>());
+      expect(firstAdded, isA<Ok<TagTable, DatabaseErrors>>());
+      expect(secondAdded, isA<Ok<TagTable, DatabaseErrors>>());
 
-        expect(
-          firstAdded.asOk.value.label,
-          equals(secondAdded.asOk.value.label),
-        );
+      expect(firstAdded.asOk.value.label, equals(secondAdded.asOk.value.label));
 
-        expect(firstAdded.asOk.value.id, isNot(secondAdded.asOk.value.id));
-      },
-    );
+      expect(firstAdded.asOk.value.id, isNot(secondAdded.asOk.value.id));
+    });
 
-    test(
-      'with a full entry, and existing id, should not replace it',
-      () async {
-        final sampleEntry = HalfTagEntry(
-          label: NonBlankString(faker.lorem.word()),
-        );
+    test('with a full entry, and existing id, should not replace it', () async {
+      final sampleEntry = HalfTagEntry(
+        label: NonBlankString(faker.lorem.word()),
+      );
 
-        final addedTag = (await database.createTag(sampleEntry)).asOk.value;
+      final addedTag = (await database.createTag(sampleEntry)).asOk.value;
 
-        final fullEntryWithSameId = FullTagEntry(
-          label: NonBlankString(faker.lorem.word()),
-          id: Id(Natural((await database.allTags).single.id)),
-        );
+      final fullEntryWithSameId = FullTagEntry(
+        label: NonBlankString(faker.lorem.word()),
+        id: Id(Natural((await database.allTags).single.id)),
+      );
 
-        final result = await database.createTag(fullEntryWithSameId);
+      final result = await database.createTag(fullEntryWithSameId);
 
-        expect(result, isA<Failure<TagTable, DatabaseErrors>>());
-        expect(database.allTags, completion(hasLength(1)));
-        expect(database.allTags, completion([addedTag]));
-      },
-    );
+      expect(result, isA<Failure<TagTable, DatabaseErrors>>());
+      expect(database.allTags, completion(hasLength(1)));
+      expect(database.allTags, completion([addedTag]));
+    });
   });
 
   group('getTagById', () {
@@ -120,11 +112,11 @@ void main() {
         addedTagTable = (await database.createTag(sampleEntry)).asOk.value;
       });
 
-      test(
-          'and the existent Id was passed, return the TagTable '
+      test('and the existent Id was passed, return the TagTable '
           'with the passed id', () async {
-        final maybeTag =
-            await database.getTagById(Id(addedTagTable.id.toNatural()));
+        final maybeTag = await database.getTagById(
+          Id(addedTagTable.id.toNatural()),
+        );
 
         expect(maybeTag, equals(addedTagTable));
       });
@@ -156,12 +148,9 @@ void main() {
         firstEntry = HalfTagEntry(label: NonBlankString(faker.lorem.word()));
 
         initialAdded = (await database.createTag(firstEntry)).asOk.value;
-        await Future.delayed(
-          const Duration(seconds: 1),
-          () {
-            // Needed to give time before the next updated operation
-          },
-        );
+        await Future.delayed(const Duration(seconds: 1), () {
+          // Needed to give time before the next updated operation
+        });
 
         secondEntry = FullTagEntry(
           id: Id(initialAdded.id.toNatural()),
@@ -184,17 +173,13 @@ void main() {
 
           expect(
             label,
-            allOf([
-              isNot(initialAdded.label),
-              equals(secondEntry.label),
-            ]),
+            allOf([isNot(initialAdded.label), equals(secondEntry.label)]),
           );
           expect(updatedAt, isNot(initialAdded.updatedAt));
         },
       );
 
-      test(
-          'but inexistent Id was passed, should return a failure '
+      test('but inexistent Id was passed, should return a failure '
           'with DatabaseErrors.cannotUpdateEntry', () async {
         final nonExistentId = Id(Natural(initialAdded.id + 1));
 
@@ -212,10 +197,7 @@ void main() {
         final result = await database.updateTag(secondEntry);
 
         expect(result, isA<Failure<TagTable, DatabaseErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(DatabaseErrors.notFoundId),
-        );
+        expect(result.asFailure.failure, equals(DatabaseErrors.notFoundId));
       });
     });
   });
@@ -272,8 +254,9 @@ void main() {
   group('clearAllTags', () {
     test('should return Ok and have 0 tags in the table', () async {
       for (var i = 0; i < 10; i++) {
-        await database
-            .createTag(HalfTagEntry(label: NonBlankString(faker.lorem.word())));
+        await database.createTag(
+          HalfTagEntry(label: NonBlankString(faker.lorem.word())),
+        );
       }
 
       final result = await database.clearAllTags();
@@ -290,8 +273,9 @@ void main() {
 
     test('with all ids existing, should return exactly N items', () async {
       for (var i = 0; i < 10; i++) {
-        await database
-            .createTag(HalfTagEntry(label: NonBlankString(faker.lorem.word())));
+        await database.createTag(
+          HalfTagEntry(label: NonBlankString(faker.lorem.word())),
+        );
       }
 
       final tags = await database.allTags;
@@ -317,8 +301,10 @@ void main() {
 
         expect(idsInDatabase.contains(missingId), isFalse);
 
-        final foundTags =
-            await database.getTagsWithIds([...idsInDatabase, missingId]);
+        final foundTags = await database.getTagsWithIds([
+          ...idsInDatabase,
+          missingId,
+        ]);
 
         expect(foundTags.map((e) => e.id).contains(missingId.toInt()), isFalse);
         expect(foundTags, equals({...tags}));

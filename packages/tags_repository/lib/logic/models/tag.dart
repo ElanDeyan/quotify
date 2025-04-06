@@ -20,23 +20,17 @@ final class Tag implements Encodable {
   final NonBlankString label;
 
   /// Copies [Tag] with specified parameters.
-  Tag copyWith({
-    Id? id,
-    NonBlankString? label,
-  }) =>
-      Tag(
-        id: id ?? this.id,
-        label: label ?? this.label,
-      );
+  Tag copyWith({Id? id, NonBlankString? label}) =>
+      Tag(id: id ?? this.id, label: label ?? this.label);
 
   @override
   String toJsonString() => jsonEncode(toMap());
 
   @override
   Map<String, Object?> toMap() => <String, Object?>{
-        'id': id.toInt(),
-        'label': label,
-      };
+    'id': id.toInt(),
+    'label': label,
+  };
 
   @override
   bool operator ==(covariant Tag other) =>
@@ -72,8 +66,10 @@ final class Tag implements Encodable {
   ///   - map: A map containing the tag's data.
   /// - Returns: A `Result` containing either a `Tag` object or an error.
   static Result<Tag, TagModelErrors> fromMap(Map<String, Object?> map) {
-    if (map case {'id': final int id, 'label': final String label}
-        when !id.isNegative && label.trim().isNotEmpty) {
+    if (map case {
+      'id': final int id,
+      'label': final String label,
+    } when !id.isNegative && label.trim().isNotEmpty) {
       return Result.ok(
         Tag(id: Id(id.toNatural()), label: NonBlankString(label)),
       );

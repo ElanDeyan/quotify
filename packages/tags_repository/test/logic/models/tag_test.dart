@@ -29,15 +29,9 @@ void main() {
           'label': faker.lorem.word(),
         };
 
-        final tagJsonBlankLabel = <String, Object?>{
-          'id': 10,
-          'label': '',
-        };
+        final tagJsonBlankLabel = <String, Object?>{'id': 10, 'label': ''};
 
-        final tagJsonBothInvalid = <String, Object?>{
-          'id': -20,
-          'label': '',
-        };
+        final tagJsonBothInvalid = <String, Object?>{'id': -20, 'label': ''};
 
         test('should return a Failure with invalid map representation', () {
           for (final sample in [
@@ -86,10 +80,7 @@ void main() {
     });
 
     group('with valid json string but invalid map representation', () {
-      final invalidTagJsonString = jsonEncode({
-        'id': -1,
-        'label': '',
-      });
+      final invalidTagJsonString = jsonEncode({'id': -1, 'label': ''});
 
       test('should return a Failure with invalid map representation', () {
         final result = Tag.fromJsonString(invalidTagJsonString);
@@ -103,10 +94,7 @@ void main() {
 
     group('with valid json string but not a map', () {
       final invalidTagJsonString = jsonEncode([
-        {
-          'id': -1,
-          'label': '',
-        }
+        {'id': -1, 'label': ''},
       ]);
 
       test('should return a Failure with invalid map representation', () {

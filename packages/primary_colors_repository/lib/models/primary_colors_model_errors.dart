@@ -6,5 +6,5 @@ import 'primary_colors_errors.dart';
 enum PrimaryColorsModelErrors implements PrimaryColorsErrors {
   /// Indicates an error where an invalid string representation is encountered
   /// when trying to convert [PrimaryColors] from strings.
-  invalidStringRepresentation;
+  invalidStringRepresentation,
 }

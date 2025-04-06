@@ -18,53 +18,60 @@ void main() {
   late LanguagesRepository languagesRepository;
 
   setUp(() {
-    sharedPreferencesAsyncService =
-        SharedPreferencesAsyncService(MockSharedPreferencesAsync());
+    sharedPreferencesAsyncService = SharedPreferencesAsyncService(
+      MockSharedPreferencesAsync(),
+    );
     languagesRepository = LanguagesRepositoryImpl(
       sharedPreferencesAsyncService,
     );
   });
 
   group('initialize', () {
-    test('when does not have an existent value, sets defaultLanguage',
-        () async {
-      when(
-        () => sharedPreferencesAsyncService
-            .containsKey(LanguagesRepository.languageKey),
-      ).thenAnswer((_) async => false);
-      when(
-        () => sharedPreferencesAsyncService.setString(
-          LanguagesRepository.languageKey,
-          Languages.defaultLanguage.languageCode,
-        ),
-      ).thenAnswer((_) async {});
+    test(
+      'when does not have an existent value, sets defaultLanguage',
+      () async {
+        when(
+          () => sharedPreferencesAsyncService.containsKey(
+            LanguagesRepository.languageKey,
+          ),
+        ).thenAnswer((_) async => false);
+        when(
+          () => sharedPreferencesAsyncService.setString(
+            LanguagesRepository.languageKey,
+            Languages.defaultLanguage.languageCode,
+          ),
+        ).thenAnswer((_) async {});
 
-      await languagesRepository.initialize();
+        await languagesRepository.initialize();
 
-      verify(
-        () => sharedPreferencesAsyncService
-            .containsKey(LanguagesRepository.languageKey),
-      ).called(1);
+        verify(
+          () => sharedPreferencesAsyncService.containsKey(
+            LanguagesRepository.languageKey,
+          ),
+        ).called(1);
 
-      verify(
-        () => sharedPreferencesAsyncService.setString(
-          LanguagesRepository.languageKey,
-          Languages.defaultLanguage.languageCode,
-        ),
-      ).called(1);
-    });
+        verify(
+          () => sharedPreferencesAsyncService.setString(
+            LanguagesRepository.languageKey,
+            Languages.defaultLanguage.languageCode,
+          ),
+        ).called(1);
+      },
+    );
 
     test('when have an existent value, not changes', () async {
       when(
-        () => sharedPreferencesAsyncService
-            .containsKey(LanguagesRepository.languageKey),
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
       ).thenAnswer((_) async => true);
 
       await languagesRepository.initialize();
 
       verify(
-        () => sharedPreferencesAsyncService
-            .containsKey(LanguagesRepository.languageKey),
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
       ).called(1);
 
       verifyNever(
@@ -85,37 +92,34 @@ void main() {
         ),
       );
     });
-    test(
-      'without an already existent value should return a '
-      'Failure with LanguagesRepositoryErrors.missingLanguageCode',
-      () async {
-        when(
-          () => sharedPreferencesAsyncService.containsKey(
-            LanguagesRepository.languageKey,
-          ),
-        ).thenAnswer((_) async => false);
+    test('without an already existent value should return a '
+        'Failure with LanguagesRepositoryErrors.missingLanguageCode', () async {
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
+      ).thenAnswer((_) async => false);
 
-        final result = await languagesRepository.fetchCurrentLanguage();
+      final result = await languagesRepository.fetchCurrentLanguage();
 
-        expect(result, isA<Failure<Languages, LanguageErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(LanguagesRepositoryErrors.missingLanguageCode),
-        );
+      expect(result, isA<Failure<Languages, LanguageErrors>>());
+      expect(
+        result.asFailure.failure,
+        equals(LanguagesRepositoryErrors.missingLanguageCode),
+      );
 
-        verify(
-          () => sharedPreferencesAsyncService.containsKey(
-            LanguagesRepository.languageKey,
-          ),
-        ).called(1);
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
+      ).called(1);
 
-        verifyNever(
-          () => sharedPreferencesAsyncService.getString(
-            LanguagesRepository.languageKey,
-          ),
-        );
-      },
-    );
+      verifyNever(
+        () => sharedPreferencesAsyncService.getString(
+          LanguagesRepository.languageKey,
+        ),
+      );
+    });
 
     test(
       'with an existent value, should return Ok with the Language',
@@ -150,48 +154,45 @@ void main() {
         ).called(1);
       },
     );
-    test(
-      'with an invalid existent value, should return Failure '
-      'with the LanguagesErrors.invalidLanguageCodeRepresentation',
-      () async {
-        final sample = faker.lorem.word();
+    test('with an invalid existent value, should return Failure '
+        'with the LanguagesErrors.invalidLanguageCodeRepresentation', () async {
+      final sample = faker.lorem.word();
 
-        assert(
-          !Languages.values.map((color) => color.languageCode).contains(sample),
-          'Should be an invalid name for this test',
-        );
+      assert(
+        !Languages.values.map((color) => color.languageCode).contains(sample),
+        'Should be an invalid name for this test',
+      );
 
-        when(
-          () => sharedPreferencesAsyncService.containsKey(
-            LanguagesRepository.languageKey,
-          ),
-        ).thenAnswer((_) async => true);
-        when(
-          () => sharedPreferencesAsyncService.getString(
-            LanguagesRepository.languageKey,
-          ),
-        ).thenAnswer((_) async => sample);
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
+      ).thenAnswer((_) async => true);
+      when(
+        () => sharedPreferencesAsyncService.getString(
+          LanguagesRepository.languageKey,
+        ),
+      ).thenAnswer((_) async => sample);
 
-        final result = await languagesRepository.fetchCurrentLanguage();
+      final result = await languagesRepository.fetchCurrentLanguage();
 
-        expect(result, isA<Failure<Languages, LanguageErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(LanguageModelErrors.invalidLanguageCodeRepresentation),
-        );
+      expect(result, isA<Failure<Languages, LanguageErrors>>());
+      expect(
+        result.asFailure.failure,
+        equals(LanguageModelErrors.invalidLanguageCodeRepresentation),
+      );
 
-        verify(
-          () => sharedPreferencesAsyncService.containsKey(
-            LanguagesRepository.languageKey,
-          ),
-        ).called(1);
-        verify(
-          () => sharedPreferencesAsyncService.getString(
-            LanguagesRepository.languageKey,
-          ),
-        ).called(1);
-      },
-    );
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          LanguagesRepository.languageKey,
+        ),
+      ).called(1);
+      verify(
+        () => sharedPreferencesAsyncService.getString(
+          LanguagesRepository.languageKey,
+        ),
+      ).called(1);
+    });
   });
 
   group('setCurrentLanguage', () {
@@ -229,42 +230,39 @@ void main() {
       });
     });
     group('if something went wrong on saving', () {
-      test(
-        'should return a Failure with '
-        'LanguagesRepositoryErrors.failAtSaving',
-        () async {
-          const sample = Languages.spanish;
+      test('should return a Failure with '
+          'LanguagesRepositoryErrors.failAtSaving', () async {
+        const sample = Languages.spanish;
 
-          when(
-            () => sharedPreferencesAsyncService.setString(
-              LanguagesRepository.languageKey,
-              any(),
-            ),
-          ).thenThrow(Exception('oops'));
+        when(
+          () => sharedPreferencesAsyncService.setString(
+            LanguagesRepository.languageKey,
+            any(),
+          ),
+        ).thenThrow(Exception('oops'));
 
-          final result = await languagesRepository.setCurrentLanguage(sample);
+        final result = await languagesRepository.setCurrentLanguage(sample);
 
-          expect(result, isA<Failure<(), LanguageErrors>>());
+        expect(result, isA<Failure<(), LanguageErrors>>());
 
-          verify(
-            () => sharedPreferencesAsyncService.setString(
-              LanguagesRepository.languageKey,
-              sample.languageCode,
-            ),
-          ).called(1);
+        verify(
+          () => sharedPreferencesAsyncService.setString(
+            LanguagesRepository.languageKey,
+            sample.languageCode,
+          ),
+        ).called(1);
 
-          verifyNever(
-            () => sharedPreferencesAsyncService.containsKey(
-              LanguagesRepository.languageKey,
-            ),
-          );
-          verifyNever(
-            () => sharedPreferencesAsyncService.getString(
-              LanguagesRepository.languageKey,
-            ),
-          );
-        },
-      );
+        verifyNever(
+          () => sharedPreferencesAsyncService.containsKey(
+            LanguagesRepository.languageKey,
+          ),
+        );
+        verifyNever(
+          () => sharedPreferencesAsyncService.getString(
+            LanguagesRepository.languageKey,
+          ),
+        );
+      });
     });
   });
 }

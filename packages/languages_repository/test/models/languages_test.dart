@@ -18,13 +18,11 @@ void main() {
   });
 
   group('With invalid language code', () {
-    test(
-        'Languages.fromString should return a Failure with '
+    test('Languages.fromString should return a Failure with '
         'LanguageErrors.invalidLanguageCode', () {
-      final samples = faker.lorem.words(20)
-        ..removeWhere(
-          (word) => Languages.values.map((e) => e.languageCode).contains(word),
-        );
+      final samples = faker.lorem.words(20)..removeWhere(
+        (word) => Languages.values.map((e) => e.languageCode).contains(word),
+      );
 
       for (final sample in samples) {
         final result = Languages.fromLanguageCodeString(sample);

@@ -13,8 +13,6 @@ extension TagModelExtension on Tag {
   /// Returns:
   ///   A `TagsCompanion` instance with the `id` and `label` values
   /// from the `Tag` instance.
-  TagsCompanion toTagsCompanion() => TagsCompanion(
-        id: Value(id.toInt()),
-        label: Value(label),
-      );
+  TagsCompanion toTagsCompanion() =>
+      TagsCompanion(id: Value(id.toInt()), label: Value(label));
 }

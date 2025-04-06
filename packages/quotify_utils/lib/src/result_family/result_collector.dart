@@ -40,9 +40,7 @@ final class ResultCollector<T extends Object, E extends Object> {
   ///
   /// This class can be particularly useful in scenarios where multiple
   /// results need to be aggregated and processed collectively.
-  ResultCollector()
-      : _values = [],
-        _failures = [];
+  ResultCollector() : _values = [], _failures = [];
   final List<T> _values;
   final List<E> _failures;
 
@@ -60,9 +58,9 @@ final class ResultCollector<T extends Object, E extends Object> {
   /// collector.add(Failure('Error'));
   /// ```
   void add(Result<T, E> result) => switch (result) {
-        Ok(:final value) => _values.add(value),
-        Failure(:final failure, stackTrace: _) => _failures.add(failure),
-      };
+    Ok(:final value) => _values.add(value),
+    Failure(:final failure, stackTrace: _) => _failures.add(failure),
+  };
 
   /// Collects the results and returns a [Result] object.
   ///
@@ -75,7 +73,8 @@ final class ResultCollector<T extends Object, E extends Object> {
   /// Returns:
   /// - `Result<List<T>, List<E>>`: A [Result] object containing either the
   ///   list of values or the list of errors and the stack trace.
-  Result<List<T>, List<E>> collect() => _failures.isEmpty
-      ? Result.ok(_values)
-      : Result.failure(_failures, StackTrace.current);
+  Result<List<T>, List<E>> collect() =>
+      _failures.isEmpty
+          ? Result.ok(_values)
+          : Result.failure(_failures, StackTrace.current);
 }

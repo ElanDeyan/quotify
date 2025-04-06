@@ -25,9 +25,9 @@ final class Quote implements Encodable, Queryable {
     this.isFavorite = false,
     this.tags = const UnmodifiableSetView.empty(),
   }) : assert(
-          !updatedAt.isBefore(createdAt),
-          'Updated at should be equal or after createdAt',
-        );
+         !updatedAt.isBefore(createdAt),
+         'Updated at should be equal or after createdAt',
+       );
 
   /// An [Id].
   final Id id;
@@ -71,16 +71,16 @@ final class Quote implements Encodable, Queryable {
 
   @override
   int get hashCode => Object.hashAllUnordered([
-        id,
-        content,
-        author,
-        source,
-        sourceUri,
-        isFavorite,
-        createdAt,
-        updatedAt,
-        tags,
-      ]);
+    id,
+    content,
+    author,
+    source,
+    sourceUri,
+    isFavorite,
+    createdAt,
+    updatedAt,
+    tags,
+  ]);
 
   /// Copies [Quote] with specified parameters.
   Quote copyWith({
@@ -93,36 +93,33 @@ final class Quote implements Encodable, Queryable {
     DateTime? createdAt,
     DateTime? updatedAt,
     UnmodifiableSetView<Tag>? tags,
-  }) =>
-      Quote(
-        id: id ?? this.id,
-        content: content ?? this.content,
-        author: author ?? this.author,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        isFavorite: isFavorite ?? this.isFavorite,
-        source: source ?? this.source,
-        sourceUri: sourceUri ?? this.sourceUri,
-        tags: tags ?? this.tags,
-      );
+  }) => Quote(
+    id: id ?? this.id,
+    content: content ?? this.content,
+    author: author ?? this.author,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    isFavorite: isFavorite ?? this.isFavorite,
+    source: source ?? this.source,
+    sourceUri: sourceUri ?? this.sourceUri,
+    tags: tags ?? this.tags,
+  );
 
   @override
   String toJsonString() => jsonEncode(toMap());
 
   @override
   Map<String, Object?> toMap() => {
-        'id': id.toInt(),
-        'content': content,
-        'author': author,
-        'source': source,
-        'sourceUri': sourceUri,
-        'isFavorite': isFavorite,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        'tags': <Map<String, Object?>>[
-          for (final tag in tags) tag.toMap(),
-        ],
-      };
+    'id': id.toInt(),
+    'content': content,
+    'author': author,
+    'source': source,
+    'sourceUri': sourceUri,
+    'isFavorite': isFavorite,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+    'tags': <Map<String, Object?>>[for (final tag in tags) tag.toMap()],
+  };
 
   /// Creates a `Quote` object from a map representation.
   ///
@@ -245,19 +242,14 @@ final class Quote implements Encodable, Queryable {
 
   @override
   String get asQueryableString {
-    final buffer = StringBuffer()
-      ..writeAll(
-        [
+    final buffer =
+        StringBuffer()..writeAll([
           content,
           author,
           if (source != null) source,
           if (sourceUri != null) sourceUri.toString(),
-          ...tags.map(
-            (e) => e.label,
-          ),
-        ],
-        '\n',
-      );
+          ...tags.map((e) => e.label),
+        ], '\n');
 
     return buffer.toString();
   }
@@ -269,14 +261,13 @@ final class Quote implements Encodable, Queryable {
     bool multiline = true,
     bool dotAll = false,
     bool unicode = false,
-  }) =>
-      RegExp(
-        string,
-        multiLine: multiline,
-        unicode: unicode,
-        dotAll: dotAll,
-        caseSensitive: caseSensitive,
-      ).hasMatch(asQueryableString);
+  }) => RegExp(
+    string,
+    multiLine: multiline,
+    unicode: unicode,
+    dotAll: dotAll,
+    caseSensitive: caseSensitive,
+  ).hasMatch(asQueryableString);
 
   /// Key for using in serialization of quotes.
   static const listOfQuotesJsonKey = 'quotes';

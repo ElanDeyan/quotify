@@ -34,7 +34,9 @@ void main() {
     });
 
     test('with entry, should return a positive length', () async {
-      await database.into(database.quotes).insert(
+      await database
+          .into(database.quotes)
+          .insert(
             PartialQuoteEntry(
               content: NonBlankString(faker.lorem.sentences(10).join(' ')),
               author: NonBlankString(faker.person.name()),
@@ -67,72 +69,63 @@ void main() {
       expect(database.allQuotes, completion(hasLength(1)));
     });
 
-    test(
-      'having a quote with same properties, will create a new one, '
-      'but with different Id',
-      () async {
-        final sampleEntry = PartialQuoteEntry(
-          content: NonBlankString(faker.lorem.sentence()),
-          author: NonBlankString(faker.person.name()),
-        );
+    test('having a quote with same properties, will create a new one, '
+        'but with different Id', () async {
+      final sampleEntry = PartialQuoteEntry(
+        content: NonBlankString(faker.lorem.sentence()),
+        author: NonBlankString(faker.person.name()),
+      );
 
-        final firstAdded = await database.createQuote(sampleEntry);
-        final secondAdded = await database.createQuote(sampleEntry);
+      final firstAdded = await database.createQuote(sampleEntry);
+      final secondAdded = await database.createQuote(sampleEntry);
 
-        expect(firstAdded, isA<Ok<QuoteTable, DatabaseErrors>>());
-        expect(secondAdded, isA<Ok<QuoteTable, DatabaseErrors>>());
+      expect(firstAdded, isA<Ok<QuoteTable, DatabaseErrors>>());
+      expect(secondAdded, isA<Ok<QuoteTable, DatabaseErrors>>());
 
-        expect(
-          firstAdded.asOk.value.content,
-          equals(secondAdded.asOk.value.content),
-        );
-        expect(
-          firstAdded.asOk.value.author,
-          equals(secondAdded.asOk.value.author),
-        );
+      expect(
+        firstAdded.asOk.value.content,
+        equals(secondAdded.asOk.value.content),
+      );
+      expect(
+        firstAdded.asOk.value.author,
+        equals(secondAdded.asOk.value.author),
+      );
 
-        expect(firstAdded.asOk.value.id, isNot(secondAdded.asOk.value.id));
-      },
-    );
+      expect(firstAdded.asOk.value.id, isNot(secondAdded.asOk.value.id));
+    });
 
-    test(
-      'with a full entry, and existing id, should not replace it',
-      () async {
-        final samplePartialEntry = PartialQuoteEntry(
-          content: NonBlankString(faker.lorem.sentence()),
-          author: NonBlankString(faker.person.name()),
-        );
+    test('with a full entry, and existing id, should not replace it', () async {
+      final samplePartialEntry = PartialQuoteEntry(
+        content: NonBlankString(faker.lorem.sentence()),
+        author: NonBlankString(faker.person.name()),
+      );
 
-        final addedQuote =
-            (await database.createQuote(samplePartialEntry)).asOk.value;
+      final addedQuote =
+          (await database.createQuote(samplePartialEntry)).asOk.value;
 
-        final fullEntryWithSameId = FullQuoteEntry(
-          content: NonBlankString(faker.lorem.sentence()),
-          author: NonBlankString(faker.person.name()),
-          id: Id(addedQuote.id.toNatural()),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now().add(const Duration(minutes: 1)),
-        );
+      final fullEntryWithSameId = FullQuoteEntry(
+        content: NonBlankString(faker.lorem.sentence()),
+        author: NonBlankString(faker.person.name()),
+        id: Id(addedQuote.id.toNatural()),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now().add(const Duration(minutes: 1)),
+      );
 
-        final result = await database.createQuote(fullEntryWithSameId);
+      final result = await database.createQuote(fullEntryWithSameId);
 
-        expect(result, isA<Failure<QuoteTable, DatabaseErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(DatabaseErrors.cannotCreateEntry),
-        );
-        expect(database.allQuotes, completion(hasLength(1)));
+      expect(result, isA<Failure<QuoteTable, DatabaseErrors>>());
+      expect(
+        result.asFailure.failure,
+        equals(DatabaseErrors.cannotCreateEntry),
+      );
+      expect(database.allQuotes, completion(hasLength(1)));
 
-        // Converting to Quote model to compare tags set by value
-        final addedQuoteAsQuoteModel = addedQuote.toQuoteModel();
-        final singleQuoteTableAsQuoteModel =
-            (await database.allQuotes).single.toQuoteModel();
-        expect(
-          singleQuoteTableAsQuoteModel,
-          addedQuoteAsQuoteModel,
-        );
-      },
-    );
+      // Converting to Quote model to compare tags set by value
+      final addedQuoteAsQuoteModel = addedQuote.toQuoteModel();
+      final singleQuoteTableAsQuoteModel =
+          (await database.allQuotes).single.toQuoteModel();
+      expect(singleQuoteTableAsQuoteModel, addedQuoteAsQuoteModel);
+    });
   });
 
   group('getQuoteById', () {
@@ -160,11 +153,11 @@ void main() {
         addedQuoteTable = (await database.createQuote(sampleEntry)).asOk.value;
       });
 
-      test(
-          'and the existent Id was passed, return the QuoteTable '
+      test('and the existent Id was passed, return the QuoteTable '
           'with the passed id', () async {
-        final quoteOrNull =
-            await database.getQuoteById(Id(addedQuoteTable.id.toNatural()));
+        final quoteOrNull = await database.getQuoteById(
+          Id(addedQuoteTable.id.toNatural()),
+        );
 
         expect(quoteOrNull, isNotNull);
         expect(quoteOrNull?.id, equals(addedQuoteTable.id));
@@ -184,9 +177,10 @@ void main() {
         expect(
           await database.allQuotes,
           predicate(
-            (List<QuoteTable> quotes) => !quotes
-                .map((quote) => quote.id)
-                .contains(nonExistentId.toInt()),
+            (List<QuoteTable> quotes) =>
+                !quotes
+                    .map((quote) => quote.id)
+                    .contains(nonExistentId.toInt()),
           ),
         );
 
@@ -211,12 +205,9 @@ void main() {
 
         initialAdded =
             (await database.createQuote(firstEntry)).asOk.value.toQuoteModel();
-        await Future.delayed(
-          const Duration(seconds: 1),
-          () {
-            // Needed to give time before the next updated operation
-          },
-        );
+        await Future.delayed(const Duration(seconds: 1), () {
+          // Needed to give time before the next updated operation
+        });
 
         secondEntry = FullQuoteEntry(
           content: NonBlankString(faker.lorem.sentence()),
@@ -246,8 +237,7 @@ void main() {
         },
       );
 
-      test(
-          'but inexistent Id was passed, should return a failure '
+      test('but inexistent Id was passed, should return a failure '
           'with DatabaseErrors.cannotUpdateEntry', () async {
         final nonExistentId = Id(Natural(initialAdded.id.toInt() + 1));
 
@@ -255,9 +245,10 @@ void main() {
           database.allQuotes,
           completion(
             predicate(
-              (List<QuoteTable> quotes) => !quotes
-                  .map((quote) => quote.id)
-                  .contains(nonExistentId.toInt()),
+              (List<QuoteTable> quotes) =>
+                  !quotes
+                      .map((quote) => quote.id)
+                      .contains(nonExistentId.toInt()),
             ),
           ),
         );
@@ -273,10 +264,7 @@ void main() {
         final result = await database.updateQuote(secondEntry);
 
         expect(result, isA<Failure<QuoteTable, DatabaseErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(DatabaseErrors.notFoundId),
-        );
+        expect(result.asFailure.failure, equals(DatabaseErrors.notFoundId));
       });
     });
   });
@@ -317,9 +305,10 @@ void main() {
           database.allQuotes,
           completion(
             predicate(
-              (List<QuoteTable> quotes) => !quotes
-                  .map((quote) => quote.id)
-                  .contains(nonExistentId.toInt()),
+              (List<QuoteTable> quotes) =>
+                  !quotes
+                      .map((quote) => quote.id)
+                      .contains(nonExistentId.toInt()),
             ),
           ),
         );
@@ -352,8 +341,7 @@ void main() {
       expect(database.allQuotes, completion(hasLength(isZero)));
     });
 
-    test(
-        'should return Ok even if table is empty and '
+    test('should return Ok even if table is empty and '
         'have 0 quotes in the table', () async {
       final result = await database.clearAllQuotes();
 
@@ -381,11 +369,10 @@ void main() {
           (await database.allQuotes).map((e) => e.toQuoteModel()).toSet();
       final allIds = quotes.map((quote) => quote.id);
 
-      final quotesWithIds = (await database.getQuotesWithIds(allIds))
-          .map(
-            (e) => e.toQuoteModel(),
-          )
-          .toSet();
+      final quotesWithIds =
+          (await database.getQuotesWithIds(
+            allIds,
+          )).map((e) => e.toQuoteModel()).toSet();
 
       expect(quotesWithIds, equals({...quotes}));
     });
@@ -403,26 +390,19 @@ void main() {
           );
         }
 
-        final quotes = (await database.allQuotes)
-            .map(
-              (e) => e.toQuoteModel(),
-            )
-            .toSet();
+        final quotes =
+            (await database.allQuotes).map((e) => e.toQuoteModel()).toSet();
         final idsInDatabase = quotes.map((quote) => quote.id);
 
         expect(idsInDatabase.contains(missingId), isFalse);
 
         final foundQuotes =
-            (await database.getQuotesWithIds([...idsInDatabase, missingId]))
-                .map(
-                  (e) => e.toQuoteModel(),
-                )
-                .toSet();
+            (await database.getQuotesWithIds([
+              ...idsInDatabase,
+              missingId,
+            ])).map((e) => e.toQuoteModel()).toSet();
 
-        expect(
-          foundQuotes.map((e) => e.id).contains(missingId),
-          isFalse,
-        );
+        expect(foundQuotes.map((e) => e.id).contains(missingId), isFalse);
         expect(foundQuotes, equals({...quotes}));
       },
     );
@@ -453,8 +433,9 @@ void main() {
 
       final sampleId = Id(Natural(faker.randomGenerator.integer(50)));
 
-      final quotesWithInexistentTagId =
-          await database.getQuotesWithTagId(sampleId);
+      final quotesWithInexistentTagId = await database.getQuotesWithTagId(
+        sampleId,
+      );
 
       expect(quotesWithInexistentTagId, isEmpty);
     });
@@ -468,9 +449,7 @@ void main() {
               id: sampleIdForTag,
             ),
           )
-          .then(
-            (value) => value.asOk.value,
-          );
+          .then((value) => value.asOk.value);
 
       final addedTagAsTagModel = addedTag.toTag();
 

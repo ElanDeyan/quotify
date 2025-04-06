@@ -10,12 +10,11 @@ abstract interface class Queryable {
     bool multiline = true,
     bool dotAll = false,
     bool unicode = false,
-  }) =>
-      RegExp(
-        string,
-        caseSensitive: caseSensitive,
-        dotAll: dotAll,
-        multiLine: multiline,
-        unicode: unicode,
-      ).hasMatch(asQueryableString);
+  }) => RegExp(
+    string,
+    caseSensitive: caseSensitive,
+    dotAll: dotAll,
+    multiLine: multiline,
+    unicode: unicode,
+  ).hasMatch(asQueryableString);
 }

@@ -41,24 +41,21 @@ void main() {
       },
     );
 
-    test(
-      'Non valid string should return '
-      'PrimaryColorsErrors.invalidStringRepresentation',
-      () {
-        for (final wrongSample in wrongSamples) {
-          expect(
-            PrimaryColors.fromString(wrongSample),
-            allOf([
-              isA<Failure<PrimaryColors, PrimaryColorsModelErrors>>(),
-              predicate(
-                (Failure<PrimaryColors, PrimaryColorsModelErrors> result) =>
-                    result.failure ==
-                    PrimaryColorsModelErrors.invalidStringRepresentation,
-              ),
-            ]),
-          );
-        }
-      },
-    );
+    test('Non valid string should return '
+        'PrimaryColorsErrors.invalidStringRepresentation', () {
+      for (final wrongSample in wrongSamples) {
+        expect(
+          PrimaryColors.fromString(wrongSample),
+          allOf([
+            isA<Failure<PrimaryColors, PrimaryColorsModelErrors>>(),
+            predicate(
+              (Failure<PrimaryColors, PrimaryColorsModelErrors> result) =>
+                  result.failure ==
+                  PrimaryColorsModelErrors.invalidStringRepresentation,
+            ),
+          ]),
+        );
+      }
+    });
   });
 }

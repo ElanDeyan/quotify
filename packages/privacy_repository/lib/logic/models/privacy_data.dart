@@ -48,21 +48,19 @@ final class PrivacyData implements Encodable {
   /// pair.
   @override
   Map<String, Object?> toMap() => {
-        PrivacyRepository.allowErrorReportingKey: allowErrorReporting,
-        PrivacyRepository.acceptedDataUsageKey: acceptedDataUsage,
-      };
+    PrivacyRepository.allowErrorReportingKey: allowErrorReporting,
+    PrivacyRepository.acceptedDataUsageKey: acceptedDataUsage,
+  };
 
   /// Returns a [Result] with either [Ok], with a [PrivacyData] object, or a
   /// [Failure] with some of [PrivacyDataModelErrors] enum members.
   static Result<PrivacyData, PrivacyDataModelErrors> fromMap(
     Map<String, Object?> map,
   ) {
-    if (map
-        case {
-          PrivacyRepository.allowErrorReportingKey: final bool
-              allowErrorReporting,
-          PrivacyRepository.acceptedDataUsageKey: final bool acceptedDataUsage,
-        }) {
+    if (map case {
+      PrivacyRepository.allowErrorReportingKey: final bool allowErrorReporting,
+      PrivacyRepository.acceptedDataUsageKey: final bool acceptedDataUsage,
+    }) {
       return Result.ok(
         PrivacyData(
           acceptedDataUsage: acceptedDataUsage,
@@ -109,9 +107,9 @@ final class PrivacyData implements Encodable {
 
   /// Helper to convert to [PrivacyDataEntry].
   PrivacyDataEntry toPrivacyDataEntry() => PrivacyDataEntry(
-        allowErrorReporting: allowErrorReporting,
-        acceptedDataUsage: acceptedDataUsage,
-      );
+    allowErrorReporting: allowErrorReporting,
+    acceptedDataUsage: acceptedDataUsage,
+  );
 
   /// Key for using in serialization.
   static const jsonKey = 'privacyData';

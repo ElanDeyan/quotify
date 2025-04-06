@@ -9,5 +9,5 @@ enum ThemeBrightnessModelErrors implements ThemeBrightnessErrors {
   /// Represents an invalid [String] representation related to the
   /// [ThemeBrightness]. This error can be used to handle situations where
   /// a [String] does not match any valid representation.
-  invalidStringRepresentation;
+  invalidStringRepresentation,
 }

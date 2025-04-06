@@ -15,8 +15,10 @@ extension TagEntryExtension on TagEntry {
   /// - For `FullTagEntry`, it will create a `TagsCompanion` with both `id` and
   /// `label` fields.
   TagsCompanion toTagsCompanion() => switch (this) {
-        HalfTagEntry(:final label) => TagsCompanion(label: Value(label)),
-        FullTagEntry(:final label, :final id) =>
-          TagsCompanion(id: Value(id.toInt()), label: Value(label)),
-      };
+    HalfTagEntry(:final label) => TagsCompanion(label: Value(label)),
+    FullTagEntry(:final label, :final id) => TagsCompanion(
+      id: Value(id.toInt()),
+      label: Value(label),
+    ),
+  };
 }

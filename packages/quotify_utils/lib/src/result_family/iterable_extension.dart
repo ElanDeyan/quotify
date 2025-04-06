@@ -13,6 +13,5 @@ extension IterableExtension<T extends Object> on Iterable<T> {
   /// - Returns: An iterable of `Result<T, E>` objects.
   Iterable<Result<T, E>> mapResults<E extends Exception>(
     Result<T, E> Function(T element) toResult,
-  ) =>
-      map(toResult);
+  ) => map(toResult);
 }

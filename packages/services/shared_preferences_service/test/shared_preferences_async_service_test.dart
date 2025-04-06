@@ -25,10 +25,7 @@ void main() {
       final sampleKey = faker.lorem.word();
       final result = await service.containsKey(sampleKey);
 
-      expect(
-        result,
-        await sharedPreferencesAsync.containsKey(sampleKey),
-      );
+      expect(result, await sharedPreferencesAsync.containsKey(sampleKey));
     });
 
     test('getString (with an already existent value)', () async {
@@ -57,8 +54,8 @@ void main() {
         containsOnce(isMethodCall('getString', arguments: [sampleKey])),
       );
 
-      final inexistentValueFromSharedPreferences =
-          await sharedPreferencesAsync.getString(sampleKey);
+      final inexistentValueFromSharedPreferences = await sharedPreferencesAsync
+          .getString(sampleKey);
 
       expect(inexistentValueFromService, inexistentValueFromSharedPreferences);
       expect(inexistentValueFromService, isNull);

@@ -13,9 +13,7 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   ///
   /// You must call [initialize] to ensure that you will have a default value
   /// if missing.
-  PrimaryColorsRepositoryImpl(
-    this._sharedPreferencesAsyncService,
-  );
+  PrimaryColorsRepositoryImpl(this._sharedPreferencesAsyncService);
 
   final _log = Logger('PrimaryColorsRepositoryImpl');
 
@@ -28,8 +26,9 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
   Future<void> initialize() => _setDefaultIfMissing();
 
   Future<void> _setDefaultIfMissing() async {
-    if (await _sharedPreferencesAsyncService
-        .containsKey(PrimaryColorsRepository.primaryColorKey)) {
+    if (await _sharedPreferencesAsyncService.containsKey(
+      PrimaryColorsRepository.primaryColorKey,
+    )) {
       return;
     }
 
@@ -38,8 +37,9 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
 
   @override
   FutureResult<PrimaryColors, PrimaryColorsErrors> fetchPrimaryColor() async {
-    if (!(await _sharedPreferencesAsyncService
-        .containsKey(PrimaryColorsRepository.primaryColorKey))) {
+    if (!(await _sharedPreferencesAsyncService.containsKey(
+      PrimaryColorsRepository.primaryColorKey,
+    ))) {
       _log.warning(
         'Missing primary color key',
         PrimaryColorsRepositoryErrors.missing,
@@ -50,8 +50,9 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
         StackTrace.current,
       );
     }
-    final storedValue = await _sharedPreferencesAsyncService
-        .getString(PrimaryColorsRepository.primaryColorKey);
+    final storedValue = await _sharedPreferencesAsyncService.getString(
+      PrimaryColorsRepository.primaryColorKey,
+    );
 
     return PrimaryColors.fromString(storedValue ?? '');
   }
@@ -68,11 +69,7 @@ final class PrimaryColorsRepositoryImpl implements PrimaryColorsRepository {
 
       return const Result.ok(());
     } on Object catch (error, stackTrace) {
-      _log.warning(
-        'Failed in save $primaryColor',
-        error,
-        stackTrace,
-      );
+      _log.warning('Failed in save $primaryColor', error, stackTrace);
 
       return Result.failure(
         PrimaryColorsRepositoryErrors.failAtSaving,

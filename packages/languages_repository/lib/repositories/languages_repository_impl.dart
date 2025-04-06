@@ -20,8 +20,9 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
   Future<void> initialize() => _setDefaultIfMissing();
 
   Future<void> _setDefaultIfMissing() async {
-    if (await _sharedPreferencesAsyncService
-        .containsKey(LanguagesRepository.languageKey)) {
+    if (await _sharedPreferencesAsyncService.containsKey(
+      LanguagesRepository.languageKey,
+    )) {
       return;
     }
 
@@ -30,8 +31,9 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
 
   @override
   FutureResult<Languages, LanguageErrors> fetchCurrentLanguage() async {
-    if (!(await _sharedPreferencesAsyncService
-        .containsKey(LanguagesRepository.languageKey))) {
+    if (!(await _sharedPreferencesAsyncService.containsKey(
+      LanguagesRepository.languageKey,
+    ))) {
       _log.warning(
         'Missing language code value',
         LanguagesRepositoryErrors.missingLanguageCode,
@@ -43,8 +45,9 @@ final class LanguagesRepositoryImpl implements LanguagesRepository {
       );
     }
 
-    final storedValue = await _sharedPreferencesAsyncService
-        .getString(LanguagesRepository.languageKey);
+    final storedValue = await _sharedPreferencesAsyncService.getString(
+      LanguagesRepository.languageKey,
+    );
 
     return Languages.fromLanguageCodeString(storedValue ?? '');
   }

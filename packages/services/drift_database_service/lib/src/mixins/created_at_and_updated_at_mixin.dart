@@ -16,7 +16,6 @@ mixin CreatedAtAndUpdatedAtMixin on Table {
       dateTime().clientDefault(DateTime.now)();
 
   /// Updated at [Column].
-  late final Column<DateTime> updatedAt = dateTime().clientDefault(
-    DateTime.now,
-  )();
+  late final Column<DateTime> updatedAt =
+      dateTime().clientDefault(DateTime.now)();
 }

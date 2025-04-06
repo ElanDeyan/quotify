@@ -19,5 +19,5 @@ enum PrimaryColorsRepositoryErrors implements PrimaryColorsErrors {
 
   /// This can be used as a catch-all for any unexpected errors that do not
   ///  fall under the specific categories.
-  unknown;
+  unknown,
 }

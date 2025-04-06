@@ -27,32 +27,33 @@ final RootIsolateToken _token = RootIsolateToken.instance!;
 /// - Disabling double-quoted string literals for SQLCipher.
 ///
 /// Returns a [DatabaseConnection] that is ready to use.
-DatabaseConnection connect(String encryptionPassPhrase) =>
-    DatabaseConnection.delayed(
-      Future(
-        () async => NativeDatabase.createBackgroundConnection(
-          File((await _databaseFile).encryptedDbPath),
-          isolateSetup: () async {
-            BackgroundIsolateBinaryMessenger.ensureInitialized(_token);
-            await setupSqlCipher();
-          },
-          setup: (database) {
-            assert(
-              _debugCheckHasCipher(database),
-              'Read more in '
-              'https://drift.simonbinder.eu/platforms/encryption/?h=sqlciph#important-notice',
-            );
-            database.execute("PRAGMA key = '$encryptionPassPhrase';");
+DatabaseConnection connect(
+  String encryptionPassPhrase,
+) => DatabaseConnection.delayed(
+  Future(
+    () async => NativeDatabase.createBackgroundConnection(
+      File((await _databaseFile).encryptedDbPath),
+      isolateSetup: () async {
+        BackgroundIsolateBinaryMessenger.ensureInitialized(_token);
+        await setupSqlCipher();
+      },
+      setup: (database) {
+        assert(
+          _debugCheckHasCipher(database),
+          'Read more in '
+          'https://drift.simonbinder.eu/platforms/encryption/?h=sqlciph#important-notice',
+        );
+        database.execute("PRAGMA key = '$encryptionPassPhrase';");
 
-            // Recommended option, not enabled by default on SQLCipher
-            database.config.doubleQuotedStringLiterals = false;
-          },
-        ),
-      ),
-    );
+        // Recommended option, not enabled by default on SQLCipher
+        database.config.doubleQuotedStringLiterals = false;
+      },
+    ),
+  ),
+);
 
 Future<({String encryptedDbPath, String nonEncryptedDbPath})>
-    get _databaseFile async {
+get _databaseFile async {
   final appDir = await getApplicationDocumentsDirectory();
 
   final encryptedDbPath = p.join(appDir.path, 'quotify.db.enc');
@@ -60,7 +61,7 @@ Future<({String encryptedDbPath, String nonEncryptedDbPath})>
 
   return (
     encryptedDbPath: encryptedDbPath,
-    nonEncryptedDbPath: nonEncryptedDbPath
+    nonEncryptedDbPath: nonEncryptedDbPath,
   );
 }
 

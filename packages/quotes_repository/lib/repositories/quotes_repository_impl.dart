@@ -15,7 +15,7 @@ import 'quotes_repository.dart';
 final class QuotesRepositoryImpl implements QuotesRepository {
   /// Implementation of [QuotesRepository].
   const QuotesRepositoryImpl({required AppDatabase appDatabase})
-      : _appDatabase = appDatabase;
+    : _appDatabase = appDatabase;
 
   final AppDatabase _appDatabase;
 
@@ -30,7 +30,9 @@ final class QuotesRepositoryImpl implements QuotesRepository {
 
   @override
   FutureResult<Quote, QuoteErrors> createQuote(PartialQuoteEntry entry) =>
-      _appDatabase.createQuote(entry).then(
+      _appDatabase
+          .createQuote(entry)
+          .then(
             (value) => value.mapSync(
               (value) => value.toQuoteModel(),
               failureMapper: (_) => QuoteRepositoryErrors.cannotCreateQuote,
@@ -40,20 +42,21 @@ final class QuotesRepositoryImpl implements QuotesRepository {
   @override
   FutureResult<Unit, QuoteErrors> deleteAllQuotes() =>
       _appDatabase.clearAllQuotes().then(
-            (value) => value.mapSync(
-              (value) => value,
-              failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteAllQuotes,
-            ),
-          );
+        (value) => value.mapSync(
+          (value) => value,
+          failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteAllQuotes,
+        ),
+      );
 
   @override
-  FutureResult<Quote, QuoteErrors> deleteQuote(Id quoteId) =>
-      _appDatabase.deleteQuote(quoteId).then(
-            (value) => value.mapSync(
-              (value) => value.toQuoteModel(),
-              failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteQuote,
-            ),
-          );
+  FutureResult<Quote, QuoteErrors> deleteQuote(Id quoteId) => _appDatabase
+      .deleteQuote(quoteId)
+      .then(
+        (value) => value.mapSync(
+          (value) => value.toQuoteModel(),
+          failureMapper: (_) => QuoteRepositoryErrors.cannotDeleteQuote,
+        ),
+      );
 
   @override
   Future<UnmodifiableListView<Quote>> get favorites async {
@@ -67,19 +70,13 @@ final class QuotesRepositoryImpl implements QuotesRepository {
 
   @override
   Future<Quote?> getQuoteById(Id quoteId) =>
-      _appDatabase.getQuoteById(quoteId).then(
-            (value) => value?.toQuoteModel(),
-          );
+      _appDatabase.getQuoteById(quoteId).then((value) => value?.toQuoteModel());
 
   @override
   Future<UnmodifiableListView<Quote>> getQuotesWithTag(Id id) async {
     final quotesWithTag = await _appDatabase.getQuotesWithTagId(id);
 
-    return UnmodifiableListView(
-      quotesWithTag.map(
-        (e) => e.toQuoteModel(),
-      ),
-    );
+    return UnmodifiableListView(quotesWithTag.map((e) => e.toQuoteModel()));
   }
 
   @override
@@ -95,7 +92,9 @@ final class QuotesRepositoryImpl implements QuotesRepository {
 
   @override
   FutureResult<Quote, QuoteErrors> updateQuote(FullQuoteEntry entry) =>
-      _appDatabase.updateQuote(entry).then(
+      _appDatabase
+          .updateQuote(entry)
+          .then(
             (value) => value.mapSync(
               (value) => value.toQuoteModel(),
               failureMapper: (_) => QuoteRepositoryErrors.cannotUpdateQuote,

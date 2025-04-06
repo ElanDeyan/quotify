@@ -43,34 +43,25 @@ void main() {
 
   group('fromMap', () {
     group('with correct map', () {
-      test(
-        'should return Ok with privacy data',
-        () {
-          final map = privacyData.toMap();
+      test('should return Ok with privacy data', () {
+        final map = privacyData.toMap();
 
-          final result = PrivacyData.fromMap(map);
+        final result = PrivacyData.fromMap(map);
 
-          expect(result, isA<Ok<PrivacyData, PrivacyDataModelErrors>>());
-          expect(result.asOk.value, equals(privacyData));
-        },
-      );
+        expect(result, isA<Ok<PrivacyData, PrivacyDataModelErrors>>());
+        expect(result.asOk.value, equals(privacyData));
+      });
     });
 
     group('with invalid map', () {
       const sampleMap = <String, Object?>{};
 
-      test(
-        'should return Failure with PrivacyDataErrors.invalidMapFormat',
-        () {
-          final result = PrivacyData.fromMap(sampleMap);
-          expect(result, isA<Failure<PrivacyData, PrivacyDataModelErrors>>());
-          final failure = result.asFailure.failure;
-          expect(
-            failure,
-            equals(PrivacyDataModelErrors.invalidMapFormat),
-          );
-        },
-      );
+      test('should return Failure with PrivacyDataErrors.invalidMapFormat', () {
+        final result = PrivacyData.fromMap(sampleMap);
+        expect(result, isA<Failure<PrivacyData, PrivacyDataModelErrors>>());
+        final failure = result.asFailure.failure;
+        expect(failure, equals(PrivacyDataModelErrors.invalidMapFormat));
+      });
     });
   });
 
@@ -91,24 +82,18 @@ void main() {
       ];
       const invalidJson = '';
 
-      test(
-        'should return a Failure with '
-        'PrivacyDataErrors.invalidJsonStringFormat',
-        () {
-          for (final sample
-              in [sampleMap, sampleList, invalidJson].map(jsonEncode)) {
-            final result = PrivacyData.fromJsonString(sample);
-            expect(
-              result,
-              isA<Failure<PrivacyData, PrivacyDataModelErrors>>(),
-            );
-            expect(
-              result.asFailure.failure,
-              isA<PrivacyDataModelErrors>(),
-            );
-          }
-        },
-      );
+      test('should return a Failure with '
+          'PrivacyDataErrors.invalidJsonStringFormat', () {
+        for (final sample in [
+          sampleMap,
+          sampleList,
+          invalidJson,
+        ].map(jsonEncode)) {
+          final result = PrivacyData.fromJsonString(sample);
+          expect(result, isA<Failure<PrivacyData, PrivacyDataModelErrors>>());
+          expect(result.asFailure.failure, isA<PrivacyDataModelErrors>());
+        }
+      });
     });
 
     group('with valid json string', () {

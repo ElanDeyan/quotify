@@ -57,15 +57,17 @@ void main() {
         expect(emptyStackTrace == currentStackTrace, isFalse);
       });
 
-      test('Failure == Failure, with same failure and stackTrace are equal',
-          () {
-        // ignore: prefer_const_constructors
-        final emptyStackTrace = Result.failure('oops', StackTrace.empty);
-        // ignore: prefer_const_constructors
-        final emptyStackTraceToo = Result.failure('oops', StackTrace.empty);
+      test(
+        'Failure == Failure, with same failure and stackTrace are equal',
+        () {
+          // ignore: prefer_const_constructors
+          final emptyStackTrace = Result.failure('oops', StackTrace.empty);
+          // ignore: prefer_const_constructors
+          final emptyStackTraceToo = Result.failure('oops', StackTrace.empty);
 
-        expect(emptyStackTrace == emptyStackTraceToo, isTrue);
-      });
+          expect(emptyStackTrace == emptyStackTraceToo, isTrue);
+        },
+      );
     });
   });
   group('Result.guardSync', () {
@@ -135,16 +137,19 @@ void main() {
       expect(result.asFailure.failure, isA<ArithmeticException>());
     });
 
-    test('should return the onTimeoutFailure when Timeout exceeds fails',
-        () async {
-      final result = await Result.guardAsyncWithTimeout<double, Exception>(
-        () => Future.delayed(const Duration(seconds: 10), () => divide(10, 0)),
-        timeout: const Duration(seconds: 1),
-        failureOnTimeout: TimeoutException('oops'),
-      );
-      expect(result, isA<Failure>());
-      expect(result.asFailure.failure, isA<TimeoutException>());
-    });
+    test(
+      'should return the onTimeoutFailure when Timeout exceeds fails',
+      () async {
+        final result = await Result.guardAsyncWithTimeout<double, Exception>(
+          () =>
+              Future.delayed(const Duration(seconds: 10), () => divide(10, 0)),
+          timeout: const Duration(seconds: 1),
+          failureOnTimeout: TimeoutException('oops'),
+        );
+        expect(result, isA<Failure>());
+        expect(result.asFailure.failure, isA<TimeoutException>());
+      },
+    );
 
     test('should rethrow the exception if is not the expected type', () async {
       expect(
@@ -171,8 +176,10 @@ void main() {
     });
 
     test('failure instances throws their failures', () {
-      final aFailure =
-          Result<Unit, Exception>.failure(Exception('oops'), StackTrace.empty);
+      final aFailure = Result<Unit, Exception>.failure(
+        Exception('oops'),
+        StackTrace.empty,
+      );
 
       expect(aFailure.unwrap, throwsException);
     });
@@ -185,38 +192,28 @@ void main() {
       // ignore: prefer_const_constructors
       final myName = Result.ok(deyan);
 
-      final nameLength = myName.mapSync(
-        (value) => value.length,
-      );
+      final nameLength = myName.mapSync((value) => value.length);
 
       expect(nameLength, isA<Ok<int, Object>>());
       expect(nameLength.asOk.value, equals(deyan.length));
     });
 
-    test(
-        'failure instances returns the original failure and stackTraces '
+    test('failure instances returns the original failure and stackTraces '
         'wrapped into a result', () {
       final exception = Exception('oops');
-      final myFailure = Result<String, Exception>.failure(
-        exception,
-      );
+      final myFailure = Result<String, Exception>.failure(exception);
 
-      final wouldBeNameLength = myFailure.mapSync(
-        (value) => value.length,
-      );
+      final wouldBeNameLength = myFailure.mapSync((value) => value.length);
 
       expect(wouldBeNameLength, isA<Failure<int, Object>>());
       expect(wouldBeNameLength.asFailure.failure, equals(exception));
     });
 
-    test(
-        'even when callback throws failure instances returns the original '
+    test('even when callback throws failure instances returns the original '
         'failure and stackTraces wrapped into a result', () {
       final exception = Exception('oops');
 
-      final myFailure = Result<String, Exception>.failure(
-        exception,
-      );
+      final myFailure = Result<String, Exception>.failure(exception);
 
       final wouldBeNameLength = myFailure.mapSync(
         (value) => throw const FormatException('a different exception'),
@@ -234,22 +231,17 @@ void main() {
       // ignore: prefer_const_constructors
       final myName = Result.ok(deyan);
 
-      final nameLength = myName.mapAsync(
-        (value) async => value.length,
-      );
+      final nameLength = myName.mapAsync((value) async => value.length);
 
       expect(nameLength, completion(isA<Ok<int, Object>>()));
       expect((await nameLength).asOk.value, equals(deyan.length));
     });
 
-    test(
-        'failure instances returns the original failure and stackTraces '
+    test('failure instances returns the original failure and stackTraces '
         'wrapped into a result', () async {
       final exception = Exception('oops');
 
-      final myFailure = Result<String, Exception>.failure(
-        exception,
-      );
+      final myFailure = Result<String, Exception>.failure(exception);
 
       final wouldBeNameLength = myFailure.mapAsync(
         (value) async => value.length,
@@ -260,14 +252,11 @@ void main() {
       expect((await wouldBeNameLength).asFailure.failure, equals(exception));
     });
 
-    test(
-        'even when callback throws failure instances returns the original '
+    test('even when callback throws failure instances returns the original '
         'failure and stackTraces wrapped into a result', () async {
       final exception = Exception('oops');
 
-      final myFailure = Result<String, Exception>.failure(
-        exception,
-      );
+      final myFailure = Result<String, Exception>.failure(exception);
 
       final wouldBeNameLength = myFailure.mapAsync(
         (value) =>

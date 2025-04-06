@@ -62,10 +62,7 @@ base class FakeSharedPreferencesAsync extends SharedPreferencesAsyncPlatform {
     SharedPreferencesOptions options,
   ) {
     log.add(
-      MethodCall(
-        'getPreferences',
-        <Object>[...?parameters.filter.allowList],
-      ),
+      MethodCall('getPreferences', <Object>[...?parameters.filter.allowList]),
     );
     return backend.getPreferences(parameters, options);
   }

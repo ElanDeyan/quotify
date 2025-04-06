@@ -17,10 +17,12 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
 
   @override
   FutureResult<PrivacyData, PrivacyRepositoryErrors> fetchPrivacyData() async {
-    final acceptedDataUsageString = await _secureStorageService
-        .read(PrivacyRepository.acceptedDataUsageKey);
-    final allowErrorReportingString = await _secureStorageService
-        .read(PrivacyRepository.allowErrorReportingKey);
+    final acceptedDataUsageString = await _secureStorageService.read(
+      PrivacyRepository.acceptedDataUsageKey,
+    );
+    final allowErrorReportingString = await _secureStorageService.read(
+      PrivacyRepository.allowErrorReportingKey,
+    );
     if (acceptedDataUsageString == null || allowErrorReportingString == null) {
       return Result.failure(
         PrivacyRepositoryErrors.missingSomeKey,
@@ -53,12 +55,13 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
     const numbers = '0123456789';
     const specialChars = r'!@#$%&*(){}[]\|?/+=_-';
 
-    final requiredChars = [
-      lowerCaseLetters[Random.secure().nextInt(lowerCaseLetters.length)],
-      upperCaseLetters[Random.secure().nextInt(upperCaseLetters.length)],
-      numbers[Random.secure().nextInt(numbers.length)],
-      specialChars[Random.secure().nextInt(specialChars.length)],
-    ].join();
+    final requiredChars =
+        [
+          lowerCaseLetters[Random.secure().nextInt(lowerCaseLetters.length)],
+          upperCaseLetters[Random.secure().nextInt(upperCaseLetters.length)],
+          numbers[Random.secure().nextInt(numbers.length)],
+          specialChars[Random.secure().nextInt(specialChars.length)],
+        ].join();
 
     final allowedChars =
         lowerCaseLetters + upperCaseLetters + numbers + specialChars;
@@ -66,8 +69,9 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
     final passwordChars = String.fromCharCodes(
       List.generate(
         passwordLength - requiredChars.length,
-        (_) => allowedChars
-            .codeUnitAt(Random.secure().nextInt(allowedChars.length)),
+        (_) => allowedChars.codeUnitAt(
+          Random.secure().nextInt(allowedChars.length),
+        ),
       ),
     );
 
@@ -108,9 +112,10 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
 
   @override
   FutureResult<(), PrivacyRepositoryErrors>
-      setEncryptionPasswordIfMissing() async {
-    if (!(await _secureStorageService
-        .containsKey(PrivacyRepository.dataEncryptionKey))) {
+  setEncryptionPasswordIfMissing() async {
+    if (!(await _secureStorageService.containsKey(
+      PrivacyRepository.dataEncryptionKey,
+    ))) {
       return (await Result.guardAsync(setEncryptionPassword)).mapAsync(
         (value) async => (),
         failureMapper: (_) => PrivacyRepositoryErrors.failAtWriting,
@@ -124,45 +129,49 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   FutureResult<(), PrivacyRepositoryErrors> setPrivacyDataIfMissing() async {
     final PrivacyData(
       acceptedDataUsage: defaultAcceptedDataUsage,
-      allowErrorReporting: defaultAllowErrorReporting
+      allowErrorReporting: defaultAllowErrorReporting,
     ) = const PrivacyData.initial();
 
-    final allowErrorReportingEntry = await _secureStorageService
-            .containsKey(PrivacyRepository.allowErrorReportingKey)
-        ? null
-        : defaultAllowErrorReporting;
+    final allowErrorReportingEntry =
+        await _secureStorageService.containsKey(
+              PrivacyRepository.allowErrorReportingKey,
+            )
+            ? null
+            : defaultAllowErrorReporting;
 
-    final acceptedDataUsageEntry = await _secureStorageService
-            .containsKey(PrivacyRepository.acceptedDataUsageKey)
-        ? null
-        : defaultAcceptedDataUsage;
+    final acceptedDataUsageEntry =
+        await _secureStorageService.containsKey(
+              PrivacyRepository.acceptedDataUsageKey,
+            )
+            ? null
+            : defaultAcceptedDataUsage;
 
-    return Result.guardAsync(
-      () async {
-        await savePrivacyData(
-          PrivacyDataEntry(
-            allowErrorReporting: allowErrorReportingEntry,
-            acceptedDataUsage: acceptedDataUsageEntry,
-          ),
-        );
+    return Result.guardAsync(() async {
+      await savePrivacyData(
+        PrivacyDataEntry(
+          allowErrorReporting: allowErrorReportingEntry,
+          acceptedDataUsage: acceptedDataUsageEntry,
+        ),
+      );
 
-        return ();
-      },
-    );
+      return ();
+    });
   }
 
   @override
   FutureResult<(), PrivacyRepositoryErrors> savePrivacyData(
     PrivacyDataEntry privacyDataEntry,
   ) async {
-    final hasAllowErrorReportingKey = await _secureStorageService
-        .containsKey(PrivacyRepository.allowErrorReportingKey);
-    final hasAcceptedDataUsageKey = await _secureStorageService
-        .containsKey(PrivacyRepository.acceptedDataUsageKey);
+    final hasAllowErrorReportingKey = await _secureStorageService.containsKey(
+      PrivacyRepository.allowErrorReportingKey,
+    );
+    final hasAcceptedDataUsageKey = await _secureStorageService.containsKey(
+      PrivacyRepository.acceptedDataUsageKey,
+    );
 
     final notHasAllowErrorReportingKeyAndNullValuePassed =
         !hasAllowErrorReportingKey &&
-            privacyDataEntry.allowErrorReporting == null;
+        privacyDataEntry.allowErrorReporting == null;
 
     final notHasAcceptedDataUsageKeyAndNullValuePassed =
         !hasAcceptedDataUsageKey && privacyDataEntry.acceptedDataUsage == null;
@@ -194,17 +203,19 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
 
   @override
   FutureResult<String, PrivacyRepositoryErrors>
-      fetchEncryptionPassword() async {
-    if (!(await _secureStorageService
-        .containsKey(PrivacyRepository.dataEncryptionKey))) {
+  fetchEncryptionPassword() async {
+    if (!(await _secureStorageService.containsKey(
+      PrivacyRepository.dataEncryptionKey,
+    ))) {
       return Result.failure(
         PrivacyRepositoryErrors.missingSomeKey,
         StackTrace.current,
       );
     }
 
-    final encryptionKey =
-        await _secureStorageService.read(PrivacyRepository.dataEncryptionKey);
+    final encryptionKey = await _secureStorageService.read(
+      PrivacyRepository.dataEncryptionKey,
+    );
 
     if (encryptionKey == null) {
       return Result.failure(
@@ -245,14 +256,12 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
   FutureResult<(), Object> setEncryptionPassword() {
     final password = generateRandomSecurePassword();
 
-    return Result.guardAsync(
-      () async {
-        await _secureStorageService.write(
-          PrivacyRepository.dataEncryptionKey,
-          password,
-        );
-        return ();
-      },
-    );
+    return Result.guardAsync(() async {
+      await _secureStorageService.write(
+        PrivacyRepository.dataEncryptionKey,
+        password,
+      );
+      return ();
+    });
   }
 }

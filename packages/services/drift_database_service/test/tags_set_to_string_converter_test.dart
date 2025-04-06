@@ -50,14 +50,10 @@ void main() {
       id: Id(faker.randomGenerator.integer(50).toNatural()),
       label: NonBlankString(faker.lorem.word()),
     );
-    final withValidTagMap = jsonEncode([
-      sampleTag.toMap(),
-    ]);
+    final withValidTagMap = jsonEncode([sampleTag.toMap()]);
     final withOneValidAndOneInvalidTagMap = jsonEncode([
       sampleTag.toMap(),
-      {
-        'uepaa': 'ratinhoo',
-      }
+      {'uepaa': 'ratinhoo'},
     ]);
 
     test('with non valid list of maps, returns empty set', () {
@@ -69,13 +65,14 @@ void main() {
       expect(converter.fromSql(emptyList), equals(<Tag>{}));
     });
 
-    test('with list of maps with only valid ones, returns set with the tag',
-        () {
-      expect(converter.fromSql(withValidTagMap), equals(<Tag>{sampleTag}));
-    });
-
     test(
-        'with list of maps with invalid maps, returns set with the valid '
+      'with list of maps with only valid ones, returns set with the tag',
+      () {
+        expect(converter.fromSql(withValidTagMap), equals(<Tag>{sampleTag}));
+      },
+    );
+
+    test('with list of maps with invalid maps, returns set with the valid '
         'and ignores invalid', () {
       expect(
         converter.fromSql(withOneValidAndOneInvalidTagMap),

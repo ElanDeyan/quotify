@@ -8,5 +8,5 @@ enum PrivacyDataModelErrors implements PrivacyDataErrors {
   invalidMapFormat,
 
   /// Used when a [String] is not a correct json form of [PrivacyData].
-  invalidJsonStringFormat;
+  invalidJsonStringFormat,
 }

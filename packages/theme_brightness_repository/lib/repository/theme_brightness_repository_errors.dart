@@ -10,5 +10,5 @@ enum ThemeBrightnessRepositoryErrors implements ThemeBrightnessErrors {
 
   /// Represents an error that occurs when there is a failure during the process
   /// of saving data in the [ThemeBrightnessRepository].
-  failAtSaving;
+  failAtSaving,
 }

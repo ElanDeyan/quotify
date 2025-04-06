@@ -17,11 +17,8 @@ final class TagRepositoryImpl implements TagRepository {
   final AppDatabase database;
 
   @override
-  Future<UnmodifiableListView<Tag>> get allTags async => UnmodifiableListView(
-        (await database.allTags).map(
-          (e) => e.toTag(),
-        ),
-      );
+  Future<UnmodifiableListView<Tag>> get allTags async =>
+      UnmodifiableListView((await database.allTags).map((e) => e.toTag()));
 
   @override
   FutureResult<(), DatabaseErrors> clearAllTags() => database.clearAllTags();
@@ -30,16 +27,20 @@ final class TagRepositoryImpl implements TagRepository {
   FutureResult<Tag, DatabaseErrors> createTag(TagEntry tag) async =>
       switch (await database.createTag(tag)) {
         Ok(:final value) => Result.ok(value.toTag()),
-        Failure(:final failure, :final stackTrace) =>
-          Result.failure(failure, stackTrace),
+        Failure(:final failure, :final stackTrace) => Result.failure(
+          failure,
+          stackTrace,
+        ),
       };
 
   @override
   FutureResult<Tag, DatabaseErrors> deleteTag(Id id) async =>
       switch (await database.deleteTag(id)) {
         Ok(:final value) => Result.ok(value.toTag()),
-        Failure(:final failure, :final stackTrace) =>
-          Result.failure(failure, stackTrace),
+        Failure(:final failure, :final stackTrace) => Result.failure(
+          failure,
+          stackTrace,
+        ),
       };
 
   @override
@@ -49,16 +50,16 @@ final class TagRepositoryImpl implements TagRepository {
   @override
   Future<UnmodifiableListView<Tag>> getTagsByIds(Iterable<Id> ids) async =>
       UnmodifiableListView(
-        (await database.getTagsWithIds(ids)).map(
-          (e) => e.toTag(),
-        ),
+        (await database.getTagsWithIds(ids)).map((e) => e.toTag()),
       );
 
   @override
   FutureResult<Tag, DatabaseErrors> updateTag(FullTagEntry tag) async =>
       switch (await database.updateTag(tag)) {
         Ok(:final value) => Result.ok(value.toTag()),
-        Failure(:final failure, :final stackTrace) =>
-          Result.failure(failure, stackTrace),
+        Failure(:final failure, :final stackTrace) => Result.failure(
+          failure,
+          stackTrace,
+        ),
       };
 }

@@ -233,10 +233,7 @@ void main() {
                 id: const Id(Natural(10)),
                 label: NonBlankString(faker.lorem.word()),
               ).toMap(),
-            {
-              'id': -1,
-              'label': '',
-            },
+            {'id': -1, 'label': ''},
           ],
         };
 

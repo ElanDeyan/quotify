@@ -10,7 +10,7 @@ import 'fake_shared_preferences_async.dart';
 ///   A record containing the preferences object and the store
 /// object is being returned.
 (SharedPreferencesAsync preferences, FakeSharedPreferencesAsync store)
-    getPreferences() {
+getPreferences() {
   final store = FakeSharedPreferencesAsync();
   SharedPreferencesAsyncPlatform.instance = store;
   final preferences = SharedPreferencesAsync();

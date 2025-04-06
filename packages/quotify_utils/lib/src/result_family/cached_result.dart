@@ -4,8 +4,8 @@ final class CachedResult<T extends Object, E extends Object> {
   CachedResult({
     required Future<T> Function() computation,
     required Duration ttl,
-  })  : _computation = computation,
-        _ttl = ttl;
+  }) : _computation = computation,
+       _ttl = ttl;
 
   final Future<T> Function() _computation;
   final Duration _ttl;

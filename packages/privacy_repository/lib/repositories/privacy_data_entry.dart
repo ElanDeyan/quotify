@@ -4,10 +4,7 @@ import 'privacy_repository.dart';
 /// Entry to add [PrivacyData] to [PrivacyRepository].
 final class PrivacyDataEntry {
   /// Entry to add [PrivacyData] to [PrivacyRepository].
-  const PrivacyDataEntry({
-    this.allowErrorReporting,
-    this.acceptedDataUsage,
-  });
+  const PrivacyDataEntry({this.allowErrorReporting, this.acceptedDataUsage});
 
   /// Creates an instance from [PrivacyData].
   factory PrivacyDataEntry.fromPrivacyData(PrivacyData privacyData) =>
@@ -24,7 +21,7 @@ final class PrivacyDataEntry {
 
   /// Helper to convert this to [PrivacyData].
   PrivacyData toPrivacyData() => PrivacyData(
-        allowErrorReporting: allowErrorReporting ?? false,
-        acceptedDataUsage: acceptedDataUsage ?? false,
-      );
+    allowErrorReporting: allowErrorReporting ?? false,
+    acceptedDataUsage: acceptedDataUsage ?? false,
+  );
 }

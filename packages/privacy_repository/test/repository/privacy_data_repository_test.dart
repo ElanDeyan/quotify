@@ -25,45 +25,42 @@ void main() {
     test('should have 16-32 length', () {
       expect(
         privacyRepository.generateRandomSecurePassword().length,
-        allOf([
-          greaterThanOrEqualTo(16),
-          lessThanOrEqualTo(32),
-        ]),
+        allOf([greaterThanOrEqualTo(16), lessThanOrEqualTo(32)]),
       );
     });
 
     test('has at least 1 lower case letter', () {
       expect(
-        privacyRepository
-            .generateRandomSecurePassword()
-            .contains(RegExp('[a-z]+')),
+        privacyRepository.generateRandomSecurePassword().contains(
+          RegExp('[a-z]+'),
+        ),
         isTrue,
       );
     });
 
     test('has at least 1 upper case letter', () {
       expect(
-        privacyRepository
-            .generateRandomSecurePassword()
-            .contains(RegExp('[A-Z]+')),
+        privacyRepository.generateRandomSecurePassword().contains(
+          RegExp('[A-Z]+'),
+        ),
         isTrue,
       );
     });
 
     test('has at least 1 digit', () {
       expect(
-        privacyRepository
-            .generateRandomSecurePassword()
-            .contains(RegExp('[0-9]+')),
+        privacyRepository.generateRandomSecurePassword().contains(
+          RegExp('[0-9]+'),
+        ),
         isTrue,
       );
     });
 
     test('has at least 1 symbol', () {
       expect(
-        privacyRepository
-            .generateRandomSecurePassword()
-            .contains(RegExp(r'[!?@#$%^&*()\[\]{}/\\~"]+')),
+        privacyRepository.generateRandomSecurePassword().contains(
+          RegExp(r'[!?@#$%^&*()\[\]{}/\\~"]+'),
+        ),
         isTrue,
       );
     });
@@ -74,21 +71,15 @@ void main() {
       expect(first, isNot(second));
     });
 
-    test(
-      'should have >= 0.9 of strength',
-      () {
-        for (var i = 0; i < 50; i++) {
-          final passwordStrength = estimatePasswordStrength(
-            privacyRepository.generateRandomSecurePassword(),
-          );
+    test('should have >= 0.9 of strength', () {
+      for (var i = 0; i < 50; i++) {
+        final passwordStrength = estimatePasswordStrength(
+          privacyRepository.generateRandomSecurePassword(),
+        );
 
-          expect(
-            passwordStrength,
-            greaterThanOrEqualTo(0.9),
-          );
-        }
-      },
-    );
+        expect(passwordStrength, greaterThanOrEqualTo(0.9));
+      }
+    });
   });
 
   group('fetchPrivacyData', () {
@@ -99,8 +90,9 @@ void main() {
               secureStorageService.read(PrivacyRepository.acceptedDataUsageKey),
         ).thenAnswer((_) async => null);
         when(
-          () => secureStorageService
-              .read(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.read(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).thenAnswer((_) async => null);
       });
 
@@ -116,12 +108,14 @@ void main() {
           );
 
           verify(
-            () => secureStorageService
-                .read(PrivacyRepository.acceptedDataUsageKey),
+            () => secureStorageService.read(
+              PrivacyRepository.acceptedDataUsageKey,
+            ),
           ).called(1);
           verify(
-            () => secureStorageService
-                .read(PrivacyRepository.allowErrorReportingKey),
+            () => secureStorageService.read(
+              PrivacyRepository.allowErrorReportingKey,
+            ),
           ).called(1);
         },
       );
@@ -133,8 +127,9 @@ void main() {
               secureStorageService.read(PrivacyRepository.acceptedDataUsageKey),
         ).thenAnswer((_) async => 'true');
         when(
-          () => secureStorageService
-              .read(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.read(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).thenAnswer((_) async => null);
       });
       test(
@@ -149,12 +144,14 @@ void main() {
           );
 
           verify(
-            () => secureStorageService
-                .read(PrivacyRepository.acceptedDataUsageKey),
+            () => secureStorageService.read(
+              PrivacyRepository.acceptedDataUsageKey,
+            ),
           ).called(1);
           verify(
-            () => secureStorageService
-                .read(PrivacyRepository.allowErrorReportingKey),
+            () => secureStorageService.read(
+              PrivacyRepository.allowErrorReportingKey,
+            ),
           ).called(1);
         },
       );
@@ -164,39 +161,37 @@ void main() {
       group('but one or both is not a valid boolean string', () {
         setUp(() {
           when(
-            () => secureStorageService
-                .read(PrivacyRepository.acceptedDataUsageKey),
+            () => secureStorageService.read(
+              PrivacyRepository.acceptedDataUsageKey,
+            ),
           ).thenAnswer((_) async => true.toString());
           when(
-            () => secureStorageService
-                .read(PrivacyRepository.allowErrorReportingKey),
+            () => secureStorageService.read(
+              PrivacyRepository.allowErrorReportingKey,
+            ),
           ).thenAnswer((_) async => 'hello!');
         });
-        test(
-          'should return a Failure with '
-          'PrivacyRepositoryErrors.invalidBooleanString',
-          () async {
-            final result = await privacyRepository.fetchPrivacyData();
+        test('should return a Failure with '
+            'PrivacyRepositoryErrors.invalidBooleanString', () async {
+          final result = await privacyRepository.fetchPrivacyData();
 
-            expect(
-              result,
-              isA<Failure<PrivacyData, PrivacyRepositoryErrors>>(),
-            );
-            expect(
-              result.asFailure.failure,
-              equals(PrivacyRepositoryErrors.invalidBooleanString),
-            );
+          expect(result, isA<Failure<PrivacyData, PrivacyRepositoryErrors>>());
+          expect(
+            result.asFailure.failure,
+            equals(PrivacyRepositoryErrors.invalidBooleanString),
+          );
 
-            verify(
-              () => secureStorageService
-                  .read(PrivacyRepository.acceptedDataUsageKey),
-            ).called(1);
-            verify(
-              () => secureStorageService
-                  .read(PrivacyRepository.allowErrorReportingKey),
-            ).called(1);
-          },
-        );
+          verify(
+            () => secureStorageService.read(
+              PrivacyRepository.acceptedDataUsageKey,
+            ),
+          ).called(1);
+          verify(
+            () => secureStorageService.read(
+              PrivacyRepository.allowErrorReportingKey,
+            ),
+          ).called(1);
+        });
       });
     });
 
@@ -214,8 +209,9 @@ void main() {
               secureStorageService.read(PrivacyRepository.acceptedDataUsageKey),
         ).thenAnswer((_) async => acceptedDataUsage.toString());
         when(
-          () => secureStorageService
-              .read(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.read(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).thenAnswer((_) async => allowedErrorReporting.toString());
       });
 
@@ -223,18 +219,16 @@ void main() {
         final result = await privacyRepository.fetchPrivacyData();
 
         expect(result, isA<Ok<PrivacyData, PrivacyRepositoryErrors>>());
-        expect(
-          result.asOk.value,
-          equals(expectedPrivacyData),
-        );
+        expect(result.asOk.value, equals(expectedPrivacyData));
 
         verify(
           () =>
               secureStorageService.read(PrivacyRepository.acceptedDataUsageKey),
         ).called(1);
         verify(
-          () => secureStorageService
-              .read(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.read(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).called(1);
       });
     });
@@ -242,91 +236,90 @@ void main() {
 
   group('savePrivacyData', () {
     group(
-        'without any (or both) data present and entry has both null parameters',
-        () {
+      'without any (or both) data present and entry has both null parameters',
+      () {
+        setUp(() {
+          when(
+            () => secureStorageService.containsKey(any()),
+          ).thenAnswer((_) async => false);
+        });
+
+        tearDown(() {
+          verify(
+            () => secureStorageService.containsKey(
+              PrivacyRepository.acceptedDataUsageKey,
+            ),
+          ).called(1);
+          verify(
+            () => secureStorageService.containsKey(
+              PrivacyRepository.allowErrorReportingKey,
+            ),
+          ).called(1);
+
+          verifyNever(() => secureStorageService.read(any()));
+          verifyNever(() => secureStorageService.write(any(), any()));
+        });
+        test(
+          'should return Failure with PrivacyRepositoryErrors.missing',
+          () async {
+            await privacyRepository.savePrivacyData(const PrivacyDataEntry());
+          },
+        );
+      },
+    );
+    group('with data present', () {
       setUp(() {
         when(
           () => secureStorageService.containsKey(any()),
-        ).thenAnswer((_) async => false);
+        ).thenAnswer((_) async => true);
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenAnswer((_) async {});
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.acceptedDataUsageKey,
+          ),
         ).called(1);
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
-        ).called(1);
-
-        verifyNever(() => secureStorageService.read(any()));
-        verifyNever(() => secureStorageService.write(any(), any()));
-      });
-      test(
-        'should return Failure with PrivacyRepositoryErrors.missing',
-        () async {
-          await privacyRepository.savePrivacyData(const PrivacyDataEntry());
-        },
-      );
-    });
-    group('with data present', () {
-      setUp(() {
-        when(() => secureStorageService.containsKey(any()))
-            .thenAnswer((_) async => true);
-        when(() => secureStorageService.write(any(), any()))
-            .thenAnswer((_) async {});
-      });
-
-      tearDown(() {
-        verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).called(1);
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
-        ).called(1);
-        verify(() => secureStorageService.write(any(), any()))
-            .called(inInclusiveRange(1, 2));
+          () => secureStorageService.write(any(), any()),
+        ).called(inInclusiveRange(1, 2));
       });
 
-      test(
-        'and one parameter is null should only '
-        'write the non-null (allowErrorReporting)',
-        () async {
-          const sample = PrivacyDataEntry(allowErrorReporting: true);
+      test('and one parameter is null should only '
+          'write the non-null (allowErrorReporting)', () async {
+        const sample = PrivacyDataEntry(allowErrorReporting: true);
 
-          final result = await privacyRepository.savePrivacyData(sample);
+        final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
-        },
-      );
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
+      });
 
-      test(
-        'and one parameter is null should only '
-        'write the non-null (acceptedDataUsage)',
-        () async {
-          const sample = PrivacyDataEntry(acceptedDataUsage: true);
+      test('and one parameter is null should only '
+          'write the non-null (acceptedDataUsage)', () async {
+        const sample = PrivacyDataEntry(acceptedDataUsage: true);
 
-          final result = await privacyRepository.savePrivacyData(sample);
+        final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
-        },
-      );
-      test(
-        'and both parameters are not null should write both',
-        () async {
-          const sample = PrivacyDataEntry(
-            acceptedDataUsage: true,
-            allowErrorReporting: false,
-          );
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
+      });
+      test('and both parameters are not null should write both', () async {
+        const sample = PrivacyDataEntry(
+          acceptedDataUsage: true,
+          allowErrorReporting: false,
+        );
 
-          final result = await privacyRepository.savePrivacyData(sample);
+        final result = await privacyRepository.savePrivacyData(sample);
 
-          expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
-        },
-      );
+        expect(result, isA<Ok<(), PrivacyRepositoryErrors>>());
+      });
     });
   });
 
@@ -394,10 +387,7 @@ void main() {
 
       test('should return true', () {
         for (final password in sampleValidPasswords) {
-          expect(
-            privacyRepository.isEncryptionPasswordValid(password),
-            isTrue,
-          );
+          expect(privacyRepository.isEncryptionPasswordValid(password), isTrue);
         }
       });
     });
@@ -407,15 +397,17 @@ void main() {
     group('with no key present', () {
       setUp(() {
         when(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).thenAnswer((_) async => false);
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).called(1);
         verifyNever(() => secureStorageService.read(any()));
       });
@@ -433,8 +425,9 @@ void main() {
 
     group('with key present, but invalid,', () {
       setUp(() {
-        when(() => secureStorageService.containsKey(any()))
-            .thenAnswer((_) async => true);
+        when(
+          () => secureStorageService.containsKey(any()),
+        ).thenAnswer((_) async => true);
         when(
           () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
         ).thenAnswer((_) async => 'password');
@@ -453,8 +446,9 @@ void main() {
     group('with key present, but valid', () {
       const samplePassword = 'Password123!@Ee6';
       setUp(() {
-        when(() => secureStorageService.containsKey(any()))
-            .thenAnswer((_) async => true);
+        when(
+          () => secureStorageService.containsKey(any()),
+        ).thenAnswer((_) async => true);
         when(
           () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
         ).thenAnswer((_) async => samplePassword);
@@ -464,10 +458,7 @@ void main() {
         final result = await privacyRepository.fetchEncryptionPassword();
 
         expect(result, isA<Ok<String, PrivacyRepositoryErrors>>());
-        expect(
-          result.asOk.value,
-          equals(samplePassword),
-        );
+        expect(result.asOk.value, equals(samplePassword));
       });
     });
   });
@@ -475,15 +466,17 @@ void main() {
   group('setEncryptionPassword', () {
     group('with no errors on write', () {
       setUp(() {
-        when(() => secureStorageService.write(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenAnswer((_) async {});
       });
 
       tearDown(() {
         verify(() => secureStorageService.write(any(), any())).called(1);
         verifyNever(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         );
         verifyNever(
           () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
@@ -499,15 +492,17 @@ void main() {
 
     group('with errors on write', () {
       setUp(() {
-        when(() => secureStorageService.write(any(), any()))
-            .thenThrow(Exception());
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenThrow(Exception());
       });
 
       tearDown(() {
         verify(() => secureStorageService.write(any(), any())).called(1);
         verifyNever(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         );
         verifyNever(
           () => secureStorageService.read(PrivacyRepository.dataEncryptionKey),
@@ -526,15 +521,17 @@ void main() {
     group('with no key present', () {
       setUp(() {
         when(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).thenAnswer((_) async => false);
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).called(1);
         verify(() => secureStorageService.write(any(), any())).called(1);
         verifyNever(() => secureStorageService.read(any()));
@@ -549,15 +546,17 @@ void main() {
     group('with key present', () {
       setUp(() {
         when(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).thenAnswer((_) async => true);
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.dataEncryptionKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.dataEncryptionKey,
+          ),
         ).called(1);
         verifyNever(() => secureStorageService.read(any()));
         verifyNever(() => secureStorageService.write(any(), any()));
@@ -574,25 +573,30 @@ void main() {
     group('without one of keys present', () {
       setUp(() {
         when(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.acceptedDataUsageKey,
+          ),
         ).thenAnswer((_) async => false);
         when(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).thenAnswer((_) async => true);
-        when(() => secureStorageService.write(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenAnswer((_) async {});
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.acceptedDataUsageKey,
+          ),
         ).called(2);
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).called(2);
         verify(
           () => secureStorageService.write(
@@ -613,18 +617,21 @@ void main() {
         when(
           () => secureStorageService.containsKey(any()),
         ).thenAnswer((_) async => false);
-        when(() => secureStorageService.write(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenAnswer((_) async {});
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.acceptedDataUsageKey,
+          ),
         ).called(2);
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).called(2);
         verify(
           () => secureStorageService.write(
@@ -651,18 +658,21 @@ void main() {
         when(
           () => secureStorageService.containsKey(any()),
         ).thenAnswer((_) async => true);
-        when(() => secureStorageService.write(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => secureStorageService.write(any(), any()),
+        ).thenAnswer((_) async {});
       });
 
       tearDown(() {
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.acceptedDataUsageKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.acceptedDataUsageKey,
+          ),
         ).called(2);
         verify(
-          () => secureStorageService
-              .containsKey(PrivacyRepository.allowErrorReportingKey),
+          () => secureStorageService.containsKey(
+            PrivacyRepository.allowErrorReportingKey,
+          ),
         ).called(2);
         verifyNever(
           () => secureStorageService.write(

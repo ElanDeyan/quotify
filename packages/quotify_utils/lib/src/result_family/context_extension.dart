@@ -7,18 +7,12 @@ extension ContextExtension<C extends Object, T extends Object, E extends Object>
     R Function(T value, C context) mapper, {
     F Function(E)? failureMapper,
   }) =>
-      mapSync(
-        (value) => mapper(value, context),
-        failureMapper: failureMapper,
-      );
+      mapSync((value) => mapper(value, context), failureMapper: failureMapper);
 
   FutureResult<R, F> mapWithContextAsync<R extends Object, F extends Object>(
     C context,
     Future<R> Function(T value, C context) mapper, {
     F Function(E)? failureMapper,
   }) =>
-      mapAsync(
-        (value) => mapper(value, context),
-        failureMapper: failureMapper,
-      );
+      mapAsync((value) => mapper(value, context), failureMapper: failureMapper);
 }

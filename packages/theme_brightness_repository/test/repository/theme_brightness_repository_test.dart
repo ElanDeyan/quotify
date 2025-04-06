@@ -16,8 +16,9 @@ void main() {
   late SharedPreferencesAsyncService sharedPreferencesAsyncService;
   late ThemeBrightnessRepository themeBrightnessRepository;
   setUp(() {
-    sharedPreferencesAsyncService =
-        SharedPreferencesAsyncService(MockSharedPreferencesAsync());
+    sharedPreferencesAsyncService = SharedPreferencesAsyncService(
+      MockSharedPreferencesAsync(),
+    );
     themeBrightnessRepository = ThemeBrightnessRepositoryImpl(
       sharedPreferencesAsyncService,
     );
@@ -86,37 +87,34 @@ void main() {
         ),
       );
     });
-    test(
-      'without an already existent value should return a '
-      'Failure with ThemeBrightnessRepositoryError.missing',
-      () async {
-        when(
-          () => sharedPreferencesAsyncService.containsKey(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).thenAnswer((_) async => false);
+    test('without an already existent value should return a '
+        'Failure with ThemeBrightnessRepositoryError.missing', () async {
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).thenAnswer((_) async => false);
 
-        final result = await themeBrightnessRepository.fetchThemeBrightness();
+      final result = await themeBrightnessRepository.fetchThemeBrightness();
 
-        expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(ThemeBrightnessRepositoryErrors.missing),
-        );
+      expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
+      expect(
+        result.asFailure.failure,
+        equals(ThemeBrightnessRepositoryErrors.missing),
+      );
 
-        verify(
-          () => sharedPreferencesAsyncService.containsKey(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).called(1);
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).called(1);
 
-        verifyNever(
-          () => sharedPreferencesAsyncService.getString(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        );
-      },
-    );
+      verifyNever(
+        () => sharedPreferencesAsyncService.getString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      );
+    });
 
     test(
       'with an existent value, should return Ok with the ThemeBrightness',
@@ -150,48 +148,45 @@ void main() {
         ).called(1);
       },
     );
-    test(
-      'with an invalid existent value, should return Failure '
-      'with the ThemeBrightnessErrors.invalidStringRepresentation',
-      () async {
-        final sample = faker.lorem.word();
+    test('with an invalid existent value, should return Failure '
+        'with the ThemeBrightnessErrors.invalidStringRepresentation', () async {
+      final sample = faker.lorem.word();
 
-        assert(
-          !ThemeBrightness.values.map((theme) => theme.name).contains(sample),
-          'Should be an invalid name for this test',
-        );
+      assert(
+        !ThemeBrightness.values.map((theme) => theme.name).contains(sample),
+        'Should be an invalid name for this test',
+      );
 
-        when(
-          () => sharedPreferencesAsyncService.containsKey(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).thenAnswer((_) async => true);
-        when(
-          () => sharedPreferencesAsyncService.getString(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).thenAnswer((_) async => sample);
+      when(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).thenAnswer((_) async => true);
+      when(
+        () => sharedPreferencesAsyncService.getString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).thenAnswer((_) async => sample);
 
-        final result = await themeBrightnessRepository.fetchThemeBrightness();
+      final result = await themeBrightnessRepository.fetchThemeBrightness();
 
-        expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
-        expect(
-          result.asFailure.failure,
-          equals(ThemeBrightnessModelErrors.invalidStringRepresentation),
-        );
+      expect(result, isA<Failure<ThemeBrightness, ThemeBrightnessErrors>>());
+      expect(
+        result.asFailure.failure,
+        equals(ThemeBrightnessModelErrors.invalidStringRepresentation),
+      );
 
-        verify(
-          () => sharedPreferencesAsyncService.containsKey(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).called(1);
-        verify(
-          () => sharedPreferencesAsyncService.getString(
-            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-          ),
-        ).called(1);
-      },
-    );
+      verify(
+        () => sharedPreferencesAsyncService.containsKey(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).called(1);
+      verify(
+        () => sharedPreferencesAsyncService.getString(
+          ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+        ),
+      ).called(1);
+    });
   });
 
   group('saveThemeBrightness', () {
@@ -205,8 +200,9 @@ void main() {
           ),
         ).thenAnswer((_) async {});
 
-        final result =
-            await themeBrightnessRepository.saveThemeBrightness(sample);
+        final result = await themeBrightnessRepository.saveThemeBrightness(
+          sample,
+        );
 
         expect(result, isA<Ok<(), ThemeBrightnessRepositoryErrors>>());
 
@@ -230,42 +226,40 @@ void main() {
       });
     });
     group('if something went wrong on saving', () {
-      test(
-        'should return a Failure with '
-        'ThemeBrightnessRepositoryErrors.failAtSaving',
-        () async {
-          const sample = ThemeBrightness.dark;
-          when(
-            () => sharedPreferencesAsyncService.setString(
-              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-              any(),
-            ),
-          ).thenThrow(Exception('oops'));
+      test('should return a Failure with '
+          'ThemeBrightnessRepositoryErrors.failAtSaving', () async {
+        const sample = ThemeBrightness.dark;
+        when(
+          () => sharedPreferencesAsyncService.setString(
+            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+            any(),
+          ),
+        ).thenThrow(Exception('oops'));
 
-          final result =
-              await themeBrightnessRepository.saveThemeBrightness(sample);
+        final result = await themeBrightnessRepository.saveThemeBrightness(
+          sample,
+        );
 
-          expect(result, isA<Failure<(), ThemeBrightnessRepositoryErrors>>());
+        expect(result, isA<Failure<(), ThemeBrightnessRepositoryErrors>>());
 
-          verify(
-            () => sharedPreferencesAsyncService.setString(
-              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-              sample.name,
-            ),
-          ).called(1);
+        verify(
+          () => sharedPreferencesAsyncService.setString(
+            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+            sample.name,
+          ),
+        ).called(1);
 
-          verifyNever(
-            () => sharedPreferencesAsyncService.containsKey(
-              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-            ),
-          );
-          verifyNever(
-            () => sharedPreferencesAsyncService.getString(
-              ThemeBrightnessRepository.themeBrightnessRepositoryKey,
-            ),
-          );
-        },
-      );
+        verifyNever(
+          () => sharedPreferencesAsyncService.containsKey(
+            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+          ),
+        );
+        verifyNever(
+          () => sharedPreferencesAsyncService.getString(
+            ThemeBrightnessRepository.themeBrightnessRepositoryKey,
+          ),
+        );
+      });
     });
   });
 }
