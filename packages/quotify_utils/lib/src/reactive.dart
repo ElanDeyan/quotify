@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:event/event.dart';
+import 'package:meta/meta.dart';
 
 /// An abstract base class that represents a reactive entity which can publish
 /// events of type [T].
@@ -8,7 +9,7 @@ import 'package:event/event.dart';
 /// [T] is a type that extends [EventArgs].
 abstract base class Reactive<T extends EventArgs> {
   /// The event publisher responsible for publishing events of type [T].
-  final EventPublisher<T> eventPublisher = EventPublisher<T>(Event());
+  final eventPublisher = EventPublisher<T>(Event());
 }
 
 /// An extension type that provides additional functionality for an [Event].
@@ -48,6 +49,7 @@ extension type EventPublisher<T extends EventArgs>(Event<T> _event)
   ///
   /// Parameters:
   /// - `handler`: A function that takes the event arguments as a parameter.
+  @redeclare
   void subscribe(void Function(T argument) handler) =>
       _event.subscribe(handler);
 
@@ -77,11 +79,13 @@ extension type EventPublisher<T extends EventArgs>(Event<T> _event)
   ///
   /// Parameters:
   /// - `handler`: A function that takes the event arguments as a parameter.
+  @redeclare
   void unsubscribe(void Function(T argument) handler) =>
       _event.unsubscribe(handler);
 
   /// Unsubscribes all handlers from the event.
   ///
   /// No handlers will be called when the event is notified.
+  @redeclare
   void unsubscribeAll() => _event.unsubscribeAll();
 }
