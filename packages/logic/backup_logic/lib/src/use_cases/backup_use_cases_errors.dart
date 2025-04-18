@@ -8,5 +8,6 @@ enum BackupUseCasesErrors implements BackupErrors {
   failAtDecryptingBackup,
   backupFileLengthIsTooShort,
   wrongFileExtension,
+  failAtUpdatingThemeBrightness,
   unknown,
 }

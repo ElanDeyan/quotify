@@ -23,6 +23,7 @@ dependencies:
   quotes_repository: ^2.0.0
   quotify_utils: ^4.0.0
   share_plus: ^10.1.4
+  synchronized: ^3.3.1
   tags_repository: ^1.0.0
   theme_brightness_repository: ^0.0.1
 
@@ -32,3 +33,4 @@ dev_dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
   lint: ^2.8.0
+  checks: ^0.3.0
