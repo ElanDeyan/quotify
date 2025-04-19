@@ -1,5 +1,9 @@
 import 'package:languages_repository/repositories/languages_repository.dart';
+import 'package:meta/meta.dart';
+import 'package:primary_colors_repository/models/primary_colors.dart';
+import 'package:primary_colors_repository/models/primary_colors_errors.dart';
 import 'package:primary_colors_repository/repositories/primary_colors_repository.dart';
+import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
 import 'package:privacy_repository/repositories/privacy_repository.dart';
 import 'package:quotes_repository/repositories/quotes_repository.dart';
 import 'package:quotify_utils/quotify_utils.dart';
@@ -87,13 +91,18 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
     final bool successfulQuotesRestoring;
 
     // Shared preferences calls
-    final (themeBrightnessResult, _) =
-        await (_themeBrightnessBackupRestore(), Future.value(1)).wait;
+    final (themeBrightnessResult, primaryColorResult) =
+        await (
+          themeBrightnessBackupRestore(),
+          primaryColorBackupRestore(),
+        ).wait;
+
     successfulThemeBrightnessRestoring = themeBrightnessResult.isOk;
+    successfulPrimaryColorsRestoring = primaryColorResult.isOk;
 
     return (
       successfulLanguagesRestoring: false,
-      successfulPrimaryColorsRestoring: false,
+      successfulPrimaryColorsRestoring: successfulPrimaryColorsRestoring,
       successfulPrivacyDataRestoring: false,
       successfulQuotesRestoring: false,
       successfulTagsRestoring: false,
@@ -101,34 +110,64 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
     );
   }
 
-  FutureResult<Unit, ThemeBrightnessRepositoryErrors>
-  _themeBrightnessBackupRestore() =>
-      _sharedPreferencesLock.synchronized(() async {
-        switch (_themeBrightnessDataSourceToUse) {
-          case DataSourceToUse.local:
-            return const Result.ok(());
-          case DataSourceToUse.backup:
-            final currentThemeBrightnessResult =
-                await _themeBrightnessRepository.fetchThemeBrightness();
-            if (currentThemeBrightnessResult
-                case final Failure<ThemeBrightness, ThemeBrightnessErrors>
-                    failure) {
-              return failure.mapSync((_) => ());
-            }
-
-            if (_backup.themeBrightness !=
-                currentThemeBrightnessResult.unwrap()) {
-              final savingResult = await _themeBrightnessRepository
-                  .saveThemeBrightness(_backup.themeBrightness);
-
-              if (savingResult
-                  case final Failure<(), ThemeBrightnessRepositoryErrors>
-                      failure) {
-                return failure.mapSync((_) => ());
-              }
-            }
-
-            return const Result.ok(());
+  @visibleForTesting
+  FutureResult<Unit, ThemeBrightnessErrors>
+  themeBrightnessBackupRestore() async {
+    switch (_themeBrightnessDataSourceToUse) {
+      case DataSourceToUse.local:
+        return const Result.ok(());
+      case DataSourceToUse.backup:
+        final currentThemeBrightnessResult =
+            await _themeBrightnessRepository.fetchThemeBrightness();
+        if (currentThemeBrightnessResult
+            case final Failure<ThemeBrightness, ThemeBrightnessErrors>
+                failure) {
+          return failure.mapSync((_) => ());
         }
-      });
+
+        if (_backup.themeBrightness != currentThemeBrightnessResult.unwrap()) {
+          final savingResult = await _sharedPreferencesLock.synchronized(
+            () => _themeBrightnessRepository.saveThemeBrightness(
+              _backup.themeBrightness,
+            ),
+          );
+
+          if (savingResult
+              case final Failure<(), ThemeBrightnessRepositoryErrors> failure) {
+            return failure.mapSync((_) => ());
+          }
+        }
+
+        return const Result.ok(());
+    }
+  }
+
+  @visibleForTesting
+  FutureResult<Unit, PrimaryColorsErrors> primaryColorBackupRestore() async {
+    switch (_primaryColorDataSourceToUse) {
+      case DataSourceToUse.local:
+        return const Result.ok(());
+      case DataSourceToUse.backup:
+        final currentPrimaryColorResult =
+            await _primaryColorsRepository.fetchPrimaryColor();
+        if (currentPrimaryColorResult
+            case final Failure<PrimaryColors, PrimaryColorsErrors> failure) {
+          return failure.mapSync((_) => ());
+        }
+
+        if (_backup.primaryColor != currentPrimaryColorResult.unwrap()) {
+          final savingResult = await _sharedPreferencesLock.synchronized(
+            () =>
+                _primaryColorsRepository.savePrimaryColor(_backup.primaryColor),
+          );
+
+          if (savingResult
+              case final Failure<(), PrimaryColorsRepositoryErrors> failure) {
+            return failure.mapSync((_) => ());
+          }
+        }
+
+        return const Result.ok(());
+    }
+  }
 }

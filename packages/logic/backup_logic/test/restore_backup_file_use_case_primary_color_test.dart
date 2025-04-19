@@ -6,9 +6,9 @@ import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:primary_colors_repository/models/primary_colors.dart';
+import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
 import 'package:quotify_utils/result.dart';
-import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
-import 'package:theme_brightness_repository/repository/theme_brightness_repository_errors.dart';
 
 import 'mocks/repository_mocks.dart';
 import 'utils/sample_backup_generator.dart';
@@ -23,7 +23,7 @@ void main() {
   late Backup sampleBackup;
 
   setUpAll(() {
-    registerFallbackValue(ThemeBrightness.defaultTheme);
+    registerFallbackValue(PrimaryColors.defaultColor);
   });
 
   setUp(() {
@@ -36,7 +36,7 @@ void main() {
     sampleBackup = sampleBackupGenerator();
   });
 
-  group('theme brightness', () {
+  group('primary color', () {
     test('when DataSourceToUse is local, '
         'ignore that one coming from backup', () async {
       final useCase = RestoreBackup(
@@ -46,42 +46,42 @@ void main() {
         languagesRepository: languagesRepository,
         languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        primaryColorDataSourceToUse: DataSourceToUse.local,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
-        themeBrightnessDataSourceToUse: DataSourceToUse.local,
+        themeBrightnessDataSourceToUse: DataSourceToUse.values.sample(1).single,
         tagsConflictResolver: ConflictResolver.replaceWithBackupData,
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase();
+      final result = await useCase.primaryColorBackupRestore();
 
-      verifyNever(themeBrightnessRepository.fetchThemeBrightness);
-      verifyNever(() => themeBrightnessRepository.saveThemeBrightness(any()));
+      verifyNever(primaryColorsRepository.fetchPrimaryColor);
+      verifyNever(() => primaryColorsRepository.savePrimaryColor(any()));
 
-      check(result.successfulThemeBrightnessRestoring).isTrue();
+      check(result).isA<Ok>();
     });
 
     test('when DataSourceToUse is backup, '
         'and no problems at writing or fetching, '
         'writes if different', () async {
-      const currentThemeBrightness = ThemeBrightness.dark;
+      const currentPrimaryColor = PrimaryColors.softApricot;
       when(
-        () => themeBrightnessRepository.fetchThemeBrightness(),
-      ).thenAnswer((_) async => const Result.ok(currentThemeBrightness));
+        primaryColorsRepository.fetchPrimaryColor,
+      ).thenAnswer((_) async => const Result.ok(currentPrimaryColor));
 
-      final newThemeBrightness =
-          ThemeBrightness.values
-              .whereNot((final element) => element == currentThemeBrightness)
+      final newPrimaryColor =
+          PrimaryColors.values
+              .whereNot((final element) => element == currentPrimaryColor)
               .sample(1)
               .single;
 
       when(
-        () => themeBrightnessRepository.saveThemeBrightness(newThemeBrightness),
+        () => primaryColorsRepository.savePrimaryColor(newPrimaryColor),
       ).thenAnswer((_) async => const Result.ok(()));
 
-      final backup = sampleBackup.copyWith(themeBrightness: newThemeBrightness);
+      final backup = sampleBackup.copyWith(primaryColor: newPrimaryColor);
 
       final useCase = RestoreBackup(
         backup: backup,
@@ -90,38 +90,36 @@ void main() {
         languagesRepository: languagesRepository,
         languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        primaryColorDataSourceToUse: DataSourceToUse.backup,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
-        themeBrightnessDataSourceToUse: DataSourceToUse.backup,
+        themeBrightnessDataSourceToUse: DataSourceToUse.values.sample(1).single,
         tagsConflictResolver: ConflictResolver.replaceWithBackupData,
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase();
+      final result = await useCase.primaryColorBackupRestore();
 
-      verify(() => themeBrightnessRepository.fetchThemeBrightness()).called(1);
+      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
       verify(
-        () => themeBrightnessRepository.saveThemeBrightness(newThemeBrightness),
+        () => primaryColorsRepository.savePrimaryColor(newPrimaryColor),
       ).called(1);
 
-      check(result.successfulThemeBrightnessRestoring).isTrue();
+      check(result).isA<Ok>();
     });
 
     test('when DataSourceToUse is backup, '
         'and no problems at writing or fetching, '
         'writes if different (not writes)', () async {
-      const currentThemeBrightness = ThemeBrightness.dark;
+      const currentPrimaryColor = PrimaryColors.icyLilac;
       when(
-        () => themeBrightnessRepository.fetchThemeBrightness(),
-      ).thenAnswer((_) async => const Result.ok(currentThemeBrightness));
+        primaryColorsRepository.fetchPrimaryColor,
+      ).thenAnswer((_) async => const Result.ok(currentPrimaryColor));
 
-      const sameThemeBrightness = currentThemeBrightness;
+      const samePrimaryColor = currentPrimaryColor;
 
-      final backup = sampleBackup.copyWith(
-        themeBrightness: sameThemeBrightness,
-      );
+      final backup = sampleBackup.copyWith(primaryColor: samePrimaryColor);
 
       final useCase = RestoreBackup(
         backup: backup,
@@ -130,38 +128,34 @@ void main() {
         languagesRepository: languagesRepository,
         languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        primaryColorDataSourceToUse: DataSourceToUse.backup,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
-        themeBrightnessDataSourceToUse: DataSourceToUse.backup,
+        themeBrightnessDataSourceToUse: DataSourceToUse.values.sample(1).single,
         tagsConflictResolver: ConflictResolver.replaceWithBackupData,
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase();
+      final result = await useCase.primaryColorBackupRestore();
 
-      verify(() => themeBrightnessRepository.fetchThemeBrightness()).called(1);
+      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
       verifyNever(
-        () =>
-            themeBrightnessRepository.saveThemeBrightness(sameThemeBrightness),
+        () => primaryColorsRepository.savePrimaryColor(samePrimaryColor),
       );
 
-      check(result.successfulThemeBrightnessRestoring).isTrue();
+      check(result).isA<Ok>();
     });
 
-    // TODO(deyan): missing tests for when fails at writing
     test('when DataSourceToUse is backup, '
         'and fails at fetching, not writes', () async {
-      when(themeBrightnessRepository.fetchThemeBrightness).thenAnswer(
+      when(primaryColorsRepository.fetchPrimaryColor).thenAnswer(
         (_) async =>
-            const Result.failure(ThemeBrightnessRepositoryErrors.missing),
+            const Result.failure(PrimaryColorsRepositoryErrors.missing),
       );
 
-      final sampleThemeBrightness = ThemeBrightness.values.sample(1).single;
-      final backup = sampleBackup.copyWith(
-        themeBrightness: sampleThemeBrightness,
-      );
+      final samplePrimaryColor = PrimaryColors.values.sample(1).single;
+      final backup = sampleBackup.copyWith(primaryColor: samplePrimaryColor);
 
       final useCase = RestoreBackup(
         backup: backup,
@@ -170,52 +164,46 @@ void main() {
         languagesRepository: languagesRepository,
         languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        primaryColorDataSourceToUse: DataSourceToUse.backup,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
-        themeBrightnessDataSourceToUse: DataSourceToUse.backup,
+        themeBrightnessDataSourceToUse: DataSourceToUse.values.sample(1).single,
         tagsConflictResolver: ConflictResolver.replaceWithBackupData,
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase();
+      final result = await useCase.primaryColorBackupRestore();
 
-      check(result.successfulThemeBrightnessRestoring).isFalse();
+      check(result).isA<Failure>();
 
-      verify(themeBrightnessRepository.fetchThemeBrightness).called(1);
+      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
       verifyNever(
-        () => themeBrightnessRepository.saveThemeBrightness(
-          sampleThemeBrightness,
-        ),
+        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
       );
     });
 
     test('when DataSourceToUse is backup, '
         'and fails at writing, not writes, keep old', () async {
-      final currentThemeBrightness = ThemeBrightness.values.sample(1).single;
+      final currentPrimaryColor = PrimaryColors.values.sample(1).single;
       when(
-        themeBrightnessRepository.fetchThemeBrightness,
-      ).thenAnswer((_) async => Result.ok(currentThemeBrightness));
+        primaryColorsRepository.fetchPrimaryColor,
+      ).thenAnswer((_) async => Result.ok(currentPrimaryColor));
 
-      final sampleThemeBrightness =
-          ThemeBrightness.values
-              .whereNot((final e) => e == currentThemeBrightness)
+      final samplePrimaryColor =
+          PrimaryColors.values
+              .whereNot((final e) => e == currentPrimaryColor)
               .sample(1)
               .single;
 
       when(
-        () => themeBrightnessRepository.saveThemeBrightness(
-          sampleThemeBrightness,
-        ),
+        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
       ).thenAnswer(
         (_) async =>
-            const Result.failure(ThemeBrightnessRepositoryErrors.failAtSaving),
+            const Result.failure(PrimaryColorsRepositoryErrors.failAtSaving),
       );
 
-      final backup = sampleBackup.copyWith(
-        themeBrightness: sampleThemeBrightness,
-      );
+      final backup = sampleBackup.copyWith(primaryColor: samplePrimaryColor);
 
       final useCase = RestoreBackup(
         backup: backup,
@@ -224,24 +212,22 @@ void main() {
         languagesRepository: languagesRepository,
         languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        primaryColorDataSourceToUse: DataSourceToUse.backup,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
-        themeBrightnessDataSourceToUse: DataSourceToUse.backup,
+        themeBrightnessDataSourceToUse: DataSourceToUse.values.sample(1).single,
         tagsConflictResolver: ConflictResolver.replaceWithBackupData,
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase();
+      final result = await useCase.primaryColorBackupRestore();
 
-      check(result.successfulThemeBrightnessRestoring).isFalse();
+      check(result).isA<Failure>();
 
-      verify(themeBrightnessRepository.fetchThemeBrightness).called(1);
+      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
       verify(
-        () => themeBrightnessRepository.saveThemeBrightness(
-          sampleThemeBrightness,
-        ),
+        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
       ).called(1);
     });
   });
