@@ -45,3 +45,7 @@ app.*.map.json
 # Test coverage
 lcov.info
 **.dart.vm.json
+
+# Mutation test
+
+mutation-test-report/
