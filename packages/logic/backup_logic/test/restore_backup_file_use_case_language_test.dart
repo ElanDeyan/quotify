@@ -5,10 +5,10 @@ import 'package:backup_logic/src/use_cases/restore_backup.dart';
 import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:languages_repository/models/language_errors.dart';
+import 'package:languages_repository/models/languages.dart';
+import 'package:languages_repository/repositories/languages_repository_errors.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:primary_colors_repository/models/primary_colors.dart';
-import 'package:primary_colors_repository/models/primary_colors_errors.dart';
-import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
 import 'package:quotify_utils/result.dart';
 
 import 'mocks/repository_mocks.dart';
@@ -24,7 +24,7 @@ void main() {
   late Backup sampleBackup;
 
   setUpAll(() {
-    registerFallbackValue(PrimaryColors.defaultColor);
+    registerFallbackValue(Languages.defaultLanguage);
   });
 
   setUp(() {
@@ -37,7 +37,7 @@ void main() {
     sampleBackup = sampleBackupGenerator();
   });
 
-  group('primary color', () {
+  group('language', () {
     test('when DataSourceToUse is local, '
         'ignore that one coming from backup', () async {
       final useCase = RestoreBackup(
@@ -45,9 +45,9 @@ void main() {
         quotesRepository: quotesRepository,
         tagRepository: tagRepository,
         languagesRepository: languagesRepository,
-        languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        languageDataSourceToUse: DataSourceToUse.local,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.local,
+        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
@@ -56,42 +56,42 @@ void main() {
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase.primaryColorBackupRestore();
+      final result = await useCase.languageBackupRestore();
 
-      verifyNever(primaryColorsRepository.fetchPrimaryColor);
-      verifyNever(() => primaryColorsRepository.savePrimaryColor(any()));
+      verifyNever(languagesRepository.fetchCurrentLanguage);
+      verifyNever(() => languagesRepository.setCurrentLanguage(any()));
 
-      check(result).isA<Ok<(), PrimaryColorsErrors>>();
+      check(result).isA<Ok<(), LanguageErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
         'and no problems at writing or fetching, '
         'writes if different', () async {
-      const currentPrimaryColor = PrimaryColors.softApricot;
+      final currentLanguage = Languages.values.sample(1).single;
       when(
-        primaryColorsRepository.fetchPrimaryColor,
-      ).thenAnswer((_) async => const Result.ok(currentPrimaryColor));
+        languagesRepository.fetchCurrentLanguage,
+      ).thenAnswer((_) async => Result.ok(currentLanguage));
 
-      final newPrimaryColor =
-          PrimaryColors.values
-              .whereNot((final element) => element == currentPrimaryColor)
+      final newLanguage =
+          Languages.values
+              .whereNot((final element) => element == currentLanguage)
               .sample(1)
               .single;
 
       when(
-        () => primaryColorsRepository.savePrimaryColor(newPrimaryColor),
+        () => languagesRepository.setCurrentLanguage(newLanguage),
       ).thenAnswer((_) async => const Result.ok(()));
 
-      final backup = sampleBackup.copyWith(primaryColor: newPrimaryColor);
+      final backup = sampleBackup.copyWith(language: newLanguage);
 
       final useCase = RestoreBackup(
         backup: backup,
         quotesRepository: quotesRepository,
         tagRepository: tagRepository,
         languagesRepository: languagesRepository,
-        languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        languageDataSourceToUse: DataSourceToUse.backup,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.backup,
+        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
@@ -100,36 +100,36 @@ void main() {
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase.primaryColorBackupRestore();
+      final result = await useCase.languageBackupRestore();
 
-      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
+      verify(languagesRepository.fetchCurrentLanguage).called(1);
       verify(
-        () => primaryColorsRepository.savePrimaryColor(newPrimaryColor),
+        () => languagesRepository.setCurrentLanguage(newLanguage),
       ).called(1);
 
-      check(result).isA<Ok<(), PrimaryColorsErrors>>();
+      check(result).isA<Ok<(), LanguageErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
         'and no problems at writing or fetching, '
         'writes if different (not writes)', () async {
-      const currentPrimaryColor = PrimaryColors.icyLilac;
+      final currentLanguage = Languages.values.sample(1).single;
       when(
-        primaryColorsRepository.fetchPrimaryColor,
-      ).thenAnswer((_) async => const Result.ok(currentPrimaryColor));
+        languagesRepository.fetchCurrentLanguage,
+      ).thenAnswer((_) async => Result.ok(currentLanguage));
 
-      const samePrimaryColor = currentPrimaryColor;
+      final sameLanguage = currentLanguage;
 
-      final backup = sampleBackup.copyWith(primaryColor: samePrimaryColor);
+      final backup = sampleBackup.copyWith(language: sameLanguage);
 
       final useCase = RestoreBackup(
         backup: backup,
         quotesRepository: quotesRepository,
         tagRepository: tagRepository,
         languagesRepository: languagesRepository,
-        languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        languageDataSourceToUse: DataSourceToUse.backup,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.backup,
+        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
@@ -138,34 +138,32 @@ void main() {
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase.primaryColorBackupRestore();
+      final result = await useCase.languageBackupRestore();
 
-      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
-      verifyNever(
-        () => primaryColorsRepository.savePrimaryColor(samePrimaryColor),
-      );
+      verify(languagesRepository.fetchCurrentLanguage).called(1);
+      verifyNever(() => languagesRepository.setCurrentLanguage(sameLanguage));
 
-      check(result).isA<Ok<(), PrimaryColorsErrors>>();
+      check(result).isA<Ok<(), LanguageErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
         'and fails at fetching, not writes', () async {
-      when(primaryColorsRepository.fetchPrimaryColor).thenAnswer(
+      when(languagesRepository.fetchCurrentLanguage).thenAnswer(
         (_) async =>
-            const Result.failure(PrimaryColorsRepositoryErrors.missing),
+            const Result.failure(LanguagesRepositoryErrors.missingLanguageCode),
       );
 
-      final samplePrimaryColor = PrimaryColors.values.sample(1).single;
-      final backup = sampleBackup.copyWith(primaryColor: samplePrimaryColor);
+      final sampleLanguage = Languages.values.sample(1).single;
+      final backup = sampleBackup.copyWith(language: sampleLanguage);
 
       final useCase = RestoreBackup(
         backup: backup,
         quotesRepository: quotesRepository,
         tagRepository: tagRepository,
         languagesRepository: languagesRepository,
-        languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        languageDataSourceToUse: DataSourceToUse.backup,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.backup,
+        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
@@ -174,46 +172,44 @@ void main() {
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase.primaryColorBackupRestore();
+      final result = await useCase.languageBackupRestore();
 
-      check(result).isA<Failure<(), PrimaryColorsErrors>>();
+      check(result).isA<Failure<(), LanguageErrors>>();
 
-      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
-      verifyNever(
-        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
-      );
+      verify(languagesRepository.fetchCurrentLanguage).called(1);
+      verifyNever(() => languagesRepository.setCurrentLanguage(sampleLanguage));
     });
 
     test('when DataSourceToUse is backup, '
         'and fails at writing, not writes, keep old', () async {
-      final currentPrimaryColor = PrimaryColors.values.sample(1).single;
+      final currentLanguage = Languages.values.sample(1).single;
       when(
-        primaryColorsRepository.fetchPrimaryColor,
-      ).thenAnswer((_) async => Result.ok(currentPrimaryColor));
+        languagesRepository.fetchCurrentLanguage,
+      ).thenAnswer((_) async => Result.ok(currentLanguage));
 
-      final samplePrimaryColor =
-          PrimaryColors.values
-              .whereNot((final e) => e == currentPrimaryColor)
+      final sampleLanguage =
+          Languages.values
+              .whereNot((final e) => e == currentLanguage)
               .sample(1)
               .single;
 
       when(
-        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
+        () => languagesRepository.setCurrentLanguage(sampleLanguage),
       ).thenAnswer(
         (_) async =>
-            const Result.failure(PrimaryColorsRepositoryErrors.failAtSaving),
+            const Result.failure(LanguagesRepositoryErrors.failAtSaving),
       );
 
-      final backup = sampleBackup.copyWith(primaryColor: samplePrimaryColor);
+      final backup = sampleBackup.copyWith(language: sampleLanguage);
 
       final useCase = RestoreBackup(
         backup: backup,
         quotesRepository: quotesRepository,
         tagRepository: tagRepository,
         languagesRepository: languagesRepository,
-        languageDataSourceToUse: DataSourceToUse.values.sample(1).single,
+        languageDataSourceToUse: DataSourceToUse.backup,
         primaryColorsRepository: primaryColorsRepository,
-        primaryColorDataSourceToUse: DataSourceToUse.backup,
+        primaryColorDataSourceToUse: DataSourceToUse.values.sample(1).single,
         privacyRepository: privacyRepository,
         privacyDataDataSourceToUse: DataSourceToUse.values.sample(1).single,
         themeBrightnessRepository: themeBrightnessRepository,
@@ -222,13 +218,13 @@ void main() {
         quotesConflictResolver: ConflictResolver.replaceWithBackupData,
       );
 
-      final result = await useCase.primaryColorBackupRestore();
+      final result = await useCase.languageBackupRestore();
 
-      check(result).isA<Failure<(), PrimaryColorsErrors>>();
+      check(result).isA<Failure<(), LanguageErrors>>();
 
-      verify(primaryColorsRepository.fetchPrimaryColor).called(1);
+      verify(languagesRepository.fetchCurrentLanguage).called(1);
       verify(
-        () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),
+        () => languagesRepository.setCurrentLanguage(sampleLanguage),
       ).called(1);
     });
   });

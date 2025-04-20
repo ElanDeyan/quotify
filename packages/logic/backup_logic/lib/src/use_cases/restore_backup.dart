@@ -1,3 +1,5 @@
+import 'package:languages_repository/models/language_errors.dart';
+import 'package:languages_repository/models/languages.dart';
 import 'package:languages_repository/repositories/languages_repository.dart';
 import 'package:meta/meta.dart';
 import 'package:primary_colors_repository/models/primary_colors.dart';
@@ -8,7 +10,6 @@ import 'package:privacy_repository/repositories/privacy_repository.dart';
 import 'package:quotes_repository/repositories/quotes_repository.dart';
 import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
-import 'package:synchronized/synchronized.dart';
 import 'package:tags_repository/repositories/tag_repository.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness_errors.dart';
@@ -63,7 +64,6 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
   final ConflictResolver _tagsConflictResolver;
   final ConflictResolver _quotesConflictResolver;
 
-  static final _sharedPreferencesLock = Lock();
   static const RestoreBackupResults _restoreBackupAllFailure = (
     successfulLanguagesRestoring: false,
     successfulPrimaryColorsRestoring: false,
@@ -90,18 +90,19 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
     final bool successfulTagsRestoring;
     final bool successfulQuotesRestoring;
 
-    // Shared preferences calls
-    final (themeBrightnessResult, primaryColorResult) =
+    final (themeBrightnessResult, primaryColorResult, languageResult) =
         await (
           themeBrightnessBackupRestore(),
           primaryColorBackupRestore(),
+          languageBackupRestore(),
         ).wait;
 
     successfulThemeBrightnessRestoring = themeBrightnessResult.isOk;
     successfulPrimaryColorsRestoring = primaryColorResult.isOk;
+    successfulLanguagesRestoring = languageResult.isOk;
 
     return (
-      successfulLanguagesRestoring: false,
+      successfulLanguagesRestoring: successfulLanguagesRestoring,
       successfulPrimaryColorsRestoring: successfulPrimaryColorsRestoring,
       successfulPrivacyDataRestoring: false,
       successfulQuotesRestoring: false,
@@ -126,11 +127,8 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
         }
 
         if (_backup.themeBrightness != currentThemeBrightnessResult.unwrap()) {
-          final savingResult = await _sharedPreferencesLock.synchronized(
-            () => _themeBrightnessRepository.saveThemeBrightness(
-              _backup.themeBrightness,
-            ),
-          );
+          final savingResult = await _themeBrightnessRepository
+              .saveThemeBrightness(_backup.themeBrightness);
 
           if (savingResult
               case final Failure<(), ThemeBrightnessRepositoryErrors> failure) {
@@ -156,13 +154,39 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
         }
 
         if (_backup.primaryColor != currentPrimaryColorResult.unwrap()) {
-          final savingResult = await _sharedPreferencesLock.synchronized(
-            () =>
-                _primaryColorsRepository.savePrimaryColor(_backup.primaryColor),
+          final savingResult = await _primaryColorsRepository.savePrimaryColor(
+            _backup.primaryColor,
           );
 
           if (savingResult
               case final Failure<(), PrimaryColorsRepositoryErrors> failure) {
+            return failure.mapSync((_) => ());
+          }
+        }
+
+        return const Result.ok(());
+    }
+  }
+
+  @visibleForTesting
+  FutureResult<Unit, LanguageErrors> languageBackupRestore() async {
+    switch (_languageDataSourceToUse) {
+      case DataSourceToUse.local:
+        return const Result.ok(());
+      case DataSourceToUse.backup:
+        final currentLanguageResult =
+            await _languagesRepository.fetchCurrentLanguage();
+        if (currentLanguageResult
+            case final Failure<Languages, LanguageErrors> failure) {
+          return failure.mapSync((_) => ());
+        }
+
+        if (_backup.language != currentLanguageResult.unwrap()) {
+          final savingResult = await _languagesRepository.setCurrentLanguage(
+            _backup.language,
+          );
+
+          if (savingResult case final Failure<(), LanguageErrors> failure) {
             return failure.mapSync((_) => ());
           }
         }

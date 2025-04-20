@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:quotify_utils/result.dart';
 import 'package:theme_brightness_repository/logic/models/theme_brightness.dart';
+import 'package:theme_brightness_repository/logic/models/theme_brightness_errors.dart';
 import 'package:theme_brightness_repository/repository/theme_brightness_repository_errors.dart';
 
 import 'mocks/repository_mocks.dart';
@@ -60,7 +61,7 @@ void main() {
       verifyNever(themeBrightnessRepository.fetchThemeBrightness);
       verifyNever(() => themeBrightnessRepository.saveThemeBrightness(any()));
 
-      check(result).isA<Ok>();
+      check(result).isA<Ok<(), ThemeBrightnessErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
@@ -106,7 +107,7 @@ void main() {
         () => themeBrightnessRepository.saveThemeBrightness(newThemeBrightness),
       ).called(1);
 
-      check(result).isA<Ok>();
+      check(result).isA<Ok<(), ThemeBrightnessErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
@@ -147,7 +148,7 @@ void main() {
             themeBrightnessRepository.saveThemeBrightness(sameThemeBrightness),
       );
 
-      check(result).isA<Ok>();
+      check(result).isA<Ok<(), ThemeBrightnessErrors>>();
     });
 
     test('when DataSourceToUse is backup, '
@@ -180,7 +181,7 @@ void main() {
 
       final result = await useCase.themeBrightnessBackupRestore();
 
-      check(result).isA<Failure>();
+      check(result).isA<Failure<(), ThemeBrightnessErrors>>();
 
       verify(themeBrightnessRepository.fetchThemeBrightness).called(1);
       verifyNever(
@@ -234,7 +235,7 @@ void main() {
 
       final result = await useCase.themeBrightnessBackupRestore();
 
-      check(result).isA<Failure>();
+      check(result).isA<Failure<(), ThemeBrightnessErrors>>();
 
       verify(themeBrightnessRepository.fetchThemeBrightness).called(1);
       verify(
