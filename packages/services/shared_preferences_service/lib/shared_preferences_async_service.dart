@@ -1,14 +1,20 @@
 import 'package:logging/logging.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A service for the [SharedPreferencesAsync].
 final class SharedPreferencesAsyncService {
   /// Constructor for the [SharedPreferencesAsyncService] class.
   /// It takes a parameter of type [SharedPreferencesAsync].
-  const SharedPreferencesAsyncService(this._sharedPreferencesAsync);
+  const SharedPreferencesAsyncService(
+    this._sharedPreferencesAsync, {
+    required Locking lockingImpl,
+  }) : _lock = lockingImpl;
 
   /// This variable will hold an instance of the [SharedPreferencesAsync] class.
   final SharedPreferencesAsync _sharedPreferencesAsync;
+
+  final Locking _lock;
 
   /// This variable is used for logging messages related to the
   /// [SharedPreferencesAsyncService] class.
@@ -36,7 +42,7 @@ final class SharedPreferencesAsyncService {
   ///   [value] ([String]): The value parameter is a string that you want
   ///   to store in the shared preferences with the corresponding [key].
   Future<void> setString(String key, String value) =>
-      _sharedPreferencesAsync.setString(key, value);
+      _lock.synchronized(() => _sharedPreferencesAsync.setString(key, value));
 
   /// Retrieves a [String] value associated with a given [key] from shared
   /// preferences asynchronously.

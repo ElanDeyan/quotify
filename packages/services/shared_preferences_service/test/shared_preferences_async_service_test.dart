@@ -1,5 +1,6 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/fake_shared_preferences_async.dart';
@@ -12,7 +13,10 @@ void main() {
 
   setUp(() {
     (sharedPreferencesAsync, store) = getPreferences();
-    service = SharedPreferencesAsyncService(sharedPreferencesAsync);
+    service = SharedPreferencesAsyncService(
+      sharedPreferencesAsync,
+      lockingImpl: const FakeLocking(),
+    );
   });
 
   tearDown(() {

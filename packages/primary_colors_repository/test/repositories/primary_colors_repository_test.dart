@@ -7,6 +7,7 @@ import 'package:primary_colors_repository/models/primary_colors_model_errors.dar
 import 'package:primary_colors_repository/repositories/primary_colors_repository.dart';
 import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
 import 'package:primary_colors_repository/repositories/primary_colors_repository_impl.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
@@ -18,6 +19,7 @@ void main() {
   setUp(() {
     sharedPreferencesAsyncService = SharedPreferencesAsyncService(
       MockSharedPreferencesAsync(),
+      lockingImpl: const FakeLocking(),
     );
     primaryColorsRepository = PrimaryColorsRepositoryImpl(
       sharedPreferencesAsyncService,

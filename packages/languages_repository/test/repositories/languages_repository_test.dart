@@ -7,6 +7,7 @@ import 'package:languages_repository/repositories/languages_repository.dart';
 import 'package:languages_repository/repositories/languages_repository_errors.dart';
 import 'package:languages_repository/repositories/languages_repository_impl.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
@@ -17,9 +18,13 @@ void main() {
   late SharedPreferencesAsyncService sharedPreferencesAsyncService;
   late LanguagesRepository languagesRepository;
 
+  setUpAll(() {
+    registerFallbackValue(Languages.defaultLanguage);
+  });
   setUp(() {
     sharedPreferencesAsyncService = SharedPreferencesAsyncService(
       MockSharedPreferencesAsync(),
+      lockingImpl: const FakeLocking(),
     );
     languagesRepository = LanguagesRepositoryImpl(
       sharedPreferencesAsyncService,

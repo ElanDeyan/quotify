@@ -6,6 +6,7 @@ export 'package:event/event.dart' show EventArgs;
 
 export 'src/diagnosticable.dart';
 export 'src/id.dart';
+export 'src/locking/locking.dart';
 export 'src/maybe.dart';
 export 'src/natural.dart';
 export 'src/non_blank_string.dart';

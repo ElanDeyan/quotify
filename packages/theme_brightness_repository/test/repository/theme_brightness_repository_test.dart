@@ -1,6 +1,7 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:quotify_utils/quotify_utils.dart';
 import 'package:quotify_utils/result.dart';
 import 'package:shared_preferences_service/shared_preferences_async_service.dart';
 import 'package:shared_preferences_service_test/mock_shared_preferences_async.dart';
@@ -18,6 +19,7 @@ void main() {
   setUp(() {
     sharedPreferencesAsyncService = SharedPreferencesAsyncService(
       MockSharedPreferencesAsync(),
+      lockingImpl: const FakeLocking(),
     );
     themeBrightnessRepository = ThemeBrightnessRepositoryImpl(
       sharedPreferencesAsyncService,
