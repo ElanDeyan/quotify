@@ -136,8 +136,8 @@ void main() {
             quotes: UnmodifiableSetView(quotes),
           );
 
-          final quotesFromBackupMap =
-              sampleBackup.toMap()[Quote.listOfQuotesJsonKey];
+          final quotesFromBackupMap = sampleBackup
+              .toMap()[Quote.listOfQuotesJsonKey];
 
           expect(
             quotesFromBackupMap,
@@ -179,8 +179,8 @@ void main() {
     group('if missing any key', () {
       test('like ${ThemeBrightness.jsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(ThemeBrightness.jsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(ThemeBrightness.jsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -192,8 +192,8 @@ void main() {
       });
       test('like ${PrimaryColors.jsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(PrimaryColors.jsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(PrimaryColors.jsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -205,8 +205,8 @@ void main() {
       });
       test('like ${Languages.jsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(Languages.jsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(Languages.jsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -218,8 +218,8 @@ void main() {
       });
       test('like ${PrivacyData.jsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(PrivacyData.jsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(PrivacyData.jsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -231,8 +231,8 @@ void main() {
       });
       test('like ${Tag.listOfTagsJsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(Tag.listOfTagsJsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(Tag.listOfTagsJsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -244,8 +244,8 @@ void main() {
       });
       test('like ${Quote.listOfQuotesJsonKey}, should return failure with'
           ' ${BackupModelErrors.invalidMapRepresentation}', () {
-        final sampleBackupMapWithoutId =
-            _backupWithDefaultData().toMap()..remove(Quote.listOfQuotesJsonKey);
+        final sampleBackupMapWithoutId = _backupWithDefaultData().toMap()
+          ..remove(Quote.listOfQuotesJsonKey);
 
         final fromMap = Backup.fromMap(sampleBackupMapWithoutId);
 
@@ -306,9 +306,8 @@ void main() {
           !Languages.values.map((e) => e.name).contains(word),
           'ensure that random value is not valid',
         );
-        final sampleBackupWithWrongLanguage =
-            _backupWithDefaultData().toMap()
-              ..update(Languages.jsonKey, (_) => word);
+        final sampleBackupWithWrongLanguage = _backupWithDefaultData().toMap()
+          ..update(Languages.jsonKey, (_) => word);
 
         final fromMap = Backup.fromMap(sampleBackupWithWrongLanguage);
 
@@ -336,9 +335,8 @@ void main() {
         ];
 
         for (final sample in wrongMapSamples) {
-          final sampleBackupWithWrongLanguage =
-              _backupWithDefaultData().toMap()
-                ..update(PrivacyData.jsonKey, (_) => sample);
+          final sampleBackupWithWrongLanguage = _backupWithDefaultData().toMap()
+            ..update(PrivacyData.jsonKey, (_) => sample);
 
           final fromMap = Backup.fromMap(sampleBackupWithWrongLanguage);
 
@@ -352,11 +350,11 @@ void main() {
       test('like tags should return Failure '
           'with ${BackupModelErrors.atLeastOneInvalidTagMap.name}', () {
         for (var i = 0; i < 5; i++) {
-          final sampleBackupWithWrongTagMap =
-              _backupWithDefaultData().toMap()..update(
-                Tag.listOfTagsJsonKey,
-                (_) => _wrongTagsMapList()..shuffle(random),
-              );
+          final sampleBackupWithWrongTagMap = _backupWithDefaultData().toMap()
+            ..update(
+              Tag.listOfTagsJsonKey,
+              (_) => _wrongTagsMapList()..shuffle(random),
+            );
 
           final fromMap = Backup.fromMap(sampleBackupWithWrongTagMap);
 
@@ -466,49 +464,46 @@ Quote _sampleQuote() {
     updatedAt: DateTime.now().add(const Duration(minutes: 5)),
     isFavorite: faker.randomGenerator.boolean(),
     source: faker.randomGenerator.boolean() ? faker.lorem.word() : null,
-    sourceUri:
-        faker.randomGenerator.boolean()
-            ? Uri.tryParse(faker.internet.httpsUrl())
-            : null,
-    tags:
-        faker.randomGenerator.boolean()
-            ? UnmodifiableSetView({
-              for (var i = 0; i < sampleTagsLength; i++) _sampleTag(),
-            })
-            : const UnmodifiableSetView.empty(),
+    sourceUri: faker.randomGenerator.boolean()
+        ? Uri.tryParse(faker.internet.httpsUrl())
+        : null,
+    tags: faker.randomGenerator.boolean()
+        ? UnmodifiableSetView({
+            for (var i = 0; i < sampleTagsLength; i++) _sampleTag(),
+          })
+        : const UnmodifiableSetView.empty(),
   );
 }
 
 List<Map<String, Object?>> _wrongQuotesMapSample() {
   final withoutId = _sampleQuote().toMap()..remove('id');
-  final withNegativeId =
-      _sampleQuote().toMap()
-        ..update('id', (_) => faker.randomGenerator.integer(-1, min: -20));
+  final withNegativeId = _sampleQuote().toMap()
+    ..update('id', (_) => faker.randomGenerator.integer(-1, min: -20));
   final withoutContent = _sampleQuote().toMap()..remove('content');
   final withEmptyContent = _sampleQuote().toMap()..update('content', (_) => '');
-  final withBlankContent =
-      _sampleQuote().toMap()..update('content', (_) => '    ');
+  final withBlankContent = _sampleQuote().toMap()
+    ..update('content', (_) => '    ');
   final withoutAuthor = _sampleQuote().toMap()..remove('author');
   final withEmptyAuthor = _sampleQuote().toMap()..update('author', (_) => '');
-  final withBlankAuthor =
-      _sampleQuote().toMap()..update('author', (_) => '   ');
+  final withBlankAuthor = _sampleQuote().toMap()
+    ..update('author', (_) => '   ');
   final withoutSource = _sampleQuote().toMap()..remove('source');
   final withEmptySource = _sampleQuote().toMap()..update('source', (_) => '');
-  final withBlankSource =
-      _sampleQuote().toMap()..update('source', (_) => '   ');
+  final withBlankSource = _sampleQuote().toMap()
+    ..update('source', (_) => '   ');
   final withoutSourceUri = _sampleQuote().toMap()..remove('sourceUri');
-  final withInvalidSourceUri =
-      _sampleQuote().toMap()..update('sourceUri', (_) => '::Not valid URI::');
+  final withInvalidSourceUri = _sampleQuote().toMap()
+    ..update('sourceUri', (_) => '::Not valid URI::');
   final withoutIsFavorite = _sampleQuote().toMap()..remove('isFavorite');
   final withoutCreatedAt = _sampleQuote().toMap()..remove('createdAt');
-  final withInvalidCreatedAtString =
-      _sampleQuote().toMap()..update('createdAt', (_) => faker.lorem.word());
+  final withInvalidCreatedAtString = _sampleQuote().toMap()
+    ..update('createdAt', (_) => faker.lorem.word());
   final withoutUpdatedAt = _sampleQuote().toMap()..remove('updatedAt');
-  final withInvalidUpdatedAtString =
-      _sampleQuote().toMap()..update('updatedAt', (_) => faker.lorem.word());
+  final withInvalidUpdatedAtString = _sampleQuote().toMap()
+    ..update('updatedAt', (_) => faker.lorem.word());
   final withoutTags = _sampleQuote().toMap()..remove('tags');
-  final withInvalidTagMap =
-      _sampleQuote().toMap()..update('tags', (_) => _wrongTagsMapList());
+  final withInvalidTagMap = _sampleQuote().toMap()
+    ..update('tags', (_) => _wrongTagsMapList());
 
   return [
     withoutId,

@@ -1,6 +1,4 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:backup_logic/src/models/conflict_resolver.dart';
-import 'package:backup_logic/src/models/data_source_to_keep.dart';
 import 'package:backup_logic/src/use_cases/restore_backup.dart';
 import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
@@ -72,11 +70,10 @@ void main() {
         () => themeBrightnessRepository.fetchThemeBrightness(),
       ).thenAnswer((_) async => const Result.ok(currentThemeBrightness));
 
-      final newThemeBrightness =
-          ThemeBrightness.values
-              .whereNot((final element) => element == currentThemeBrightness)
-              .sample(1)
-              .single;
+      final newThemeBrightness = ThemeBrightness.values
+          .whereNot((element) => element == currentThemeBrightness)
+          .sample(1)
+          .single;
 
       when(
         () => themeBrightnessRepository.saveThemeBrightness(newThemeBrightness),
@@ -198,11 +195,10 @@ void main() {
         themeBrightnessRepository.fetchThemeBrightness,
       ).thenAnswer((_) async => Result.ok(currentThemeBrightness));
 
-      final sampleThemeBrightness =
-          ThemeBrightness.values
-              .whereNot((final e) => e == currentThemeBrightness)
-              .sample(1)
-              .single;
+      final sampleThemeBrightness = ThemeBrightness.values
+          .whereNot((e) => e == currentThemeBrightness)
+          .sample(1)
+          .single;
 
       when(
         () => themeBrightnessRepository.saveThemeBrightness(

@@ -15,21 +15,25 @@ import '../utils/uri_to_nullable_string_converter.dart';
 /// - `createdAt`: The timestamp when the quote was created.
 base class Quotes extends Table
     with IntIdPrimaryKeyMixin, CreatedAtAndUpdatedAtMixin {
-  late final Column<String> content =
-      text().check(content.length.isBiggerThanValue(0))();
+  late final Column<String> content = text().check(
+    content.length.isBiggerThanValue(0),
+  )();
 
-  late final Column<String> author =
-      text().check(author.length.isBiggerThanValue(0))();
+  late final Column<String> author = text().check(
+    author.length.isBiggerThanValue(0),
+  )();
 
   late final Column<String> source = text().nullable()();
 
-  late final Column<String> sourceUri =
-      text().nullable().map(const UriToNullableStringConverter())();
+  late final Column<String> sourceUri = text().nullable().map(
+    const UriToNullableStringConverter(),
+  )();
 
   late final Column<bool> isFavorite = boolean()();
 
-  late final Column<String> tags =
-      text().map(const TagsSetToStringConverter())();
+  late final Column<String> tags = text().map(
+    const TagsSetToStringConverter(),
+  )();
 
   @override
   bool get isStrict => true;

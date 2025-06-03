@@ -19,7 +19,7 @@ final class ShareBackupFile implements UseCase<void> {
        _backupFile = backupFile;
 
   factory ShareBackupFile.withSharePlus(XFile file) => ShareBackupFile._(
-    handler: (file) => Share.shareXFiles([file]),
+    handler: (file) => SharePlus.instance.share(ShareParams(files: [file])),
     backupFile: file,
   );
 

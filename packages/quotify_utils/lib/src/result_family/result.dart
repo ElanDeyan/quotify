@@ -114,15 +114,16 @@ sealed class Result<T extends Object, E extends Object> {
     Future<T> Function() computation, {
     required Duration timeout,
     required E failureOnTimeout,
-  }) => Future.sync(
-    computation,
-  ).timeout(timeout).then(Result<T, E>.ok).catchError((Object error) {
-    if (error is TimeoutException) {
-      return Result<T, E>.failure(failureOnTimeout);
-    }
+  }) => Future.sync(computation)
+      .timeout(timeout)
+      .then(Result<T, E>.ok)
+      .catchError((Object error) {
+        if (error is TimeoutException) {
+          return Result<T, E>.failure(failureOnTimeout);
+        }
 
-    return Result<T, E>.failure(error as E);
-  }, test: (error) => error is E || error is TimeoutException);
+        return Result<T, E>.failure(error as E);
+      }, test: (error) => error is E || error is TimeoutException);
 
   /// Converts a stream of values of type `T` into a stream of `Result<T, E>`
   /// objects.
@@ -140,17 +141,16 @@ sealed class Result<T extends Object, E extends Object> {
   /// - Returns: A broadcast stream of `Result<T, E>` objects.
   static Stream<Result<T, E>> guardStream<T extends Object, E extends Object>(
     Stream<T> stream,
-  ) =>
-      stream
-          .map(Result<T, E>.ok)
-          .handleError(
-            (Object error, StackTrace stackTrace) => Result<T, E>.failure(
-              error as E,
-              stackTrace == StackTrace.empty ? null : stackTrace,
-            ),
-            test: (error) => error is E,
-          )
-          .asBroadcastStream();
+  ) => stream
+      .map(Result<T, E>.ok)
+      .handleError(
+        (Object error, StackTrace stackTrace) => Result<T, E>.failure(
+          error as E,
+          stackTrace == StackTrace.empty ? null : stackTrace,
+        ),
+        test: (error) => error is E,
+      )
+      .asBroadcastStream();
 
   static FutureResult<T, E> retryAsync<T extends Object, E extends Object>(
     Future<T> Function() computation, {

@@ -1,6 +1,4 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:backup_logic/src/models/conflict_resolver.dart';
-import 'package:backup_logic/src/models/data_source_to_keep.dart';
 import 'package:backup_logic/src/use_cases/restore_backup.dart';
 import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
@@ -72,11 +70,10 @@ void main() {
         primaryColorsRepository.fetchPrimaryColor,
       ).thenAnswer((_) async => const Result.ok(currentPrimaryColor));
 
-      final newPrimaryColor =
-          PrimaryColors.values
-              .whereNot((final element) => element == currentPrimaryColor)
-              .sample(1)
-              .single;
+      final newPrimaryColor = PrimaryColors.values
+          .whereNot((element) => element == currentPrimaryColor)
+          .sample(1)
+          .single;
 
       when(
         () => primaryColorsRepository.savePrimaryColor(newPrimaryColor),
@@ -191,11 +188,10 @@ void main() {
         primaryColorsRepository.fetchPrimaryColor,
       ).thenAnswer((_) async => Result.ok(currentPrimaryColor));
 
-      final samplePrimaryColor =
-          PrimaryColors.values
-              .whereNot((final e) => e == currentPrimaryColor)
-              .sample(1)
-              .single;
+      final samplePrimaryColor = PrimaryColors.values
+          .whereNot((e) => e == currentPrimaryColor)
+          .sample(1)
+          .single;
 
       when(
         () => primaryColorsRepository.savePrimaryColor(samplePrimaryColor),

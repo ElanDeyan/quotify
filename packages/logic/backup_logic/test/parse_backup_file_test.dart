@@ -17,10 +17,10 @@ void main() {
   setUp(() async {
     sampleBackup = sampleBackupGenerator();
     password = sampleBackupPasswordGenerator();
-    sampleBackupFile =
-        (await GenerateBackupFile(backup: sampleBackup, password: password)())
-            .asOk
-            .value;
+    sampleBackupFile = (await GenerateBackupFile(
+      backup: sampleBackup,
+      password: password,
+    )()).asOk.value;
   });
 
   test('if same password, should return the same backup instance', () async {

@@ -19,7 +19,7 @@ dev_dependencies:
   faker: ^2.2.0
   flutter_test:
     sdk: flutter
+  kiri_check: ^1.2.0
+  lint: ^2.8.0
   mocktail: ^1.0.4
   shared_preferences_service_test: ^0.0.1
-  lint: ^2.8.0
-  kiri_check: ^1.2.0

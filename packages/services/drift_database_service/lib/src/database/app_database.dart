@@ -181,9 +181,9 @@ final class AppDatabase extends _$AppDatabase {
   /// successful.
   FutureResult<TagTable, DatabaseErrors> deleteTag(Id id) => Result.guardAsync(
     () => transaction(() async {
-      final affectedRows =
-          await (delete(tags)
-            ..where((tbl) => tbl.id.equals(id.toInt()))).goAndReturn();
+      final affectedRows = await (delete(
+        tags,
+      )..where((tbl) => tbl.id.equals(id.toInt()))).goAndReturn();
 
       return switch (affectedRows) {
         [final deletedTag] => deletedTag,
@@ -196,9 +196,9 @@ final class AppDatabase extends _$AppDatabase {
   FutureResult<QuoteTable, DatabaseErrors> deleteQuote(Id id) =>
       Result.guardAsync(
         () => transaction(() async {
-          final affectedRows =
-              await (delete(quotes)
-                ..where((tbl) => tbl.id.equals(id.toInt()))).goAndReturn();
+          final affectedRows = await (delete(
+            quotes,
+          )..where((tbl) => tbl.id.equals(id.toInt()))).goAndReturn();
 
           return switch (affectedRows) {
             [final deletedTag] => deletedTag,
@@ -220,13 +220,13 @@ final class AppDatabase extends _$AppDatabase {
   /// Returns a [Future] that completes with a [Maybe] of [TagTable] if
   /// a tag with the specified ID is found, or `null` if no such tag
   /// exists.
-  Future<TagTable?> getTagById(Id id) =>
-      (select(tags)
-        ..where((tbl) => tbl.id.equals(id.toInt()))).getSingleOrNull();
+  Future<TagTable?> getTagById(Id id) => (select(
+    tags,
+  )..where((tbl) => tbl.id.equals(id.toInt()))).getSingleOrNull();
 
-  Future<QuoteTable?> getQuoteById(Id id) =>
-      (select(quotes)
-        ..where((tbl) => tbl.id.equals(id.toInt()))).getSingleOrNull();
+  Future<QuoteTable?> getQuoteById(Id id) => (select(
+    quotes,
+  )..where((tbl) => tbl.id.equals(id.toInt()))).getSingleOrNull();
 
   Future<Set<QuoteTable>> getQuotesWithTagId(Id id) async {
     final quotes = await allQuotes;
@@ -295,14 +295,15 @@ final class AppDatabase extends _$AppDatabase {
     FullTagEntry updatedTagEntry,
   ) => Result.guardAsync(
     () => transaction(() async {
-      final affectedRows = await (update(tags)..where(
-        (tbl) => tbl.id.equals(updatedTagEntry.id.toInt()),
-      )).writeReturning(
-        TagsCompanion(
-          label: Value(updatedTagEntry.label),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final affectedRows =
+          await (update(tags)
+                ..where((tbl) => tbl.id.equals(updatedTagEntry.id.toInt())))
+              .writeReturning(
+                TagsCompanion(
+                  label: Value(updatedTagEntry.label),
+                  updatedAt: Value(DateTime.now()),
+                ),
+              );
 
       return switch (affectedRows) {
         [final updatedRow] => updatedRow,
@@ -316,19 +317,20 @@ final class AppDatabase extends _$AppDatabase {
     FullQuoteEntry updatedQuoteEntry,
   ) => Result.guardAsync(
     () => transaction(() async {
-      final affectedRows = await (update(quotes)..where(
-        (tbl) => tbl.id.equals(updatedQuoteEntry.id.toInt()),
-      )).writeReturning(
-        QuotesCompanion(
-          content: Value(updatedQuoteEntry.content),
-          author: Value(updatedQuoteEntry.author),
-          isFavorite: Value(updatedQuoteEntry.isFavorite),
-          source: Value(updatedQuoteEntry.source),
-          sourceUri: Value(updatedQuoteEntry.sourceUri),
-          tags: Value(updatedQuoteEntry.tags),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final affectedRows =
+          await (update(quotes)
+                ..where((tbl) => tbl.id.equals(updatedQuoteEntry.id.toInt())))
+              .writeReturning(
+                QuotesCompanion(
+                  content: Value(updatedQuoteEntry.content),
+                  author: Value(updatedQuoteEntry.author),
+                  isFavorite: Value(updatedQuoteEntry.isFavorite),
+                  source: Value(updatedQuoteEntry.source),
+                  sourceUri: Value(updatedQuoteEntry.sourceUri),
+                  tags: Value(updatedQuoteEntry.tags),
+                  updatedAt: Value(DateTime.now()),
+                ),
+              );
 
       return switch (affectedRows) {
         [final updatedRow] => updatedRow,

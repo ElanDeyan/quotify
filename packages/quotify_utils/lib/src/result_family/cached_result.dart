@@ -16,7 +16,7 @@ final class CachedResult<T extends Object, E extends Object> {
   bool get isExpired =>
       _lastComputed == null || DateTime.now().difference(_lastComputed!) > _ttl;
 
-  FutureResult<T, E> get value async {
+  FutureResult<T, E> get value {
     if (_cachedResult == null || isExpired) {
       _cachedResult = Result.guardAsync(_computation);
       _lastComputed = DateTime.now();

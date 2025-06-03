@@ -20,8 +20,9 @@ import '../mixins/int_id_primary_key_mixin.dart';
 base class Tags extends Table
     with IntIdPrimaryKeyMixin, CreatedAtAndUpdatedAtMixin {
   /// Label column.
-  late final Column<String> label =
-      text().check(label.length.isBiggerThanValue(0))();
+  late final Column<String> label = text().check(
+    label.length.isBiggerThanValue(0),
+  )();
 
   @override
   bool get isStrict => true;

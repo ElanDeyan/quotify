@@ -1,6 +1,4 @@
 import 'package:backup_logic/backup_logic.dart';
-import 'package:backup_logic/src/models/conflict_resolver.dart';
-import 'package:backup_logic/src/models/data_source_to_keep.dart';
 import 'package:backup_logic/src/use_cases/restore_backup.dart';
 import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
@@ -72,11 +70,10 @@ void main() {
         languagesRepository.fetchCurrentLanguage,
       ).thenAnswer((_) async => Result.ok(currentLanguage));
 
-      final newLanguage =
-          Languages.values
-              .whereNot((final element) => element == currentLanguage)
-              .sample(1)
-              .single;
+      final newLanguage = Languages.values
+          .whereNot((element) => element == currentLanguage)
+          .sample(1)
+          .single;
 
       when(
         () => languagesRepository.setCurrentLanguage(newLanguage),
@@ -187,11 +184,10 @@ void main() {
         languagesRepository.fetchCurrentLanguage,
       ).thenAnswer((_) async => Result.ok(currentLanguage));
 
-      final sampleLanguage =
-          Languages.values
-              .whereNot((final e) => e == currentLanguage)
-              .sample(1)
-              .single;
+      final sampleLanguage = Languages.values
+          .whereNot((e) => e == currentLanguage)
+          .sample(1)
+          .single;
 
       when(
         () => languagesRepository.setCurrentLanguage(sampleLanguage),

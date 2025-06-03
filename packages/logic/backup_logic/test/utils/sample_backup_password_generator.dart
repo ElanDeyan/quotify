@@ -18,9 +18,8 @@ BackupPassword sampleBackupPasswordGenerator() {
 
   final digits = faker.randomGenerator.fromCharSet('0123456789', 3);
 
-  final passwordBuffer =
-      StringBuffer()
-        ..writeAll([lowerCaseLetters, upperCaseLetters, specialChars, digits]);
+  final passwordBuffer = StringBuffer()
+    ..writeAll([lowerCaseLetters, upperCaseLetters, specialChars, digits]);
 
   return BackupPassword(passwordBuffer.toString().split('').shuffled().join());
 }

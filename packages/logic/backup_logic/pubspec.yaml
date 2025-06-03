@@ -27,10 +27,10 @@ dependencies:
   theme_brightness_repository: ^0.0.1
 
 dev_dependencies:
+  checks: ^0.3.0
   faker: ^2.2.0
   flutter_test:
     sdk: flutter
-  plugin_platform_interface: ^2.1.8
-  lint: ^2.8.0
-  checks: ^0.3.0
   glados: ^1.1.7
+  lint: ^2.8.0
+  plugin_platform_interface: ^2.1.8

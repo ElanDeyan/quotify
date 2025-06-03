@@ -106,7 +106,7 @@ void main() {
       expect(result.asFailure.failure, isA<ArithmeticException>());
     });
 
-    test('should rethrow the exception if is not the expected type', () async {
+    test('should rethrow the exception if is not the expected type', () {
       expect(
         () => Result.guardAsync<String, FormatException>(
           () => Future.error(ArithmeticException('Unexpected!')),
@@ -151,7 +151,7 @@ void main() {
       },
     );
 
-    test('should rethrow the exception if is not the expected type', () async {
+    test('should rethrow the exception if is not the expected type', () {
       expect(
         () => Result.guardAsyncWithTimeout<String, FormatException>(
           () => Future.error(ArithmeticException('Unexpected!')),

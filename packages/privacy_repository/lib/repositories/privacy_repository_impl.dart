@@ -55,13 +55,12 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
     const numbers = '0123456789';
     const specialChars = r'!@#$%&*(){}[]\|?/+=_-';
 
-    final requiredChars =
-        [
-          lowerCaseLetters[Random.secure().nextInt(lowerCaseLetters.length)],
-          upperCaseLetters[Random.secure().nextInt(upperCaseLetters.length)],
-          numbers[Random.secure().nextInt(numbers.length)],
-          specialChars[Random.secure().nextInt(specialChars.length)],
-        ].join();
+    final requiredChars = [
+      lowerCaseLetters[Random.secure().nextInt(lowerCaseLetters.length)],
+      upperCaseLetters[Random.secure().nextInt(upperCaseLetters.length)],
+      numbers[Random.secure().nextInt(numbers.length)],
+      specialChars[Random.secure().nextInt(specialChars.length)],
+    ].join();
 
     final allowedChars =
         lowerCaseLetters + upperCaseLetters + numbers + specialChars;
@@ -134,17 +133,17 @@ final class PrivacyRepositoryImpl implements PrivacyRepository {
 
     final allowErrorReportingEntry =
         await _secureStorageService.containsKey(
-              PrivacyRepository.allowErrorReportingKey,
-            )
-            ? null
-            : defaultAllowErrorReporting;
+          PrivacyRepository.allowErrorReportingKey,
+        )
+        ? null
+        : defaultAllowErrorReporting;
 
     final acceptedDataUsageEntry =
         await _secureStorageService.containsKey(
-              PrivacyRepository.acceptedDataUsageKey,
-            )
-            ? null
-            : defaultAcceptedDataUsage;
+          PrivacyRepository.acceptedDataUsageKey,
+        )
+        ? null
+        : defaultAcceptedDataUsage;
 
     return Result.guardAsync(() async {
       await savePrivacyData(

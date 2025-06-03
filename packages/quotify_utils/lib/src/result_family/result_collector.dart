@@ -73,8 +73,7 @@ final class ResultCollector<T extends Object, E extends Object> {
   /// Returns:
   /// - `Result<List<T>, List<E>>`: A [Result] object containing either the
   ///   list of values or the list of errors and the stack trace.
-  Result<List<T>, List<E>> collect() =>
-      _failures.isEmpty
-          ? Result.ok(_values)
-          : Result.failure(_failures, StackTrace.current);
+  Result<List<T>, List<E>> collect() => _failures.isEmpty
+      ? Result.ok(_values)
+      : Result.failure(_failures, StackTrace.current);
 }

@@ -242,14 +242,14 @@ final class Quote implements Encodable, Queryable {
 
   @override
   String get asQueryableString {
-    final buffer =
-        StringBuffer()..writeAll([
-          content,
-          author,
-          if (source != null) source,
-          if (sourceUri != null) sourceUri.toString(),
-          ...tags.map((e) => e.label),
-        ], '\n');
+    final buffer = StringBuffer()
+      ..writeAll([
+        content,
+        author,
+        if (source != null) source,
+        if (sourceUri != null) sourceUri.toString(),
+        ...tags.map((e) => e.label),
+      ], '\n');
 
     return buffer.toString();
   }
