@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.8.0
 
 workspace:
   - packages/quotify_utils
@@ -21,6 +21,8 @@ workspace:
   - packages/logic/backup_logic
 
 dependencies:
+  backup_logic: ^0.0.1
+  collection: ^1.19.1
   flutter:
     sdk: flutter
   languages_repository: ^0.0.1
@@ -39,11 +41,13 @@ dev_dependencies:
   faker: ^2.2.0
   flutter_test:
     sdk: flutter
+  glados: ^1.1.7
   integration_test:
     sdk: flutter
+  kiri_check: ^1.2.0
   lint: ^2.8.0
   mocktail: ^1.0.4
   shared_preferences_service_test: ^0.0.1
 
-flutter:
-  uses-material-design: true
+formatter:
+  trailing_commas: preserve

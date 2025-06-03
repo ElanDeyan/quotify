@@ -13,3 +13,4 @@ linter:
     omit_obvious_property_types: true
     specify_nonobvious_property_types: true
     require_trailing_commas: false
+    use_null_aware_elements: true
