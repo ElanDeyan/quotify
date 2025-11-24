@@ -44,6 +44,12 @@ final class PrivacyData implements Encodable {
       allowErrorReporting == other.allowErrorReporting &&
       acceptedDataUsage == other.acceptedDataUsage;
 
+  PrivacyData copyWith({bool? acceptedDataUsage, bool? allowErrorReporting}) =>
+      PrivacyData(
+        acceptedDataUsage: acceptedDataUsage ?? this.acceptedDataUsage,
+        allowErrorReporting: allowErrorReporting ?? this.allowErrorReporting,
+      );
+
   /// Method to transform [PrivacyData] to a [Map] of [String] and [Object]?
   /// pair.
   @override

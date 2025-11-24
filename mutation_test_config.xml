@@ -29,6 +29,12 @@
     <literal text="||" id="builtin.or">
       <mutation text="&amp;&amp;"/>
     </literal>
+    <literal text="true" id="dart.boolean.true">
+      <mutation text="false"/>
+    </literal>
+    <literal text="false" id="dart.boolean.false">
+      <mutation text="true"/>
+    </literal>
     <!-- Replaces assignments with other assignments -->
     <literal text="+=" id="builtin.op.add_assign">
       <mutation text="="/>
@@ -42,7 +48,7 @@
     <literal text="/=" id="builtin.op.div_assign">
       <mutation text="="/>
     </literal>
-    <literal text="&=" id="builtin.op.and_assign">
+    <literal text="&amp;=" id="builtin.op.and_assign">
       <mutation text="="/>
     </literal>
     <literal text="^=" id="builtin.op.or_assign">
@@ -121,6 +127,9 @@
       <mutation text="$1($2,$4,$3,$5);"/>
       <mutation text="$1($2,$3,$5,$4);"/>
     </regex>
+    <regex pattern="(\S+)\s*\?\?\s*(\S+)" id="dart.null.coalescing.replace">
+      <mutation text="$2"/>
+    </regex>
     <!-- Replaces arithmetic operators with their opposite -->
     <regex pattern="\+([^=])" id="builtin.arith.add">
       <mutation text="-$1"/>
@@ -133,6 +142,20 @@
     </regex>
     <regex pattern="/([^=])" id="builtin.arith.div">
       <mutation text="*$1"/>
+    </regex>
+    <regex pattern="\b0\b" id="dart.number.zero.to.one">
+    <mutation text="1"/>
+</regex>
+    <regex pattern="\b1\b" id="dart.number.one.to.zero">
+        <mutation text="0"/>
+    </regex>
+
+    <regex pattern="\b([2-9]|[1-9]\d+)\b" id="dart.number.integer.increment">
+        <mutation text="($1 + 1)"/> <mutation text="0"/>
+    </regex>
+
+    <regex pattern="\b([1-9]\d*)\b" id="dart.number.integer.decrement">
+        <mutation text="($1 - 1)"/> <mutation text="0"/>
     </regex>
     <!-- Removes break; statements for c++ switches -->
     <regex pattern="break;(\s+)case" id="builtin.switch.break">
@@ -149,6 +172,16 @@
     <regex pattern="([};]\s*)([^\(;=\s}]+\([^;]+\)\s*;)" id="builtin.function.removeVoidCall2">
       <mutation text="$1"/>
     </regex>
+    <regex pattern="\bis\b" id="dart.type.is.to.isNot">
+   <mutation text="is!"/>
+</regex>
+<regex pattern="\bis!\b" id="dart.type.isNot.to.is">
+   <mutation text="is"/>
+</regex>
+<regex pattern="\?\s*(.*?)\s*:\s*(.*)" id="dart.conditional.ternary.replace">
+    <mutation text="$1"/>
+    <mutation text="$2"/>
+</regex>
   </rules>
   <!-- This element creates a blacklist, allowing you to exclude parts from the mutations -->
   <exclude>

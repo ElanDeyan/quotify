@@ -6,6 +6,9 @@ import 'package:primary_colors_repository/models/primary_colors.dart';
 import 'package:primary_colors_repository/models/primary_colors_errors.dart';
 import 'package:primary_colors_repository/repositories/primary_colors_repository.dart';
 import 'package:primary_colors_repository/repositories/primary_colors_repository_errors.dart';
+import 'package:privacy_repository/logic/models/privacy_data.dart';
+import 'package:privacy_repository/logic/models/privacy_data_errors.dart';
+import 'package:privacy_repository/repositories/privacy_data_repository_errors.dart';
 import 'package:privacy_repository/repositories/privacy_repository.dart';
 import 'package:quotes_repository/repositories/quotes_repository.dart';
 import 'package:quotify_utils/quotify_utils.dart';
@@ -17,25 +20,23 @@ import 'package:theme_brightness_repository/repository/theme_brightness_reposito
 import 'package:theme_brightness_repository/repository/theme_brightness_repository_errors.dart';
 
 import '../../backup_logic.dart';
-import '../models/conflict_resolver.dart';
-import '../models/data_source_to_keep.dart';
 import '../models/restore_backup_results.dart';
 
 final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
   const RestoreBackup({
-    required final Backup backup,
-    required final QuotesRepository quotesRepository,
-    required final TagRepository tagRepository,
-    required final LanguagesRepository languagesRepository,
-    required final PrimaryColorsRepository primaryColorsRepository,
-    required final PrivacyRepository privacyRepository,
-    required final ThemeBrightnessRepository themeBrightnessRepository,
-    required final DataSourceToUse themeBrightnessDataSourceToUse,
-    required final DataSourceToUse primaryColorDataSourceToUse,
-    required final DataSourceToUse languageDataSourceToUse,
-    required final DataSourceToUse privacyDataDataSourceToUse,
-    required final ConflictResolver tagsConflictResolver,
-    required final ConflictResolver quotesConflictResolver,
+    required Backup backup,
+    required QuotesRepository quotesRepository,
+    required TagRepository tagRepository,
+    required LanguagesRepository languagesRepository,
+    required PrimaryColorsRepository primaryColorsRepository,
+    required PrivacyRepository privacyRepository,
+    required ThemeBrightnessRepository themeBrightnessRepository,
+    required DataSourceToUse themeBrightnessDataSourceToUse,
+    required DataSourceToUse primaryColorDataSourceToUse,
+    required DataSourceToUse languageDataSourceToUse,
+    required DataSourceToUse privacyDataDataSourceToUse,
+    required ConflictResolver tagsConflictResolver,
+    required ConflictResolver quotesConflictResolver,
   }) : _backup = backup,
        _quotesRepository = quotesRepository,
        _tagRepository = tagRepository,
@@ -64,23 +65,6 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
   final ConflictResolver _tagsConflictResolver;
   final ConflictResolver _quotesConflictResolver;
 
-  static const RestoreBackupResults _restoreBackupAllFailure = (
-    successfulLanguagesRestoring: false,
-    successfulPrimaryColorsRestoring: false,
-    successfulPrivacyDataRestoring: false,
-    successfulQuotesRestoring: false,
-    successfulTagsRestoring: false,
-    successfulThemeBrightnessRestoring: false,
-  );
-  static const RestoreBackupResults _restoreBackupAllSuccess = (
-    successfulLanguagesRestoring: false,
-    successfulPrimaryColorsRestoring: false,
-    successfulPrivacyDataRestoring: false,
-    successfulQuotesRestoring: false,
-    successfulTagsRestoring: false,
-    successfulThemeBrightnessRestoring: false,
-  );
-
   @override
   Future<RestoreBackupResults> call() async {
     final bool successfulThemeBrightnessRestoring;
@@ -90,21 +74,27 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
     final bool successfulTagsRestoring;
     final bool successfulQuotesRestoring;
 
-    final (themeBrightnessResult, primaryColorResult, languageResult) =
-        await (
-          themeBrightnessBackupRestore(),
-          primaryColorBackupRestore(),
-          languageBackupRestore(),
-        ).wait;
+    final (
+      themeBrightnessResult,
+      primaryColorResult,
+      languageResult,
+      privacyDataResult,
+    ) = await (
+      themeBrightnessBackupRestore(),
+      primaryColorBackupRestore(),
+      languageBackupRestore(),
+      privacyDataRestore(),
+    ).wait;
 
     successfulThemeBrightnessRestoring = themeBrightnessResult.isOk;
     successfulPrimaryColorsRestoring = primaryColorResult.isOk;
     successfulLanguagesRestoring = languageResult.isOk;
+    successfulPrivacyDataRestoring = privacyDataResult.isOk;
 
     return (
       successfulLanguagesRestoring: successfulLanguagesRestoring,
       successfulPrimaryColorsRestoring: successfulPrimaryColorsRestoring,
-      successfulPrivacyDataRestoring: false,
+      successfulPrivacyDataRestoring: successfulPrivacyDataRestoring,
       successfulQuotesRestoring: false,
       successfulTagsRestoring: false,
       successfulThemeBrightnessRestoring: successfulThemeBrightnessRestoring,
@@ -118,8 +108,8 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
       case DataSourceToUse.local:
         return const Result.ok(());
       case DataSourceToUse.backup:
-        final currentThemeBrightnessResult =
-            await _themeBrightnessRepository.fetchThemeBrightness();
+        final currentThemeBrightnessResult = await _themeBrightnessRepository
+            .fetchThemeBrightness();
         if (currentThemeBrightnessResult
             case final Failure<ThemeBrightness, ThemeBrightnessErrors>
                 failure) {
@@ -146,8 +136,8 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
       case DataSourceToUse.local:
         return const Result.ok(());
       case DataSourceToUse.backup:
-        final currentPrimaryColorResult =
-            await _primaryColorsRepository.fetchPrimaryColor();
+        final currentPrimaryColorResult = await _primaryColorsRepository
+            .fetchPrimaryColor();
         if (currentPrimaryColorResult
             case final Failure<PrimaryColors, PrimaryColorsErrors> failure) {
           return failure.mapSync((_) => ());
@@ -174,8 +164,8 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
       case DataSourceToUse.local:
         return const Result.ok(());
       case DataSourceToUse.backup:
-        final currentLanguageResult =
-            await _languagesRepository.fetchCurrentLanguage();
+        final currentLanguageResult = await _languagesRepository
+            .fetchCurrentLanguage();
         if (currentLanguageResult
             case final Failure<Languages, LanguageErrors> failure) {
           return failure.mapSync((_) => ());
@@ -187,6 +177,34 @@ final class RestoreBackup implements UseCase<Future<RestoreBackupResults>> {
           );
 
           if (savingResult case final Failure<(), LanguageErrors> failure) {
+            return failure.mapSync((_) => ());
+          }
+        }
+
+        return const Result.ok(());
+    }
+  }
+
+  @visibleForTesting
+  FutureResult<Unit, PrivacyDataErrors> privacyDataRestore() async {
+    switch (_privacyDataDataSourceToUse) {
+      case DataSourceToUse.local:
+        return const Result.ok(());
+      case DataSourceToUse.backup:
+        final currentPrivacyDataResult = await _privacyRepository
+            .fetchPrivacyData();
+        if (currentPrivacyDataResult
+            case final Failure<PrivacyData, PrivacyRepositoryErrors> failure) {
+          return failure.mapSync((_) => ());
+        }
+
+        final currentPrivacyData = currentPrivacyDataResult.unwrap();
+
+        if (_backup.privacyData != currentPrivacyData) {
+          final writeBackupPrivacyDataResult = await _privacyRepository
+              .savePrivacyData(_backup.privacyData.toPrivacyDataEntry());
+          if (writeBackupPrivacyDataResult
+              case final Failure<(), PrivacyRepositoryErrors> failure) {
             return failure.mapSync((_) => ());
           }
         }
